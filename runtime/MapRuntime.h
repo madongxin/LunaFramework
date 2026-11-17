@@ -51,6 +51,8 @@ struct MapEntity {
     float aoi_x = 0;
     float aoi_z = 0;
     bool aoi_live = false;
+    /** 上次呈现推进的墙钟。步进必须用真实 Δt，才能和外推 pred（也用墙钟）对齐。 */
+    int64_t last_present_ms = 0;
     float PresentedX() const { return aoi_live ? aoi_x : x; }
     float PresentedZ() const { return aoi_live ? aoi_z : z; }
 };
@@ -247,8 +249,9 @@ private:
     std::unordered_set<uint64_t> DesiredVisible(const InstanceState &st, const MapEntity &viewer) const;
     std::vector<uint64_t> NeighborhoodIdsRadius(const InstanceState &st, float x, float z, int radius) const;
     bool InCellRadius(const InstanceState &st, float x0, float z0, float x1, float z1, int radius) const;
-    bool AllowMoveAoi(InstanceState *st, const MapEntity &watcher, const MapEntity &subject,
-                      int64_t now_ms) const;
+    /** 允许发 MOVE 时会写 subject.last_present_ms / aoi，与外推 rec 对齐（C1c/C1d）。 */
+    bool AllowMoveAoi(InstanceState *st, const MapEntity &watcher, MapEntity &subject,
+                      int64_t now_ms);
 
     int ResolvedRadius(const InstanceState &st) const;
     /** 锁等待记在构造前，持锁时间记在析构。调用方只把它当作用域锁。 */

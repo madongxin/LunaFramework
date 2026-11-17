@@ -1,6 +1,6 @@
 # 外推是否能少发（D3 证实 → C1 修复）
 
-开关 `GAMEMESH_AOI_EXTRAPOLATE` **默认仍关**。C1 已改判定口径；未确认客户端外推前不要默认打开。
+开关 `GAMEMESH_AOI_EXTRAPOLATE`：**默认开**（P1g@905 验收后）。显式 `=0` 关闭。C1…C1g 已修判定/时钟口径。
 
 ## H1：旧口径（权威算误差）→ 每 tick drifted（已证实，C1 已修）
 

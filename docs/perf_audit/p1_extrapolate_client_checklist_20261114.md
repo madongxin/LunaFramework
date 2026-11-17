@@ -1,6 +1,6 @@
 # P1 外推：客户端配合清单（2026-11-14）
 
-服务端 C1（呈现坐标误差 + 远层关键帧）可先合入，**默认仍关** `GAMEMESH_AOI_EXTRAPOLATE`。  
+服务端外推 + egress enforce：P1g@905 验收后 **默认开**（`GAMEMESH_AOI_EXTRAPOLATE` / `GAMEMESH_EGRESS_ENFORCE`；显式 `=0` 关闭）。  
 灰度打开前，客户端需具备下列能力；否则不要开开关。
 
 ---
@@ -53,15 +53,15 @@
 
 ## 5. 联调顺序（建议）
 
-1. 客户端声明：**已具备 / 排期中 / 不具备**  
-2. 服务端合入 C1（默认关）→ 单测绿  
-3. 双方同日升级 → `GAMEMESH_AOI_EXTRAPOLATE=1` 短压（可先 200 人再 905）  
-4. 对比 P0 基线：AOI 帧/s、wire 占比、timeout、观感  
+1. 客户端：**外推默认开**（与服务端默认一致；schema 已对齐）  
+2. 服务端：C1…C1g 已合入，**外推 + enforce 默认开**（`=0` 可关）  
+3. 905 验收见 `p1g_extrapolate_acceptance_905_20261117.md`（timeout 1.68% 优于 P0）  
+4. 约束：一边关外推时另一边不要单开  
 
 ---
 
 ## 6. 服务端现状（给客户端同学）
 
-- P0 已过：timeout ~2.7%；出口仍贴 2.6 Mbps，需外推继续砍 AOI。  
-- C1 修复点：误差用**呈现坐标**；远关键帧默认 10s（`GAMEMESH_AOI_FAR_KEYFRAME_MS`）。  
-- ENTER/MOVE 在 `AOI_EXTRAPOLATE=1` 时由 `FillEntitySnapshot` / `FillMoveSnapshot` 写入 `vx/vz/move_start_ms`。  
+- P0 enforce + P1 外推为正式默认；P1g@905 timeout **1.68%**。  
+- 误差用**呈现坐标**；远关键帧默认 10s（`GAMEMESH_AOI_FAR_KEYFRAME_MS`）。  
+- ENTER/MOVE 在外推开启时由 `FillEntitySnapshot` / `FillMoveSnapshot` 写入 `vx/vz/move_start_ms`。  

@@ -23,16 +23,25 @@ inline int NearHardSilenceMs() { return MoveEnvInt("GAMEMESH_NEAR_SILENCE_MS", 3
 inline int FarHardSilenceMs() { return MoveEnvInt("GAMEMESH_FAR_SILENCE_MS", 15000, 200, 120000); }
 /** 外推打开时，远层速度没变才用这个间隔。外推关闭时，兴趣内的人不论远近都按约 200ms 发坐标。 */
 inline int FarMoveIntervalMs() { return MoveEnvInt("GAMEMESH_FAR_MOVE_INTERVAL_MS", 200, 200, 120000); }
-/** 只有显式 GAMEMESH_AOI_EXTRAPOLATE=1 才按速度扣广播。默认关，近处 200ms、远处按上面的间隔发坐标。 */
-inline bool AoiExtrapolateEnabled() {
-    const char *env = std::getenv("GAMEMESH_AOI_EXTRAPOLATE");
-    return env && env[0] == '1' && env[1] == '\0';
-}
-
+/** 显式 opt-in：仅当值为恰好 "1"。 */
 inline bool AoiV2Flag(const char *name) {
     const char *env = std::getenv(name);
     return env && env[0] == '1' && env[1] == '\0';
 }
+
+/** 默认开；未设置或空视为开；显式 "0" 关闭；其它非 "1" 也关闭。 */
+inline bool EnvFlagDefaultOn(const char *name) {
+    const char *env = std::getenv(name);
+    if (!env || !*env)
+        return true;
+    return env[0] == '1' && env[1] == '\0';
+}
+
+/**
+ * AOI 速度外推（P1g@905 已验收优于纯 P0）。默认开。
+ * 关闭：GAMEMESH_AOI_EXTRAPOLATE=0。
+ */
+inline bool AoiExtrapolateEnabled() { return EnvFlagDefaultOn("GAMEMESH_AOI_EXTRAPOLATE"); }
 
 /** 未设置时返回 -1，表示不覆盖图实例上的半径。 */
 inline int AoiV2RadiusOverride() {
@@ -78,8 +87,11 @@ inline int ExtrapFarKeyframeMs() {
 inline int ExtrapErrorCm() { return MoveEnvInt("GAMEMESH_EXTRAP_ERROR_CM", 100, 10, 10000); }
 inline int MoveBatchMinEvents() { return MoveEnvInt("GAMEMESH_MOVE_BATCH_MIN", 8, 1, 40); }
 
-/** 独立出口预算强制开关。默认关；不依赖 AOI_V2_*。 */
-inline bool EgressEnforce() { return AoiV2Flag("GAMEMESH_EGRESS_ENFORCE"); }
+/**
+ * 独立出口预算强制（P0 路由修复后验收通过；与外推叠加为正式默认）。
+ * 默认开。关闭：GAMEMESH_EGRESS_ENFORCE=0。不依赖 AOI_V2_*。
+ */
+inline bool EgressEnforce() { return EnvFlagDefaultOn("GAMEMESH_EGRESS_ENFORCE"); }
 /** tc 共用游戏类 ceil（kbit）。未设置时走 GAMEMESH_EGRESS_BUDGET_MBPS。0 表示未设置。 */
 inline int EgressSharedClassKbit() {
     const char *env = std::getenv("GAMEMESH_EGRESS_SHARED_CLASS_KBIT");

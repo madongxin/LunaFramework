@@ -19,6 +19,7 @@
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -177,7 +178,10 @@ void MapRuntime::AdvancePresented(std::vector<AoiPushBatch> *batches) {
                 maps.emplace_back(kv.first, kv.second);
         }
     }
-    constexpr float kTickSec = 0.2f;
+    // 呈现步进必须与外推 pred 同一套墙钟与速度模型：
+    // C1b/C1e：按 last_present_ms 的墙钟 Δt，禁止固定 0.2s / 0.25s 硬顶。
+    // C1f：也不再对单步 Δt 做 2s 封顶——少走会与无封顶的 pred 再次假 drifted。
+    // 只钳到权威点。
     for (const auto &item : maps) {
         AoiPushBatch batch;
         batch.map_instance_id = item.first;
@@ -356,27 +360,52 @@ void MapRuntime::AdvancePresented(std::vector<AoiPushBatch> *batches) {
             const float dx = e.x - e.aoi_x;
             const float dz = e.z - e.aoi_z;
             const float dist = std::sqrt(dx * dx + dz * dz);
+            const int64_t now_present = NowMs();
             if (dist < 0.4f) {
                 if (std::fabs(e.vx) > 0.05f || std::fabs(e.vz) > 0.05f) {
                     e.vx = 0.f;
                     e.vz = 0.f;
-                    e.move_start_ms = NowMs();
+                    e.move_start_ms = now_present;
                     e.aoi_x = e.x;
                     e.aoi_z = e.z;
+                    e.last_present_ms = now_present;
                     int arrived_watchers = 0;
                     auto arrived_wit = st->watchers.find(e.player_id);
                     if (arrived_wit != st->watchers.end())
                         arrived_watchers = static_cast<int>(arrived_wit->second.size());
                     LogMoveTrace("arrive", e, e.x, e.z, 0.f, 0.f, arrived_watchers, false, false,
                                  false);
-                    sync_pose(e, NowMs());
+                    sync_pose(e, now_present);
                 }
                 continue;
             }
+            // 尚未对齐过呈现时钟：先打戳，本拍不迈大步，避免与刚 emit 的 rec 错位。
+            if (e.last_present_ms <= 0) {
+                e.last_present_ms = now_present;
+                continue;
+            }
+            float dt_sec = static_cast<float>(now_present - e.last_present_ms) / 1000.f;
+            if (dt_sec < 0.001f)
+                dt_sec = 0.001f;
+            e.last_present_ms = now_present;
             const float speed = std::sqrt(e.vx * e.vx + e.vz * e.vz);
-            const float step = std::min(dist, (speed > 0.05f ? speed : 10.f) * kTickSec);
-            const float nx = e.aoi_x + dx / dist * step;
-            const float nz = e.aoi_z + dz / dist * step;
+            float nx = e.aoi_x;
+            float nz = e.aoi_z;
+            if (speed > 0.05f) {
+                // 与客户端外推同一模型：pos += vel * dt，再钳到不超过权威点。
+                nx = e.aoi_x + e.vx * dt_sec;
+                nz = e.aoi_z + e.vz * dt_sec;
+                const float mx = nx - e.aoi_x;
+                const float mz = nz - e.aoi_z;
+                if (mx * dx + mz * dz >= dist * dist) {
+                    nx = e.x;
+                    nz = e.z;
+                }
+            } else {
+                const float step = std::min(dist, 10.f * dt_sec);
+                nx = e.aoi_x + dx / dist * step;
+                nz = e.aoi_z + dz / dist * step;
+            }
             int ocx = 0, ocz = 0, ncx = 0, ncz = 0;
             st->data->WorldToAoiCell(e.aoi_x, e.aoi_z, &ocx, &ocz);
             st->data->WorldToAoiCell(nx, nz, &ncx, &ncz);
@@ -1563,8 +1592,9 @@ void MapRuntime::RefreshViewers(InstanceState *st, const std::vector<uint64_t> &
             st->visible_targets[viewer_id] = neu;
         if (mover_id != 0 && mover_id != viewer_id && old.count(mover_id) && neu.count(mover_id)) {
             auto mit = st->entities.find(mover_id);
-            if (mit != st->entities.end() &&
-                AllowMoveAoi(st, viewer, mit->second, mit->second.last_move_server_ms)) {
+            // 必须用墙钟 NowMs。last_move_server_ms 可能早于最近一次 AdvancePresented，
+            // 拿旧 now 去比已经推进的 aoi → 假 drifted，还会把 last_present 回拨（C1g）。
+            if (mit != st->entities.end() && AllowMoveAoi(st, viewer, mit->second, NowMs())) {
                 EmitTo(st, pushes, map_instance_id, viewer, 2, mit->second);
                 ServerStats::aoi_move_events.fetch_add(1, std::memory_order_relaxed);
             }
@@ -1682,8 +1712,8 @@ void MapRuntime::RemovePlayerInterest(InstanceState *st, uint64_t map_instance_i
         RefreshViewers(st, viewers, 0, 0, map_instance_id, pushes);
 }
 
-bool MapRuntime::AllowMoveAoi(InstanceState *st, const MapEntity &watcher, const MapEntity &subject,
-                              int64_t now_ms) const {
+bool MapRuntime::AllowMoveAoi(InstanceState *st, const MapEntity &watcher, MapEntity &subject,
+                              int64_t now_ms) {
     if (!st || watcher.player_id == 0 || subject.player_id == 0)
         return false;
     // 距离用正在显示的位置。权威坐标已经落到路点时，人还在半路上，不能按终点把近处收成远层。
@@ -1693,12 +1723,42 @@ bool MapRuntime::AllowMoveAoi(InstanceState *st, const MapEntity &watcher, const
     constexpr float kNearM = 16.f;
     const bool far = !(dist2 < kNearM * kNearM);
     auto &rec = st->move_notify_ms[watcher.player_id][subject.player_id];
-    const int64_t now = now_ms > 0 ? now_ms : 1;
+    // C1g：now 不得早于 last_present_ms。呈现推进后若仍塞进更旧的 Move 时间戳，
+    // 会把「已积分的 aoi」和「过早的 pred」比出假 drifted，并回拨呈现时钟。
+    int64_t now = now_ms > 0 ? now_ms : 1;
+    if (subject.last_present_ms > 0 && now < subject.last_present_ms)
+        now = subject.last_present_ms;
     if (AoiExtrapolateEnabled()) {
         // C1：记录与误差一律用呈现坐标（EmitTo 实际发出的点），禁止用权威点算 pred 再和权威比。
-        // 否则权威已到点、呈现仍滑行且 vx≠0 时，每个 tick 都会 drifted，外推省不了流量。
-        const float cur_x = subject.PresentedX();
-        const float cur_z = subject.PresentedZ();
+        // C1d：Move 插缝时 aoi 可能尚未 Advance；误差用「积分到 now 的 live 呈现」比 pred。
+        // C1e：live/pred 都钳到权威点，避免到点前 pred 穿模。
+        // C1f：禁止对 pred/live 墙钟做 2s 封顶——外推安静超过 2s（关键帧前）会系统性假 drifted，
+        // keyframe 永远到不了（905 上 keyframe=0 的直接原因）。
+        const float base_x = subject.PresentedX();
+        const float base_z = subject.PresentedZ();
+        auto clamp_to_auth = [&](float px, float pz, float from_x, float from_z) {
+            const float ax = subject.x - from_x;
+            const float az = subject.z - from_z;
+            const float ad2 = ax * ax + az * az;
+            if (!(ad2 > 1e-8f))
+                return std::pair<float, float>{subject.x, subject.z};
+            const float mx = px - from_x;
+            const float mz = pz - from_z;
+            if (mx * ax + mz * az >= ad2)
+                return std::pair<float, float>{subject.x, subject.z};
+            return std::pair<float, float>{px, pz};
+        };
+        float cur_x = base_x;
+        float cur_z = base_z;
+        if (subject.last_present_ms > 0 && now > subject.last_present_ms) {
+            const float pdt = static_cast<float>(now - subject.last_present_ms) / 1000.f;
+            if (std::fabs(subject.vx) > 0.05f || std::fabs(subject.vz) > 0.05f) {
+                auto live = clamp_to_auth(base_x + subject.vx * pdt, base_z + subject.vz * pdt, base_x,
+                                          base_z);
+                cur_x = live.first;
+                cur_z = live.second;
+            }
+        }
         const bool moving = std::fabs(subject.vx) > 0.05f || std::fabs(subject.vz) > 0.05f;
         bool vel_changed = true;
         bool drifted = false;
@@ -1710,8 +1770,11 @@ bool MapRuntime::AllowMoveAoi(InstanceState *st, const MapEntity &watcher, const
             const bool was_moving = std::fabs(rec.vx) > 0.05f || std::fabs(rec.vz) > 0.05f;
             arrival_stop = was_moving && !moving;
             const float elapsed = static_cast<float>(now - rec.ms) / 1000.f;
-            const float pred_x = rec.x + rec.vx * elapsed;
-            const float pred_z = rec.z + rec.vz * elapsed;
+            float pred_x = rec.x + rec.vx * elapsed;
+            float pred_z = rec.z + rec.vz * elapsed;
+            auto pred = clamp_to_auth(pred_x, pred_z, rec.x, rec.z);
+            pred_x = pred.first;
+            pred_z = pred.second;
             const float ex = pred_x - cur_x;
             const float ez = pred_z - cur_z;
             const float err_cm = std::sqrt(ex * ex + ez * ez) * 100.f;
@@ -1750,6 +1813,14 @@ bool MapRuntime::AllowMoveAoi(InstanceState *st, const MapEntity &watcher, const
         else if (std::strcmp(reason, "interval") == 0)
             ri = 5;
         ServerStats::aoi_move_emit_reason[ri].fetch_add(1, std::memory_order_relaxed);
+        // emit 前把 aoi 追到 live，避免发出过期点却把 last_present 打到 now。
+        if (subject.aoi_live &&
+            ((cur_x - base_x) * (cur_x - base_x) + (cur_z - base_z) * (cur_z - base_z) > 1e-6f)) {
+            RemoveFromCell(st, subject);
+            subject.aoi_x = cur_x;
+            subject.aoi_z = cur_z;
+            PlaceInCell(st, subject);
+        }
         rec.ms = now;
         rec.x = cur_x;
         rec.z = cur_z;
@@ -1757,6 +1828,8 @@ bool MapRuntime::AllowMoveAoi(InstanceState *st, const MapEntity &watcher, const
         rec.vz = subject.vz;
         rec.move_start_ms = subject.move_start_ms;
         rec.has = true;
+        // C1c：emit 快照与呈现积分共用同一墙钟。
+        subject.last_present_ms = now;
         return true;
     }
     (void)far;
@@ -1783,6 +1856,7 @@ bool MapRuntime::AllowMoveAoi(InstanceState *st, const MapEntity &watcher, const
     rec.x = subject.PresentedX();
     rec.z = subject.PresentedZ();
     rec.has = true;
+    subject.last_present_ms = now;
     return true;
 }
 
@@ -2103,10 +2177,12 @@ MapMoveReject MapRuntime::Move(uint64_t map_instance_id, uint64_t player_id, flo
         e.aoi_x = want_x;
         e.aoi_z = want_z;
         e.aoi_live = true;
+        e.last_present_ms = t1;
     } else if (!e.aoi_live) {
         e.aoi_x = old_x;
         e.aoi_z = old_z;
         e.aoi_live = true;
+        e.last_present_ms = t1;
     }
     float nvx = 0.f;
     float nvz = 0.f;
@@ -2121,6 +2197,9 @@ MapMoveReject MapRuntime::Move(uint64_t map_instance_id, uint64_t player_id, flo
     e.vz = nvz;
     if (vel_changed || e.move_start_ms == 0)
         e.move_start_ms = t1;
+    // 改速度或首次滑行：呈现积分从本拍起算。随后 AllowMoveAoi 成功还会再对齐一次。
+    if (vel_changed || e.last_present_ms <= 0)
+        e.last_present_ms = t1;
     PlaceInCell(st.get(), e);
     const bool same_cell = old_cx == new_cx && old_cz == new_cz;
     // 格子占用版本没变时，成员关系和上次算的一样。不用再扫邻居，Move 持锁是 O(1)。

@@ -16,7 +16,7 @@
 | 新进入发 ENTER；窗口内约每 180ms 一次 MOVE；同一 `state_seq` 配新坐标也发；坐标没变不发 | 逻辑侧 `AllowMoveAoi`（`MapRuntime.cpp`）在外推关闭时：呈现坐标有变化，且距上次发给这个观察者至少 180ms，才 `EmitTo` op=2。未变（平方差 `<= 1e-4`）不发。`state_seq` 不参与这个判断。 | 180ms 是**逻辑侧产生 MOVE 的门**，不是网上实际到达的间隔。网关账本还会再砍一刀，见下一条。 |
 | 跨出窗口立刻 LEAVE，并在约 1.6 秒内补发 | `sync_pose` 对不在新窗口里的旧观察者立刻 `EmitTo` op=3，并写入 `leave_again`。`tries>=8` 且间隔 200ms 就停。第一次发出时 `tries=1`，之后每 200ms 再发，直到 `tries` 变成 8 后删除。从第一次到停发大约 **1.4 秒、最多 8 帧**，不是按送达停止。 | 口述的「1.6 秒」接近，但不是可靠送达。写失败也会计满次数后丢掉。 |
 | 大于 0.4 米按 `move_speed` 走，不瞬移 | `Move` 里 `step_dist >= 0.4f` 才滑行。剩余距离 `< 0.4` 米时呈现点贴到权威点。 | 一致。 |
-| 不用 vx、vz、move_start_ms | `AoiExtrapolateEnabled()` 仅当 `GAMEMESH_AOI_EXTRAPOLATE` 恰好为 `1`。默认关。`FillMoveSnapshot` 在关闭时不写这三个字段。 | 一致。 |
+| vx、vz、move_start_ms | `AoiExtrapolateEnabled()` **默认开**（显式 `=0` 关）。开启时 `FillMoveSnapshot` 写入三字段；关闭时不写。 | 与 P1g 后正式默认一致。 |
 | 200 人上限在格子窗口内不生效 | `VisibleIds` 会把候选裁到 `max_visible`（默认 200）。`RefreshViewers` 随后把**仍在格子窗口内**的人塞回 `neu`，不发 LEAVE。`sync_pose` 的 `in_range` 用的是**不裁剪**的 `NeighborhoodIds`，窗口里的人都会进 `watchers`。`CollectFullView` 的全量快照才会真正裁到 200。 | 一致。推送兴趣集大于快照兴趣集。 |
 | 不恢复 5cm 过滤 | 非外推路径用 `1e-4` 的平方距离判断「没动」，没有 5cm 过滤。 | 一致。 |
 

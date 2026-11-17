@@ -124,7 +124,8 @@ void TestD_NoDueRaise() {
     setenv("GAMEMESH_EGRESS_ENFORCE", "1", 1);
     AoiMoveCoalesceLedger with_enforce;
     with_enforce.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
-    ClearEnv();  // due-raise path: no enforce flags
+    ClearEnv();
+    setenv("GAMEMESH_EGRESS_ENFORCE", "0", 1);  // due-raise path: enforce 显式关
     AoiMoveCoalesceLedger without;
     without.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
     const int B = kOnWireHeaderBytes + kAoiMoveEventBytes;  // one entity

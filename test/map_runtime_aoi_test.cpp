@@ -450,7 +450,7 @@ int main() {
     Expect(rt.Move(41, 2, 11.f, 0, 30, 0, 2, 1500, &conf, &pushes, &err, true) == MapMoveReject::Ok,
            "extrap far 2");
     Expect(CountOp(pushes, 1, 2) == 0, "far same velocity has no periodic keyframe");
-    ::unsetenv("GAMEMESH_AOI_EXTRAPOLATE");
+    ::setenv("GAMEMESH_AOI_EXTRAPOLATE", "0", 1);
 
     // 没订阅过的人不能收到 LEAVE。走出视野的人仍然要收到一次。
     rt.ClearForTest();
