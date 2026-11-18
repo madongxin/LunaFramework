@@ -9,7 +9,7 @@
 #include "EventLoop.h"
 #include "Logging.h"
 #include "TimeStamp.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "SafePath.h"
 #include "FormalMode.h"
 #include "HttpAdminAccess.h"
@@ -97,16 +97,16 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &requ
     socklen_t peer_len = sizeof(peeraddr);
     if (getpeername(conn->fd(), (struct sockaddr *)&peeraddr, &peer_len) == 0)
         peer = inet_ntoa(peeraddr.sin_addr);
-    const char *configured_env = std::getenv("GAMEMESH_HTTP_ACCESS_TOKEN");
+    const char *configured_env = std::getenv("LUNASERVER_HTTP_ACCESS_TOKEN");
     const std::string configured = configured_env ? configured_env : "";
-    std::string presented = request.GetHeader("X-GameMesh-Token");
+    std::string presented = request.GetHeader("X-LunaServer-Token");
     if (presented.empty()) {
         const std::string auth = request.GetHeader("Authorization");
         if (auth.size() > 7 && auth.compare(0, 7, "Bearer ") == 0)
             presented = auth.substr(7);
     }
     if (presented.empty())
-        presented = HttpCookieValue(request.GetHeader("Cookie"), "gamemesh_token");
+        presented = HttpCookieValue(request.GetHeader("Cookie"), "lunaserver_token");
     // 解析器把 ? 后面的参数放进 request_params，url() 里没有查询串。
     std::string query_token = HttpQueryParam(request.url(), "access_token");
     if (query_token.empty()) {
@@ -174,7 +174,7 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &requ
         std::string filedata = filemessage.substr(begin_index, end_index - begin_index);
         // 写入文件
         std::string upload_path;
-        if (!SafeJoinUnderRoot(GameMeshPaths::FilesRoot(), filename, &upload_path)) {
+        if (!SafeJoinUnderRoot(LunaServerPaths::FilesRoot(), filename, &upload_path)) {
             LOG_ERROR << "rejected upload path";
             return;
         }
@@ -190,7 +190,7 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &requ
     response_callback_(request, &response);
     if (set_access_cookie) {
         response.AddHeader("Set-Cookie",
-                           "gamemesh_token=" + configured + "; Path=/; HttpOnly; SameSite=Lax");
+                           "lunaserver_token=" + configured + "; Path=/; HttpOnly; SameSite=Lax");
     }
     // 如果是HTML，直接发送所有信息
     if(response.bodytype() == HttpResponse::HttpBodyType::HTML_TYPE){

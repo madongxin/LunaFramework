@@ -98,7 +98,7 @@ if missing:
     sys.exit(1)
 
 manifest = {
-    "protocol_name": "gamemesh.game",
+    "protocol_name": "lunaserver.game",
     "protocol_version": 1,
     "min_supported_protocol_version": 1,
     "server_commit": os.environ["GIT"],
@@ -117,7 +117,7 @@ manifest = {
     "max_frame_bytes": 4194304,
     "protoc_version": os.environ["PROTOC_VER"],
     "package": "game",
-    "csharp_namespace": "GameMesh.Protocol",
+    "csharp_namespace": "LunaServer.Protocol",
     "generated_at_utc": os.environ["TS"],
     "required_types": required,
     "push_message_types": ["aoi.delta.v1", "mailbox.changed.v1", "player.state.v1",
@@ -144,13 +144,13 @@ python3 - "$OUT/protocol_manifest.json" "$HASH" "$DESC_HASH" "$GIT" "$PROTOC_VER
 import json, sys
 p, h, d, commit, protoc = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
 m = json.load(open(p))
-assert m["protocol_name"] == "gamemesh.game"
+assert m["protocol_name"] == "lunaserver.game"
 assert int(m["protocol_version"]) == 1
 assert int(m["min_supported_protocol_version"]) == 1
 assert m["server_commit"] == commit == m["server_git_sha"] == m["git_sha"]
 assert m["schema_sha256"] == h == m["game_proto_sha256"]
 assert m["descriptor_sha256"] == d == m["descriptor_set_sha256"]
-assert m["csharp_namespace"] == "GameMesh.Protocol"
+assert m["csharp_namespace"] == "LunaServer.Protocol"
 assert m["package"] == "game"
 assert m["frame_format"] == "uint32_be_length_prefixed"
 assert int(m["max_frame_bytes"]) == 4194304

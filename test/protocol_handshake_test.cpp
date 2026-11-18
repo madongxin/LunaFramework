@@ -24,15 +24,15 @@ void Expect(bool c, const char *m) {
 }  // namespace
 
 int main() {
-    ::unsetenv("GAMEMESH_ALLOW_LEGACY_NO_HELLO");
-    ::unsetenv("GAMEMESH_FORMAL");
+    ::unsetenv("LUNASERVER_ALLOW_LEGACY_NO_HELLO");
+    ::unsetenv("LUNASERVER_FORMAL");
     Expect(!ClientHelloRequired(), "non-formal default no hello");
-    ::setenv("GAMEMESH_FORMAL", "1", 1);
+    ::setenv("LUNASERVER_FORMAL", "1", 1);
     Expect(ClientHelloRequired(), "formal requires hello");
-    ::setenv("GAMEMESH_ALLOW_LEGACY_NO_HELLO", "1", 1);
+    ::setenv("LUNASERVER_ALLOW_LEGACY_NO_HELLO", "1", 1);
     Expect(!ClientHelloRequired(), "legacy switch");
-    ::unsetenv("GAMEMESH_ALLOW_LEGACY_NO_HELLO");
-    ::unsetenv("GAMEMESH_FORMAL");
+    ::unsetenv("LUNASERVER_ALLOW_LEGACY_NO_HELLO");
+    ::unsetenv("LUNASERVER_FORMAL");
 
     Expect(gameproto::ErrorCodeRetryable("ERR_RATE_LIMITED"), "retryable rate");
     Expect(gameproto::ErrorCodeRetryable("ERR_OPERATION_TOO_FREQUENT"), "friend apply rate retryable");
@@ -79,14 +79,14 @@ int main() {
     Expect(!hello.ok() && hello.error_code() == "ERR_SCHEMA_MISMATCH", "bad schema");
     Expect(hello.schema_sha256() == schema, "mismatch carries server hash");
 
-    ::setenv("GAMEMESH_MIN_CLIENT_VERSION", "2.0.0", 1);
+    ::setenv("LUNASERVER_MIN_CLIENT_VERSION", "2.0.0", 1);
     game::ClientHelloReq oldc = okh;
     oldc.set_client_version("1.0.0");
     hello.Clear();
     outer.Clear();
     gameproto::HandleClientHello(oldc, 9, &hello, &outer);
     Expect(!hello.ok() && hello.error_code() == "ERR_CLIENT_UPGRADE_REQUIRED", "upgrade");
-    ::unsetenv("GAMEMESH_MIN_CLIENT_VERSION");
+    ::unsetenv("LUNASERVER_MIN_CLIENT_VERSION");
 
     game::GameResponse leak;
     leak.set_ok(false);

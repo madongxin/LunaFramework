@@ -502,7 +502,7 @@ public:
                 static_cast<double>(instances);
             v = static_cast<int>(bytes);
         } else {
-            const char *env = std::getenv("GAMEMESH_EGRESS_BUDGET_MBPS");
+            const char *env = std::getenv("LUNASERVER_EGRESS_BUDGET_MBPS");
             double mbps = (env && *env) ? std::atof(env) : 2.4;
             if (mbps < 0.1)
                 mbps = 0.1;
@@ -518,7 +518,7 @@ public:
 
     /** 旧 MBPS 预算换成线上字节/秒（整机，未按实例拆）便于启动 WARN。 */
     static int LegacyBudgetBytesPerSecWholeHost() {
-        const char *env = std::getenv("GAMEMESH_EGRESS_BUDGET_MBPS");
+        const char *env = std::getenv("LUNASERVER_EGRESS_BUDGET_MBPS");
         double mbps = (env && *env) ? std::atof(env) : 2.4;
         if (mbps < 0.1)
             mbps = 0.1;

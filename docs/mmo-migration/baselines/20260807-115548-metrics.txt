@@ -10,30 +10,30 @@ process_resident_memory_bytes 43671552
 # TYPE process_open_fds gauge
 process_open_fds 50
 
-# HELP gamemesh_eventloop_tick_seconds Last event loop iteration duration.
-# TYPE gamemesh_eventloop_tick_seconds gauge
-gamemesh_eventloop_tick_seconds 0.0504779
+# HELP lunaserver_eventloop_tick_seconds Last event loop iteration duration.
+# TYPE lunaserver_eventloop_tick_seconds gauge
+lunaserver_eventloop_tick_seconds 0.0504779
 
-# HELP gamemesh_eventloop_tick_peak_seconds Peak event loop iteration duration.
-# TYPE gamemesh_eventloop_tick_peak_seconds gauge
-gamemesh_eventloop_tick_peak_seconds 1.57027
+# HELP lunaserver_eventloop_tick_peak_seconds Peak event loop iteration duration.
+# TYPE lunaserver_eventloop_tick_peak_seconds gauge
+lunaserver_eventloop_tick_peak_seconds 1.57027
 
-# HELP gamemesh_logic_handle_seconds Last GameLogic::Handle duration.
-# TYPE gamemesh_logic_handle_seconds gauge
-gamemesh_logic_handle_seconds 0
+# HELP lunaserver_logic_handle_seconds Last GameLogic::Handle duration.
+# TYPE lunaserver_logic_handle_seconds gauge
+lunaserver_logic_handle_seconds 0
 
-# HELP gamemesh_logic_handle_peak_seconds Peak GameLogic::Handle duration.
-# TYPE gamemesh_logic_handle_peak_seconds gauge
-gamemesh_logic_handle_peak_seconds 0
+# HELP lunaserver_logic_handle_peak_seconds Peak GameLogic::Handle duration.
+# TYPE lunaserver_logic_handle_peak_seconds gauge
+lunaserver_logic_handle_peak_seconds 0
 
 # HELP process_threads OS thread count.
 # TYPE process_threads gauge
 process_threads 19
 
-# HELP gamemesh_os_threads Threads by /proc state letter.
-# TYPE gamemesh_os_threads gauge
-gamemesh_os_threads{state="R"} 2
-gamemesh_os_threads{state=":"} 2
-gamemesh_os_threads{state="S"} 17
-gamemesh_os_threads{state=":"} 17
+# HELP lunaserver_os_threads Threads by /proc state letter.
+# TYPE lunaserver_os_threads gauge
+lunaserver_os_threads{state="R"} 2
+lunaserver_os_threads{state=":"} 2
+lunaserver_os_threads{state="S"} 17
+lunaserver_os_threads{state=":"} 17
 

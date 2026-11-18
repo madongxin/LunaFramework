@@ -4,7 +4,7 @@
 
 1. `./scripts/check_deps.sh --full`
 2. `./scripts/bootstrap_local_config.sh`（或注入生产 cnf）
-3. Redis / MySQL 就绪；`GAMEMESH_FORMAL=1` 时 fail-closed
+3. Redis / MySQL 就绪；`LUNASERVER_FORMAL=1` 时 fail-closed
 
 ## 本地 / E2E 拓扑
 
@@ -18,7 +18,7 @@
 ## 正式多进程
 
 ```bash
-./scripts/start_formal.sh             # 见脚本内端口与 GAMEMESH_INSTANCE_ID
+./scripts/start_formal.sh             # 见脚本内端口与 LUNASERVER_INSTANCE_ID
 ./scripts/stop_formal.sh
 ```
 
@@ -26,9 +26,9 @@
 
 ```bash
 # 推荐：先构建工具链镜像（钉 brpc 1.9.0），再以其为 base 或挂载 PREFIX
-docker build -f Dockerfile.toolchain -t gamemesh-toolchain:brpc-1.9.0 .
+docker build -f Dockerfile.toolchain -t lunaserver-toolchain:brpc-1.9.0 .
 # 应用镜像：build 阶段会执行 install_deps.sh --build-brpc（需网络）
-docker build -t gamemesh:local .
+docker build -t lunaserver:local .
 docker compose -f compose.yml config
 # 角色: gateway|session|gamelogic|world|gamedb （entrypoint argv）
 ```

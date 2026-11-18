@@ -10,7 +10,7 @@ run_asan() {
   local b="$ROOT/build-asan"
   rm -rf "$b"
   ENABLE_ASAN=ON ENABLE_BRPC=OFF ENABLE_MYSQL=OFF ENABLE_REDIS=ON \
-    GAMEMESH_BUILD_DIR="$b" ./scripts/build.sh Debug
+    LUNASERVER_BUILD_DIR="$b" ./scripts/build.sh Debug
   ASAN_OPTIONS=detect_leaks=0 "$b/test/reactor_unit_test"
   ASAN_OPTIONS=detect_leaks=0 "$b/test/gateway_conn_race_test"
   ASAN_OPTIONS=detect_leaks=0 "$b/test/password_hash_test"
@@ -24,7 +24,7 @@ run_ubsan() {
   local b="$ROOT/build-ubsan"
   rm -rf "$b"
   ENABLE_UBSAN=ON ENABLE_BRPC=OFF ENABLE_MYSQL=OFF ENABLE_REDIS=ON \
-    GAMEMESH_BUILD_DIR="$b" ./scripts/build.sh Debug
+    LUNASERVER_BUILD_DIR="$b" ./scripts/build.sh Debug
   UBSAN_OPTIONS=print_stacktrace=1 "$b/test/reactor_unit_test"
   UBSAN_OPTIONS=print_stacktrace=1 "$b/test/password_hash_test"
   rm -rf "$b"
@@ -36,7 +36,7 @@ run_tsan() {
   local b="$ROOT/build-tsan"
   rm -rf "$b"
   local tsan_opts="halt_on_error=1:suppressions=${ROOT}/tools/tsan_suppressions.txt"
-  local deps="${GAMEMESH_DEPS_PREFIX:-$HOME/.local/gamemesh-deps}"
+  local deps="${LUNASERVER_DEPS_PREFIX:-$HOME/.local/lunaserver-deps}"
   local has_brpc=0
   if [[ -f /usr/local/include/brpc/server.h || -f /usr/include/brpc/server.h || \
         -f "$deps/include/brpc/server.h" ]]; then
@@ -44,16 +44,16 @@ run_tsan() {
   fi
   if [[ "$has_brpc" -eq 1 ]]; then
     ENABLE_TSAN=ON ENABLE_BRPC=ON ENABLE_MYSQL=ON ENABLE_REDIS=ON \
-      GAMEMESH_BUILD_DIR="$b" ./scripts/build.sh Debug
+      LUNASERVER_BUILD_DIR="$b" ./scripts/build.sh Debug
     TSAN_OPTIONS="$tsan_opts" "$b/test/channel_snapshot_race_test"
     TSAN_OPTIONS="$tsan_opts" "$b/test/player_serial_async_test"
   else
-    if [[ "${GAMEMESH_REQUIRE_BRPC_TSAN:-0}" == "1" ]]; then
-      echo "ERROR: brpc required for TSan channel_snapshot_race_test (GAMEMESH_REQUIRE_BRPC_TSAN=1)" >&2
+    if [[ "${LUNASERVER_REQUIRE_BRPC_TSAN:-0}" == "1" ]]; then
+      echo "ERROR: brpc required for TSan channel_snapshot_race_test (LUNASERVER_REQUIRE_BRPC_TSAN=1)" >&2
       exit 1
     fi
     ENABLE_TSAN=ON ENABLE_BRPC=OFF ENABLE_MYSQL=OFF ENABLE_REDIS=ON \
-      GAMEMESH_BUILD_DIR="$b" ./scripts/build.sh Debug
+      LUNASERVER_BUILD_DIR="$b" ./scripts/build.sh Debug
     TSAN_OPTIONS="$tsan_opts" "$b/test/player_serial_async_test"
     TSAN_OPTIONS="$tsan_opts" "$b/test/gateway_conn_race_test"
     echo "WARN: brpc missing — TSan channel_snapshot_race_test skipped"

@@ -1,6 +1,6 @@
 # Distributed Remediation Progress
 
-> 对照：`docs/GameMesh_Cursor_Distributed_Server_Remediation.md`
+> 对照：`docs/LunaServer_Cursor_Distributed_Server_Remediation.md`
 > 说明：本文件阶段编号与 `PHASE*_STATUS.md`（All_Phases MVP）**不是同一套编号**。
 
 ## Baseline
@@ -51,7 +51,7 @@ Remediation 文档描述的是 **真实缺口**，不是已完成能力的重复
 | `./scripts/build.sh clean && ./scripts/build.sh Debug` | 0* | *首次因缺 PlacementStore 链接失败；修 CMake 后增量 0 |
 | `./scripts/test.sh unit` | 0 | reactor/boundary/password/push_replay 等 PASS |
 | `ENABLE_BRPC=OFF ./scripts/build.sh Debug --lowlevel <targets>` | 0 | 低层 target 可编 |
-| `GAMEMESH_BUILD_DIR=build-release ./scripts/build.sh Release` | 0 | Release 全量通过；后因磁盘删除 `build-release` |
+| `LUNASERVER_BUILD_DIR=build-release ./scripts/build.sh Release` | 0 | Release 全量通过；后因磁盘删除 `build-release` |
 | `docker compose -f compose.yml config` | 0 | 配置合法 |
 | `docker compose up -d` + `./scripts/smoke_test.sh` | 0 | 各角色 `/api/version` service 字段匹配 |
 | `docker compose down` | 0 | 已清理 |
@@ -69,9 +69,9 @@ Remediation 文档描述的是 **真实缺口**，不是已完成能力的重复
 ### 阻塞 / 遗留风险
 
 - 本机磁盘紧张（~40G 用满）；Release 产物与自包含镜像不宜长期保留。
-- 自包含 `gamemesh:local`（centos 内拷贝宿主 .so）曾 stack smash；Compose 改为挂载宿主 `/lib64` + 二进制，依赖宿主机 ABI。
+- 自包含 `lunaserver:local`（centos 内拷贝宿主 .so）曾 stack smash；Compose 改为挂载宿主 `/lib64` + 二进制，依赖宿主机 ABI。
 - GitHub `full` job 在无 brpc 的 runner 上会 **明确失败**（符合“不可假绿”）；需 brpc 工具链镜像。
-- 配置仍用相对路径 `../config/*.cnf`；容器内靠 `working_dir=/opt/gamemesh` + `/opt/config` 挂载。
+- 配置仍用相对路径 `../config/*.cnf`；容器内靠 `working_dir=/opt/lunaserver` + `/opt/config` 挂载。
 
 ### 回滚
 
@@ -85,7 +85,7 @@ Remediation 文档描述的是 **真实缺口**，不是已完成能力的重复
 
 ### 任务
 
-- [x] `GatewayIdentity`：`GAMEMESH_INSTANCE_ID` / `gateway.cnf`；禁止 listen 拼接；FORMAL 空 ID fail-fast；Redis SET NX 防撞 ID
+- [x] `GatewayIdentity`：`LUNASERVER_INSTANCE_ID` / `gateway.cnf`；禁止 listen 拼接；FORMAL 空 ID fail-fast；Redis SET NX 防撞 ID
 - [x] GameTCP / GatewayPush / etcd register / Session Bind 共用同一 `gateway_instance_id`
 - [x] `GatewayConnRegistry::Forget` / `Remember` 条件删除索引（接管后旧连接关不断新索引）
 - [x] `GatewayAuthFlow`：单连接单 in-flight；回调校验 alive+flow_gen；迟到成功路径 `CompensateGatewaySession`
@@ -99,7 +99,7 @@ Remediation 文档描述的是 **真实缺口**，不是已完成能力的重复
 | `./scripts/build.sh Debug` | 0 | 含 GatewayIdentity / AuthFlow |
 | `./scripts/test.sh unit` | 0 | 含 `gateway_conn_race_test` |
 | `./build/test/session_store_test` | 0 | 旧 gen MarkDisconnected=STALE；跨 GW Reconnect |
-| 短启 `gateway` `GAMEMESH_INSTANCE_ID=gw-0` | 0 | 日志 Push/GameTCP 均为 `gw-0` |
+| 短启 `gateway` `LUNASERVER_INSTANCE_ID=gw-0` | 0 | 日志 Push/GameTCP 均为 `gw-0` |
 
 ### 门禁逐项
 
@@ -173,10 +173,10 @@ Remediation 文档描述的是 **真实缺口**，不是已完成能力的重复
 - [x] 统一 `IServiceRegistry` 字段（advertise / status / lease）；拒绝 `0.0.0.0` advertise
 - [x] `Discover` 仅 UP；空 `SetStatic` 不覆盖；Register TTL + `RenewInstance`；SIGTERM → DRAINING → Unregister
 - [x] Session / Auth 客户端：CSV → `list://` + `rr`，禁止截首地址；`max_retry` 有限
-- [x] Bootstrap：`session_instance_ids`、`GAMEMESH_INSTANCE_ID`、advertise 与 listen 分离
+- [x] Bootstrap：`session_instance_ids`、`LUNASERVER_INSTANCE_ID`、advertise 与 listen 分离
 - [x] `BrpcChannelManager::ApplySnapshot`（空快照保留健康 Channel；热增删）
-- [x] Gateway `GAMEMESH_DISCOVERY_POLL_SEC` 热加载 cnf + 进程内 lease 续租
-- [x] 生产路径停用 etcd v2（仅 `GAMEMESH_ENABLE_ETCD_V2=1` 遗留）
+- [x] Gateway `LUNASERVER_DISCOVERY_POLL_SEC` 热加载 cnf + 进程内 lease 续租
+- [x] 生产路径停用 etcd v2（仅 `LUNASERVER_ENABLE_ETCD_V2=1` 遗留）
 - [x] `discovery_ha_test`、`test_session_ha.sh`；`run_cluster_local` 双 Session 写入 `session_addrs`
 
 ### 测试命令与结果
@@ -348,7 +348,7 @@ Remediation 文档描述的是 **真实缺口**，不是已完成能力的重复
 ### 任务
 
 - [x] `/health/live` + `/health/ready`（兼容 `/api/liveness|readiness`）；依赖检查；EventLoop `MarkAlive` 心跳；503 fail-closed
-- [x] SIGTERM：DRAINING → StopAccept → 拒新 Login/EnterMap → `GAMEMESH_DRAIN_SEC` → Unregister → Stop brpc
+- [x] SIGTERM：DRAINING → StopAccept → 拒新 Login/EnterMap → `LUNASERVER_DRAIN_SEC` → Unregister → Stop brpc
 - [x] `OpsMetrics` + `/metrics` 导出（TCP/Login/Reconnect/Push/Outbox backlog）
 - [x] 演练脚本：`kill_gateway/session/logic/gamedb_drill.sh`、`network_partition_drill.sh`；`load_test.sh` 分位
 - [x] Compose 管理口 healthcheck；`smoke_test.sh` 校验 ready；ops-basics SPOF 声明
@@ -386,7 +386,7 @@ Remediation 文档描述的是 **真实缺口**，不是已完成能力的重复
 - Compose healthcheck 仅为 TCP 通，完整 ready 靠 `smoke_test.sh`。
 - 压测仍为 HTTP 探活，非 GameTCP P99。
 - 场景 7（动态发现 gl-2）与 10（混沌压测）未自动化。
-- 高端口 Logic 必须设 `GAMEMESH_INSTANCE_ID`（已修 Bootstrap；勿再按 8201 硬编码）。
+- 高端口 Logic 必须设 `LUNASERVER_INSTANCE_ID`（已修 Bootstrap；勿再按 8201 硬编码）。
 
 ### 回滚
 

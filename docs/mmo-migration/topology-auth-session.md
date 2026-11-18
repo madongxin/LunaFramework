@@ -1,4 +1,4 @@
-# GameMesh 拓扑（登录边界 / Push / LB 修正）
+# LunaServer 拓扑（登录边界 / Push / LB 修正）
 
 > 二进制 `globalservice` 是逻辑服务 **GlobalService**（邮件等）。
 > Session/Auth、GlobalService、Redis、MySQL 标注为 **MVP 单点**。

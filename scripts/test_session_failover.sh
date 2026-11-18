@@ -11,10 +11,10 @@ DISPATCH="${ROOT}/build/test/logic_dispatch_tool"
 [[ -x "$CLIENT" ]] || { echo "ERROR: build game_tcp_e2e_client"; exit 1; }
 [[ -x "$DISPATCH" ]] || { echo "ERROR: build logic_dispatch_tool"; exit 1; }
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME}"
@@ -27,7 +27,7 @@ REDIS_PASS=""
 [[ -f "$ROOT/config/redis.cnf" ]] && REDIS_PASS="$(awk -F= '/^password=/{print $2; exit}' "$ROOT/config/redis.cnf")"
 RCLI=(redis-cli)
 [[ -n "$REDIS_PASS" ]] && RCLI=(redis-cli -a "$REDIS_PASS" --no-auth-warning)
-PREFIX="${GAMEMESH_REDIS_PREFIX:-gamemesh:dev:}"
+PREFIX="${LUNASERVER_REDIS_PREFIX:-lunaserver:dev:}"
 
 echo "== pre: login on gw0 =="
 dev="sessfail_$$"

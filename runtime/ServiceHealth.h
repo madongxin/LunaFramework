@@ -35,7 +35,7 @@ public:
 
 private:
     ServiceHealth() = default;
-    std::string service_ = "gamemesh";
+    std::string service_ = "lunaserver";
     std::string server_id_ = "local";
     std::atomic<bool> ready_{false};
     std::atomic<bool> draining_{false};

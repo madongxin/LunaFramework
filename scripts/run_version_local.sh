@@ -30,7 +30,7 @@ HTTP_S=29093; SESSION=29401
 HTTP_D0=29094; GAMEDB0=29501
 HTTP_D1=29095; GAMEDB1=29502
 
-WORKDIR=/tmp/gamemesh-version
+WORKDIR=/tmp/lunaserver-version
 mkdir -p "$WORKDIR"
 GW_CNF="$ROOT/config/gateway.cnf"
 WORLD_CNF="$ROOT/config/globalservice.cnf"

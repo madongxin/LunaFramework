@@ -105,9 +105,9 @@ int main() {
     }
 
     const auto before = OpsMetrics::Instance().PrometheusText();
-    const uint64_t pending_before = Metric(before, "gamemesh_reliable_replay_pending_total{reason=\"buffer_full\"}");
-    const uint64_t resend_before = Metric(before, "gamemesh_reliable_resend_total ");
-    const uint64_t overflow_before = Metric(before, "gamemesh_reliable_outbox_overflow_total ");
+    const uint64_t pending_before = Metric(before, "lunaserver_reliable_replay_pending_total{reason=\"buffer_full\"}");
+    const uint64_t resend_before = Metric(before, "lunaserver_reliable_resend_total ");
+    const uint64_t overflow_before = Metric(before, "lunaserver_reliable_outbox_overflow_total ");
 
     {
         Pipe pipe;
@@ -125,7 +125,7 @@ int main() {
             Expect(pipe.sent.empty(), "still full: retry does not skip ahead");
         }
         const auto mid = OpsMetrics::Instance().PrometheusText();
-        Expect(Metric(mid, "gamemesh_reliable_replay_pending_total{reason=\"buffer_full\"}") ==
+        Expect(Metric(mid, "lunaserver_reliable_replay_pending_total{reason=\"buffer_full\"}") ==
                    pending_before + 1,
                "one buffer_full per frame, not per retry");
         pipe.fail_left = 0;
@@ -137,9 +137,9 @@ int main() {
         }
         Expect(ReliableOutboxHub::Instance().Depth(41) == 0, "queue drains");
         const auto after = OpsMetrics::Instance().PrometheusText();
-        Expect(Metric(after, "gamemesh_reliable_resend_total ") == resend_before + 1,
+        Expect(Metric(after, "lunaserver_reliable_resend_total ") == resend_before + 1,
                "only the frame that failed is a resend");
-        Expect(Metric(after, "gamemesh_reliable_outbox_peak ") >= 2, "peak depth recorded");
+        Expect(Metric(after, "lunaserver_reliable_outbox_peak ") >= 2, "peak depth recorded");
         ReliableOutboxHub::Instance().Forget(41);
         GatewayConnRegistry::Instance().Forget(41);
     }
@@ -164,7 +164,7 @@ int main() {
         }
         Expect(Push(42, 1001, "after") == -1, "closed connection accepts nothing more");
         const auto after = OpsMetrics::Instance().PrometheusText();
-        Expect(Metric(after, "gamemesh_reliable_outbox_overflow_total ") == overflow_before + 1,
+        Expect(Metric(after, "lunaserver_reliable_outbox_overflow_total ") == overflow_before + 1,
                "overflow counted");
         ReliableOutboxHub::Instance().Forget(42);
         GatewayConnRegistry::Instance().Forget(42);

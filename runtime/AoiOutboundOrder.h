@@ -19,7 +19,7 @@ struct AoiOutboundBooks {
 };
 
 /** LEAVE 之后这段时间拒收该实体的 MOVE。收到 ENTER 提前解除。待压测校准。 */
-inline int AoiMoveTombstoneMs() { return MoveEnvInt("GAMEMESH_AOI_MOVE_TOMB_MS", 5000, 0, 120000); }
+inline int AoiMoveTombstoneMs() { return MoveEnvInt("LUNASERVER_AOI_MOVE_TOMB_MS", 5000, 0, 120000); }
 
 inline bool KeepCoalescedMoveSeq(bool has_kept, uint64_t kept_seq, uint64_t incoming_seq) {
     return !has_kept || incoming_seq >= kept_seq;

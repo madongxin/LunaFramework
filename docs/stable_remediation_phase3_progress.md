@@ -1,6 +1,6 @@
 # 稳定整改三阶段 — 阶段三进度
 
-对照：`docs/GameMesh_Cursor_Server_Stable_Remediation_3_Phases.md`
+对照：`docs/LunaServer_Cursor_Server_Stable_Remediation_3_Phases.md`
 基线含阶段一/二工作区改动。**阶段三门禁未全部达标 → `STABLE BLOCKED`。**
 
 | 项 | 内容 | 状态 |
@@ -22,14 +22,14 @@
 - `test_sanitizers.sh`：TSan + BRPC 时 `MYSQL=ON`；`tools/tsan_suppressions.txt` 抑制未 TSan 重编的 brpc/bthread
 - `test_e2e_20x.sh`：`START_CLUSTER=1` 时先 stop 再 start（避免已运行集群 exit 1）
 - `scripts/build.sh`：Release 默认写入 `build-release/`，避免覆盖 Debug E2E 二进制
-- 本机 3.5Gi 内存：`GAMEMESH_JOBS=2`，否则并行链接易被 OOM kill
+- 本机 3.5Gi 内存：`LUNASERVER_JOBS=2`，否则并行链接易被 OOM kill
 
 ### 门禁证据（本机实测）
 
 | 命令 | 结果 | 日志 |
 |------|------|------|
-| `GAMEMESH_JOBS=2 ./scripts/build.sh Debug` | PASS | `/tmp/p3_dbg3.log` |
-| `GAMEMESH_JOBS=2 ./scripts/build.sh Release` | PASS | `/tmp/p3_rel2.log`（当时仍写 `build/`；之后脚本已改独立目录） |
+| `LUNASERVER_JOBS=2 ./scripts/build.sh Debug` | PASS | `/tmp/p3_dbg3.log` |
+| `LUNASERVER_JOBS=2 ./scripts/build.sh Release` | PASS | `/tmp/p3_rel2.log`（当时仍写 `build/`；之后脚本已改独立目录） |
 | `./scripts/test.sh unit` | PASS | `/tmp/p3_unit.log` |
 | `./scripts/test.sh integration` | PASS | `/tmp/p3_int2.log` |
 | `./scripts/test_sanitizers.sh asan` | PASS | `/tmp/p3_asan3.log` |
@@ -60,7 +60,7 @@ E2E_ROUNDS=2 LOAD_DURATION_SEC=60 SOAK_DURATION_SEC=90 ./scripts/stable_gate.sh 
 
 ### 遗留风险
 
-- 低内存机并行链接 OOM；建议 `GAMEMESH_JOBS=2`
+- 低内存机并行链接 OOM；建议 `LUNASERVER_JOBS=2`
 - TSan 对系统 brpc 依赖 suppressions；彻底方案需用 TSan 重编 brpc
 - Redis Registry 仍是控制面单点
 - Mail BatchClaim 仍可能同步阻塞 shard（阶段二遗留）

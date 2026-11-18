@@ -4,7 +4,7 @@
 
 ## 11:35–11:43 计数
 
-Prometheus `query_range`，UTC `2026-10-23T03:35:00Z` 到 `03:43:00Z`。两台 Gateway 的 `gamemesh_reply_soft_drop_total` 和 `gamemesh_heartbeat_soft_drop_total` 在这个窗口里没有增加，差值是 0。
+Prometheus `query_range`，UTC `2026-10-23T03:35:00Z` 到 `03:43:00Z`。两台 Gateway 的 `lunaserver_reply_soft_drop_total` 和 `lunaserver_heartbeat_soft_drop_total` 在这个窗口里没有增加，差值是 0。
 
 因此不能把「回包被软丢」写成这次约 52% 移动超时的主因。这项保持 **待验证**。监控截图里的内核发送队列接近 0，也不足以单独证明内核拥塞。
 

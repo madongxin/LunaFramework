@@ -441,49 +441,49 @@ std::string ControlResponseOutbox::Prometheus() {
         }
     }
     std::ostringstream os;
-    os << "# HELP gamemesh_control_outbox_current_frames RPC replies still queued, not yet in the socket buffer.\n"
-          "# TYPE gamemesh_control_outbox_current_frames gauge\n"
-          "gamemesh_control_outbox_current_frames "
+    os << "# HELP lunaserver_control_outbox_current_frames RPC replies still queued, not yet in the socket buffer.\n"
+          "# TYPE lunaserver_control_outbox_current_frames gauge\n"
+          "lunaserver_control_outbox_current_frames "
        << frames
-       << "\n# HELP gamemesh_control_outbox_current_bytes Bytes of RPC replies still queued.\n"
-          "# TYPE gamemesh_control_outbox_current_bytes gauge\n"
-          "gamemesh_control_outbox_current_bytes "
+       << "\n# HELP lunaserver_control_outbox_current_bytes Bytes of RPC replies still queued.\n"
+          "# TYPE lunaserver_control_outbox_current_bytes gauge\n"
+          "lunaserver_control_outbox_current_bytes "
        << bytes
-       << "\n# HELP gamemesh_control_outbox_peak_frames Lifetime peak of queued RPC replies on one connection since process start. Monotonic until restart. Not a windowed time series.\n"
-          "# TYPE gamemesh_control_outbox_peak_frames gauge\n"
-          "gamemesh_control_outbox_peak_frames "
+       << "\n# HELP lunaserver_control_outbox_peak_frames Lifetime peak of queued RPC replies on one connection since process start. Monotonic until restart. Not a windowed time series.\n"
+          "# TYPE lunaserver_control_outbox_peak_frames gauge\n"
+          "lunaserver_control_outbox_peak_frames "
        << g_peak_frames.load(std::memory_order_relaxed)
-       << "\n# HELP gamemesh_control_outbox_peak_bytes Lifetime peak of queued RPC reply bytes on one connection since process start. Monotonic until restart. Not a windowed time series.\n"
-          "# TYPE gamemesh_control_outbox_peak_bytes gauge\n"
-          "gamemesh_control_outbox_peak_bytes "
+       << "\n# HELP lunaserver_control_outbox_peak_bytes Lifetime peak of queued RPC reply bytes on one connection since process start. Monotonic until restart. Not a windowed time series.\n"
+          "# TYPE lunaserver_control_outbox_peak_bytes gauge\n"
+          "lunaserver_control_outbox_peak_bytes "
        << g_peak_bytes.load(std::memory_order_relaxed)
-       << "\n# HELP gamemesh_control_outbox_held_connections Connections with an RPC reply not yet in the send stream.\n"
-          "# TYPE gamemesh_control_outbox_held_connections gauge\n"
-          "gamemesh_control_outbox_held_connections "
+       << "\n# HELP lunaserver_control_outbox_held_connections Connections with an RPC reply not yet in the send stream.\n"
+          "# TYPE lunaserver_control_outbox_held_connections gauge\n"
+          "lunaserver_control_outbox_held_connections "
        << held_conns
-       << "\n# HELP gamemesh_control_outbox_oldest_held_ms Age of the oldest RPC reply not yet in the send stream.\n"
-          "# TYPE gamemesh_control_outbox_oldest_held_ms gauge\n"
-          "gamemesh_control_outbox_oldest_held_ms "
+       << "\n# HELP lunaserver_control_outbox_oldest_held_ms Age of the oldest RPC reply not yet in the send stream.\n"
+          "# TYPE lunaserver_control_outbox_oldest_held_ms gauge\n"
+          "lunaserver_control_outbox_oldest_held_ms "
        << oldest
-       << "\n# HELP gamemesh_control_outbox_drain_runs_total Attempts to write a queued RPC reply.\n"
-          "# TYPE gamemesh_control_outbox_drain_runs_total counter\n"
-          "gamemesh_control_outbox_drain_runs_total "
+       << "\n# HELP lunaserver_control_outbox_drain_runs_total Attempts to write a queued RPC reply.\n"
+          "# TYPE lunaserver_control_outbox_drain_runs_total counter\n"
+          "lunaserver_control_outbox_drain_runs_total "
        << g_drain_runs.load(std::memory_order_relaxed)
-       << "\n# HELP gamemesh_control_outbox_drain_stalls_total Drains that stopped because the socket accepted nothing.\n"
-          "# TYPE gamemesh_control_outbox_drain_stalls_total counter\n"
-          "gamemesh_control_outbox_drain_stalls_total "
+       << "\n# HELP lunaserver_control_outbox_drain_stalls_total Drains that stopped because the socket accepted nothing.\n"
+          "# TYPE lunaserver_control_outbox_drain_stalls_total counter\n"
+          "lunaserver_control_outbox_drain_stalls_total "
        << g_drain_stalls.load(std::memory_order_relaxed)
-       << "\n# HELP gamemesh_control_outbox_wakeup_missed_total Drains that finished while a reply was queued behind them.\n"
-          "# TYPE gamemesh_control_outbox_wakeup_missed_total counter\n"
-          "gamemesh_control_outbox_wakeup_missed_total "
+       << "\n# HELP lunaserver_control_outbox_wakeup_missed_total Drains that finished while a reply was queued behind them.\n"
+          "# TYPE lunaserver_control_outbox_wakeup_missed_total counter\n"
+          "lunaserver_control_outbox_wakeup_missed_total "
        << g_wakeup_missed.load(std::memory_order_relaxed)
-       << "\n# HELP gamemesh_control_outbox_write_errors_total RPC reply writes that found the connection gone.\n"
-          "# TYPE gamemesh_control_outbox_write_errors_total counter\n"
-          "gamemesh_control_outbox_write_errors_total "
+       << "\n# HELP lunaserver_control_outbox_write_errors_total RPC reply writes that found the connection gone.\n"
+          "# TYPE lunaserver_control_outbox_write_errors_total counter\n"
+          "lunaserver_control_outbox_write_errors_total "
        << g_write_errors.load(std::memory_order_relaxed)
-       << "\n# HELP gamemesh_control_outbox_overflow_total Connections closed because the RPC reply queue exceeded its cap.\n"
-          "# TYPE gamemesh_control_outbox_overflow_total counter\n"
-          "gamemesh_control_outbox_overflow_total "
+       << "\n# HELP lunaserver_control_outbox_overflow_total Connections closed because the RPC reply queue exceeded its cap.\n"
+          "# TYPE lunaserver_control_outbox_overflow_total counter\n"
+          "lunaserver_control_outbox_overflow_total "
        << g_overflow.load(std::memory_order_relaxed) << "\n\n";
     return os.str();
 }

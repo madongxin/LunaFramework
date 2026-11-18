@@ -2,7 +2,7 @@
 # 优雅停止：先 SIGTERM，等待 readiness/进程退出，再 SIGKILL
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/formal}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/formal}"
 if [[ ! -f "$RUN_DIR/pids" ]]; then
   echo "no pids at $RUN_DIR/pids"
   exit 0

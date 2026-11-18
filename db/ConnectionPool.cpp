@@ -92,8 +92,8 @@ bool ConnectionPool::loadConfigFile() {
 
 ConnectionPool::ConnectionPool() {
     if (g_mysql_forbidden.load() ||
-        (std::getenv("GAMEMESH_FORBID_MYSQL") &&
-         std::strcmp(std::getenv("GAMEMESH_FORBID_MYSQL"), "1") == 0)) {
+        (std::getenv("LUNASERVER_FORBID_MYSQL") &&
+         std::strcmp(std::getenv("LUNASERVER_FORBID_MYSQL"), "1") == 0)) {
         LOG_WARN << "ConnectionPool: MySQL init skipped (formal data boundary)";
         return;
     }

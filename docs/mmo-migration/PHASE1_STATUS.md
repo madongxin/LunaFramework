@@ -1,7 +1,7 @@
-# 阶段 1 状态（GameMesh_Cursor_All_Phases）
+# 阶段 1 状态（LunaServer_Cursor_All_Phases）
 
 > 更新：2026-08-08
-> 对照：`docs/GameMesh_Cursor_All_Phases.md` 阶段 1
+> 对照：`docs/LunaServer_Cursor_All_Phases.md` 阶段 1
 
 ## 已落地
 
@@ -30,7 +30,7 @@
 ### 1.6 Session 可水平扩展
 - `RedisPool`：有上限连接池 + Ping 健康检查 / 超时租约
 - Acquire / Reconnect / MarkDisconnected / Logout / BindConnection 走 Redis **Lua** 原子脚本
-- Key 前缀 `key_prefix`（默认 `gamemesh:dev:`），可配 `redis_pool_size`
+- Key 前缀 `key_prefix`（默认 `lunaserver:dev:`），可配 `redis_pool_size`
 
 ### 1.7 启动脚本
 - `start_formal.sh`：双 Gateway 注入完整 `logic_addrs` + `logic_instance_ids=gl-0,gl-1`

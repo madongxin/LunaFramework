@@ -18,9 +18,9 @@
 | --- | --- |
 | 频道 | 空/`world`/`whisper`/`private`；其它 → `ERR_CHANNEL_FORBIDDEN` |
 | 文本 | UTF-8，1–200 码点，且 ≤800 字节；控制符拒绝（`ERR_TEXT_LENGTH` / `ERR_TEXT_CONTROL`） |
-| 每玩家 | Redis INCR，默认 5 条 / 2 秒 → `ERR_RATE_LIMITED`（`GAMEMESH_CHAT_PER_PLAYER` / `GAMEMESH_CHAT_WINDOW_SEC`） |
+| 每玩家 | Redis INCR，默认 5 条 / 2 秒 → `ERR_RATE_LIMITED`（`LUNASERVER_CHAT_PER_PLAYER` / `LUNASERVER_CHAT_WINDOW_SEC`） |
 | 每连接 | Gateway `CheckChatRate`：5 条 / 2 秒 |
-| 环境 | `GAMEMESH_CHAT_MAX_CP`（默认 200）、`GAMEMESH_CHAT_MAX_BYTES`（默认 800） |
+| 环境 | `LUNASERVER_CHAT_MAX_CP`（默认 200）、`LUNASERVER_CHAT_MAX_BYTES`（默认 800） |
 
 发送方身份来自连接绑定的 `player_id`，不信任客户端自报。
 

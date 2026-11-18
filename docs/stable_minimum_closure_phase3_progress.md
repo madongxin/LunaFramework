@@ -1,6 +1,6 @@
 # 稳定最小闭环 — 阶段三进度与结论
 
-对照：`docs/GameMesh_Cursor_Server_Stable_Minimum_Closure_e8ab08f.md`
+对照：`docs/LunaServer_Cursor_Server_Stable_Minimum_Closure_e8ab08f.md`
 工作树 commit（dirty）：`e8ab08fc1b2beef59d106fd1ac75bb9e43860ba5` + 阶段一/二/三未提交改动。
 
 ## 工程交付（已落地）
@@ -8,7 +8,7 @@
 | 项 | 状态 |
 |----|------|
 | brpc 1.9.0 SHA256 钉死 + `install_deps --build-brpc` | **已做** |
-| `check_deps`/`build.sh` 认可 `GAMEMESH_DEPS_PREFIX` | **已做** |
+| `check_deps`/`build.sh` 认可 `LUNASERVER_DEPS_PREFIX` | **已做** |
 | `Dockerfile.toolchain`；根 Dockerfile 校验构建 brpc | **已做** |
 | CI：PR=lowlevel；push main=full+brpc cache；nightly=`stable_gate --full` | **已做** |
 | git diff --check / bash -n / shellcheck；生成 pb 排除 | **已做** |

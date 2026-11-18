@@ -13,7 +13,7 @@ namespace gameproto {
 
 uint32_t MaxFrameSize() {
     static const uint32_t kLimit = [] {
-        const char *env = std::getenv("GAMEMESH_MAX_FRAME_BYTES");
+        const char *env = std::getenv("LUNASERVER_MAX_FRAME_BYTES");
         unsigned long n = kMaxFrameSize;
         if (env && *env)
             n = std::strtoul(env, nullptr, 10);

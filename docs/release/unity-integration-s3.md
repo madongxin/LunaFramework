@@ -15,7 +15,7 @@
 | --- | --- |
 | 服务器 HEAD | `60542e51ed5f7e757fced13cb2a069c29739aa36`（S3 已随 foundation slice 提交） |
 | Unity 审计基线 | `38a0042a62a1e3975a5315a7e742dbc5342102f4`（仍绑定旧 hash `aed5c952…`，与服务器 `4c29a73…` **不兼容**） |
-| 协议 namespace | `GameMesh.Protocol` |
+| 协议 namespace | `LunaServer.Protocol` |
 | `game.proto` SHA-256 | `4c29a73aa7fbed19f122e122bc1832852e593f6bfaca0b7433249391e2ec643d` |
 | 地图模板 | 1001 |
 | 地图 SHA-256 | `ceef56586c5281dca4ce45340f511d0d577fd724b14131ae5a21d01ea7f41317` |
@@ -51,7 +51,7 @@ S3 仅追加字段/message，未改已发布编号。无新 SQL 迁移。详见 
 
 ## 回滚
 
-- 停集群：`GAMEMESH_RUN_DIR=run/unity-e2e ./scripts/stop_formal.sh`
+- 停集群：`LUNASERVER_RUN_DIR=run/unity-e2e ./scripts/stop_formal.sh`
 - 协议：继续使用已导出的 `game.proto` + manifest hash；客户端勿混用未匹配的 C# 生成物
 - 不 `git reset --hard` 除非用户明确要求
 
@@ -61,7 +61,7 @@ S3 仅追加字段/message，未改已发布编号。无新 SQL 迁移。详见 
 
 | 命令 | 退出码 |
 | --- | ---: |
-| `GAMEMESH_JOBS=2 ./scripts/build.sh Debug` | 0 |
+| `LUNASERVER_JOBS=2 ./scripts/build.sh Debug` | 0 |
 | `./scripts/test.sh unit` | 0 |
 | `./scripts/test.sh integration` | 0 |
 | `./scripts/client_ready_gate.sh` | 0 `CLIENT READY PASS` |

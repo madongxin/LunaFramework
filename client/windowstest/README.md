@@ -1,25 +1,25 @@
-# GameMesh Windows Test Client
+# LunaServer Windows Test Client
 
 WPF 联调客户端（VS2022），连接 Gateway 游戏 TCP，覆盖本版账号 / 邮件 / 道具切片。
 
 ## 打开与构建
 
-1. 用 **Visual Studio 2022** 打开 `GameMesh.WindowsTest.sln`
+1. 用 **Visual Studio 2022** 打开 `LunaServer.WindowsTest.sln`
 2. 工作负载：**.NET 桌面开发**（含 WPF）
 3. 目标框架：`net8.0-windows`（需安装 .NET 8 SDK）
 4. `F5` 运行；或命令行：
 
 ```bat
 cd client\windowstest
-dotnet restore GameMesh.WindowsTest.sln
-dotnet build GameMesh.WindowsTest.sln -c Debug
-dotnet run --project GameMesh.WindowsTest
+dotnet restore LunaServer.WindowsTest.sln
+dotnet build LunaServer.WindowsTest.sln -c Debug
+dotnet run --project LunaServer.WindowsTest
 ```
 
 ## 协议
 
 - 帧格式：`[uint32 BE len][GameRequest/GameResponse protobuf]`（与 `ProtoFraming` 一致）
-- 源协议：`GameMesh.WindowsTest/Proto/game.proto`（构建时由 `Grpc.Tools` 生成 C#）
+- 源协议：`LunaServer.WindowsTest/Proto/game.proto`（构建时由 `Grpc.Tools` 生成 C#）
 - 与仓库根目录 `proto/game.proto` 保持同步；改协议后请同步拷贝到本目录再编译
 
 ## 推荐联调步骤
@@ -40,10 +40,10 @@ dotnet run --project GameMesh.WindowsTest
 
 ```
 windowstest/
-├── GameMesh.WindowsTest.sln
+├── LunaServer.WindowsTest.sln
 ├── README.md
-└── GameMesh.WindowsTest/
-    ├── GameMesh.WindowsTest.csproj
+└── LunaServer.WindowsTest/
+    ├── LunaServer.WindowsTest.csproj
     ├── App.xaml(.cs)
     ├── MainWindow.xaml(.cs)
     ├── Proto/game.proto

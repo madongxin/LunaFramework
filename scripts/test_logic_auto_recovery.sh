@@ -15,16 +15,16 @@ SEED="${ROOT}/build/test/placement_seed_tool"
 CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
 [[ -x "$SEED" && -x "$CLIENT" ]] || { echo "ERROR: missing seed/client"; exit 1; }
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME}"
 GW1="${E2E_GW1_GAME}"
 MAP_TPL="$((930000 + RANDOM % 1000))"
-PREFIX="${GAMEMESH_REDIS_PREFIX:-gamemesh:dev:}"
+PREFIX="${LUNASERVER_REDIS_PREFIX:-lunaserver:dev:}"
 REDIS_PASS=""
 [[ -f "$ROOT/config/redis.cnf" ]] && REDIS_PASS="$(awk -F= '/^password=/{print $2; exit}' "$ROOT/config/redis.cnf")"
 RCLI=(redis-cli)

@@ -6,9 +6,9 @@ cd "$ROOT"
 # shellcheck disable=SC1090
 source "$ROOT/scripts/e2e_inventory.sh"
 
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
-export GAMEMESH_RUN_DIR="$RUN_DIR"
-PREFIX="${GAMEMESH_REDIS_PREFIX:-gamemesh:dev:}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
+export LUNASERVER_RUN_DIR="$RUN_DIR"
+PREFIX="${LUNASERVER_REDIS_PREFIX:-lunaserver:dev:}"
 NEW_OWNER="${NEW_OWNER:-gl-1}"
 LEASE_WAIT="${LEASE_WAIT:-1}"
 DRILL_BIN="$ROOT/build/test/map_lease_drill"

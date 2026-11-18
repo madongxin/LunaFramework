@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package game;
 
-option csharp_namespace = "GameMesh.Protocol";
+option csharp_namespace = "LunaServer.Protocol";
 
 message LoginReq {
   uint64 player_id = 1;

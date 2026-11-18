@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # 1002 当苏州 LINE：系统选线压 N 人（默认 1000）进同一条软顶线。
-# 必须先滚动正式集群（新 catalog + GAMEMESH_CONNECT_RATE_MAX）。
+# 必须先滚动正式集群（新 catalog + LUNASERVER_CONNECT_RATE_MAX）。
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 ulimit -n 65535 || true
-unset GAMEMESH_MAP_SHA256 GAMEMESH_MAP_SHA256_FILE
+unset LUNASERVER_MAP_SHA256 LUNASERVER_MAP_SHA256_FILE
 
 N="${1:-3000}"
 HOST="${2:-127.0.0.1}"
@@ -24,10 +24,10 @@ if os.path.isfile(cnf):
             continue
         k, v = line.split("=", 1)
         kv[k.strip()] = v.strip()
-host = os.environ.get("GAMEMESH_REDIS_HOST", kv.get("ip", "127.0.0.1"))
-port = os.environ.get("GAMEMESH_REDIS_PORT", kv.get("port", "6379"))
-pw = os.environ.get("GAMEMESH_REDIS_PASSWORD", kv.get("password", ""))
-prefix = kv.get("key_prefix", "gamemesh:dev")
+host = os.environ.get("LUNASERVER_REDIS_HOST", kv.get("ip", "127.0.0.1"))
+port = os.environ.get("LUNASERVER_REDIS_PORT", kv.get("port", "6379"))
+pw = os.environ.get("LUNASERVER_REDIS_PASSWORD", kv.get("password", ""))
+prefix = kv.get("key_prefix", "lunaserver:dev")
 if not prefix.endswith(":"):
     prefix += ":"
 cmd = ["redis-cli", "-h", host, "-p", str(port)]

@@ -329,7 +329,7 @@ private:
     int long_ttl_sec_ = 86400;
     int grace_sec_ = 45;
     int pool_size_ = 8;
-    std::string key_prefix_ = "gamemesh:dev:";
+    std::string key_prefix_ = "lunaserver:dev:";
     std::vector<std::string> logic_instance_ids_{"gl-0"};
     /** 保护 logic_instance_ids_ 等进程内配置；Redis 权威状态靠 Lua */
     mutable std::mutex cfg_mu_;

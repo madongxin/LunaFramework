@@ -24,7 +24,7 @@
 
 ```bash
 # 系统包见 install_deps 打印；不依赖 runner 预装 /usr/local/include/brpc
-./scripts/install_deps.sh --build-brpc   # → $HOME/.local/gamemesh-deps
+./scripts/install_deps.sh --build-brpc   # → $HOME/.local/lunaserver-deps
 ./scripts/check_deps.sh --full           # 认可 PREFIX 或 /usr/local
 ./scripts/bootstrap_local_config.sh
 ./scripts/build.sh Debug
@@ -95,9 +95,9 @@ SOAK_DURATION_SEC=7200 ./scripts/soak_test.sh
 
 | 开关 | 能力 |
 |------|------|
-| `GAMEMESH_EXPERIMENTAL_DYNAMIC_SCALE=1` | 运行期 gl-2 动态扩容 / DRAINING 在线迁移演练 |
-| `GAMEMESH_EXPERIMENTAL_PLACEMENT_RECOVERY=1` | Placement 自动无损接管调度 |
-| `GAMEMESH_EXPERIMENTAL_REGISTRY_OUTAGE=1` | Registry outage 自愈演练 |
+| `LUNASERVER_EXPERIMENTAL_DYNAMIC_SCALE=1` | 运行期 gl-2 动态扩容 / DRAINING 在线迁移演练 |
+| `LUNASERVER_EXPERIMENTAL_PLACEMENT_RECOVERY=1` | Placement 自动无损接管调度 |
+| `LUNASERVER_EXPERIMENTAL_REGISTRY_OUTAGE=1` | Registry outage 自愈演练 |
 
 正式 `run_e2e_cluster.sh` / `stable_gate.sh --full` 默认上述为 `0`；开启后脚本才会跑对应测试。
 
@@ -113,6 +113,6 @@ SOAK_DURATION_SEC=7200 ./scripts/soak_test.sh
 ## Schema / Redis
 
 - MySQL：`db/` EnsureTables / 幂等表。
-- Redis 前缀：`gamemesh:dev:`（配置 `key_prefix`）。
+- Redis 前缀：`lunaserver:dev:`（配置 `key_prefix`）。
 
 未经人为授权不要创建 git tag / push。

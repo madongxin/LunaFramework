@@ -4,7 +4,7 @@
 
 /**
  * 稳定 Gateway 实例身份：配置/环境注入，禁止从 0.0.0.0:port 拼接。
- * 解析优先级：显式参数 > GAMEMESH_INSTANCE_ID > gateway.cnf gateway_instance_id
+ * 解析优先级：显式参数 > LUNASERVER_INSTANCE_ID > gateway.cnf gateway_instance_id
  */
 class GatewayIdentity {
 public:

@@ -4,7 +4,7 @@
 #include "OpsMetrics.h"
 #include "BrpcSslUtil.h"
 #include "PlayerSerialQueue.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "GlobalServiceForwardServiceImpl.h"
 
 #include <brpc/server.h>
@@ -53,7 +53,7 @@ const std::string &GlobalServiceCnfPath() {
     if (!once) {
         once = true;
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/globalservice.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/globalservice.cnf", &resolved))
             path = std::move(resolved);
     }
     return path;

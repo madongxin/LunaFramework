@@ -34,7 +34,7 @@ private:
     size_t scan_count_ = 32;
     std::string cursor_ = "0";
     std::string instance_id_;
-    std::string key_prefix_ = "gamemesh:dev:";
+    std::string key_prefix_ = "lunaserver:dev:";
     int leader_lease_sec_ = 15;
     bool is_leader_ = false;
     uint64_t recover_ok_ = 0;

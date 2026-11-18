@@ -12,7 +12,7 @@ class EtcdDiscovery {
 public:
     static EtcdDiscovery &Instance();
 
-    void Configure(std::string endpoints, std::string prefix = "gamemesh");
+    void Configure(std::string endpoints, std::string prefix = "lunaserver");
     bool enabled() const;
 
     bool Register(const std::string &service, const std::string &instance_id,
@@ -26,6 +26,6 @@ private:
 
     std::string host_ = "127.0.0.1";
     int port_ = 2379;
-    std::string prefix_ = "gamemesh";
+    std::string prefix_ = "lunaserver";
     bool enabled_ = false;
 };

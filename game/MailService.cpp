@@ -1652,7 +1652,7 @@ bool ConsumePlayerMailQuota(uint64_t sender_id, int limit, int window_sec) {
         auto lease = RedisPool::Instance().Acquire();
         if (lease) {
             char key[192];
-            std::snprintf(key, sizeof(key), "gamemesh:dev:mailrate:%llu",
+            std::snprintf(key, sizeof(key), "lunaserver:dev:mailrate:%llu",
                           static_cast<unsigned long long>(sender_id));
             static const char *kLua =
                 "local c=redis.call('INCR', KEYS[1]); if c==1 then redis.call('EXPIRE', KEYS[1], "

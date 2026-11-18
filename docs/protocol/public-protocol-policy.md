@@ -14,7 +14,7 @@
 1. 服务器仓库 `./scripts/export_unity_protocol.sh <dir>` 产出：
    `game.proto`、`game.desc`、`protocol_manifest.json`、`game.proto.sha256`、`game.desc.sha256`
 2. Unity 管道只消费该目录，并用 `schema_sha256` 与本地文件核对。
-3. 用 `protoc` / protobuf-net 等从 **导出的 game.proto** 生成 C#（`csharp_namespace = GameMesh.Protocol`）。
+3. 用 `protoc` / protobuf-net 等从 **导出的 game.proto** 生成 C#（`csharp_namespace = LunaServer.Protocol`）。
 4. 禁止把服务器 `game/game.pb.h` 或手改 C# 当协议源。
 
 ## schema hash、协议版本、build id
@@ -29,7 +29,7 @@
 
 握手（S1）时：协议世代不兼容 → `ERR_PROTOCOL_VERSION`；hash 不一致 → `ERR_SCHEMA_MISMATCH`（携带服务器 hash）。
 
-Formal 默认强制 `ClientHello`。兼容开关 `GAMEMESH_ALLOW_LEGACY_NO_HELLO=1` 允许旧 C++ E2E 跳过握手，**截止 2026-09-15 后删除**。
+Formal 默认强制 `ClientHello`。兼容开关 `LUNASERVER_ALLOW_LEGACY_NO_HELLO=1` 允许旧 C++ E2E 跳过握手，**截止 2026-09-15 后删除**。
 
 ## 向前兼容
 

@@ -11,9 +11,9 @@
 ## 正式模式开关
 
 ```bash
-export GAMEMESH_FORMAL=1
-export GAMEMESH_HTTP_BIND=127.0.0.1   # 默认在 FORMAL 下强制 loopback
-export GAMEMESH_ENABLE_ADMIN=0       # 危险 HTTP 接口默认关
+export LUNASERVER_FORMAL=1
+export LUNASERVER_HTTP_BIND=127.0.0.1   # 默认在 FORMAL 下强制 loopback
+export LUNASERVER_ENABLE_ADMIN=0       # 危险 HTTP 接口默认关
 ```
 
 - FORMAL=1：Auth 账号查询/注册必须经 GameDB；无密码账号拒绝登录。

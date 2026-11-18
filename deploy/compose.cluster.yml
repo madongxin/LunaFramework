@@ -2,34 +2,34 @@
 # 角色正确性由 scripts/smoke_test.sh 校验 /api/version（不只看容器 running）。
 version: "3.8"
 
-x-gamemesh-app: &gamemesh_app
+x-lunaserver-app: &lunaserver_app
   image: centos:8
   network_mode: host
-  # cwd=/opt/gamemesh 使代码里的 ../config/*.cnf 解析到 /opt/config
-  working_dir: /opt/gamemesh
+  # cwd=/opt/lunaserver 使代码里的 ../config/*.cnf 解析到 /opt/config
+  working_dir: /opt/lunaserver
   volumes:
-    - ../build/test/gateway:/opt/gamemesh/gateway:ro
-    - ../build/test/session:/opt/gamemesh/session:ro
-    - ../build/test/gamelogic:/opt/gamemesh/gamelogic:ro
-    - ../build/test/globalservice:/opt/gamemesh/globalservice:ro
-    - ../build/test/gamedb:/opt/gamemesh/gamedb:ro
-    - ./docker-entrypoint.sh:/opt/gamemesh/docker-entrypoint.sh:ro
+    - ../build/test/gateway:/opt/lunaserver/gateway:ro
+    - ../build/test/session:/opt/lunaserver/session:ro
+    - ../build/test/gamelogic:/opt/lunaserver/gamelogic:ro
+    - ../build/test/globalservice:/opt/lunaserver/globalservice:ro
+    - ../build/test/gamedb:/opt/lunaserver/gamedb:ro
+    - ./docker-entrypoint.sh:/opt/lunaserver/docker-entrypoint.sh:ro
     - ../config:/opt/config:ro
     - /lib64:/lib64:ro
     - /usr/lib64:/usr/lib64:ro
-  entrypoint: ["/opt/gamemesh/docker-entrypoint.sh"]
+  entrypoint: ["/opt/lunaserver/docker-entrypoint.sh"]
   # 管理口探活：centos 镜像无 curl 时用 /dev/tcp；完整 ready 由 smoke_test.sh 断言
   healthcheck:
-    test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/$${GAMEMESH_HEALTH_PORT}'"]
+    test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/$${LUNASERVER_HEALTH_PORT}'"]
     interval: 10s
     timeout: 3s
     retries: 6
     start_period: 25s
-  environment: &gamemesh_env
-    GAMEMESH_FORMAL: "1"
-    GAMEMESH_ADVERTISE_HOST: "127.0.0.1"
-    GAMEMESH_HTTP_BIND: "127.0.0.1"
-    GAMEMESH_BIN_DIR: "/opt/gamemesh"
+  environment: &lunaserver_env
+    LUNASERVER_FORMAL: "1"
+    LUNASERVER_ADVERTISE_HOST: "127.0.0.1"
+    LUNASERVER_HTTP_BIND: "127.0.0.1"
+    LUNASERVER_BIN_DIR: "/opt/lunaserver"
     LD_LIBRARY_PATH: "/usr/lib64:/lib64:/usr/lib64/mysql"
 
 services:
@@ -39,11 +39,11 @@ services:
     profiles: ["deps"]
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: gamemesh
-      MYSQL_DATABASE: gamemesh
+      MYSQL_ROOT_PASSWORD: lunaserver
+      MYSQL_DATABASE: lunaserver
     ports: ["3306:3306"]
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pgamemesh"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-plunaserver"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -59,78 +59,78 @@ services:
       retries: 20
 
   session0:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "session-0"
-      GAMEMESH_HEALTH_PORT: "8093"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "session-0"
+      LUNASERVER_HEALTH_PORT: "8093"
     command: ["session", "8093", "8401"]
 
   session1:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "session-1"
-      GAMEMESH_HEALTH_PORT: "8096"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "session-1"
+      LUNASERVER_HEALTH_PORT: "8096"
     command: ["session", "8096", "8402"]
 
   gamedb0:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "gamedb-0"
-      GAMEMESH_HEALTH_PORT: "8094"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "gamedb-0"
+      LUNASERVER_HEALTH_PORT: "8094"
     command: ["gamedb", "8094", "8501"]
 
   gamedb1:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "gamedb-1"
-      GAMEMESH_HEALTH_PORT: "8095"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "gamedb-1"
+      LUNASERVER_HEALTH_PORT: "8095"
     command: ["gamedb", "8095", "8502"]
 
   globalservice:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "globalservice-1"
-      GAMEMESH_HEALTH_PORT: "8092"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "globalservice-1"
+      LUNASERVER_HEALTH_PORT: "8092"
     command: ["globalservice", "8092"]
     depends_on: [gamedb0]
 
   gamelogic0:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "gl-0"
-      GAMEMESH_HEALTH_PORT: "8090"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "gl-0"
+      LUNASERVER_HEALTH_PORT: "8090"
     command: ["gamelogic", "8090", "8201"]
     depends_on: [session0, gamedb0]
 
   gamelogic1:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "gl-1"
-      GAMEMESH_HEALTH_PORT: "8091"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "gl-1"
+      LUNASERVER_HEALTH_PORT: "8091"
     command: ["gamelogic", "8091", "8202"]
     depends_on: [session0, gamedb0]
 
   gateway0:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "gw-0"
-      GAMEMESH_HEALTH_PORT: "8080"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "gw-0"
+      LUNASERVER_HEALTH_PORT: "8080"
     command: ["gateway", "8080", "8081"]
     depends_on: [session0, gamelogic0, gamelogic1]
 
   gateway1:
-    <<: *gamemesh_app
+    <<: *lunaserver_app
     environment:
-      <<: *gamemesh_env
-      GAMEMESH_INSTANCE_ID: "gw-1"
-      GAMEMESH_HEALTH_PORT: "8082"
+      <<: *lunaserver_env
+      LUNASERVER_INSTANCE_ID: "gw-1"
+      LUNASERVER_HEALTH_PORT: "8082"
     command: ["gateway", "8082", "8083"]
     depends_on: [session0, gamelogic0]

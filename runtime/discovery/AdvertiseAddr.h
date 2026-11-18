@@ -39,9 +39,9 @@ inline int PortFromHostPort(const std::string &host_port) {
     return std::atoi(host_port.c_str() + colon + 1);
 }
 
-/** GAMEMESH_ADVERTISE_HOST + port → host:port；缺省 127.0.0.1（开发） */
+/** LUNASERVER_ADVERTISE_HOST + port → host:port；缺省 127.0.0.1（开发） */
 inline std::string MakeAdvertiseAddr(int port) {
-    const char *adv = std::getenv("GAMEMESH_ADVERTISE_HOST");
+    const char *adv = std::getenv("LUNASERVER_ADVERTISE_HOST");
     std::string host = (adv && *adv) ? adv : "127.0.0.1";
     if (IsForbiddenAdvertiseHost(host))
         host = "127.0.0.1";
@@ -49,7 +49,7 @@ inline std::string MakeAdvertiseAddr(int port) {
 }
 
 /** 从 listen 生成对端能拨通的地址。
- *  0.0.0.0 / :: 换成 GAMEMESH_ADVERTISE_HOST。
+ *  0.0.0.0 / :: 换成 LUNASERVER_ADVERTISE_HOST。
  *  已经绑在具体地址（含 127.0.0.1）上时必须原样公布，否则对端会去连一块没在听的网卡。
  */
 inline std::string AdvertiseFromListen(const std::string &listen_addr) {

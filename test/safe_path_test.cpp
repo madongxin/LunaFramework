@@ -16,13 +16,13 @@ static void Expect(bool ok, const char *msg) {
 
 int main() {
     std::string out;
-    Expect(!SafeJoinUnderRoot("/var/gamemesh/files", "../../etc/passwd", &out),
+    Expect(!SafeJoinUnderRoot("/var/lunaserver/files", "../../etc/passwd", &out),
            "reject unix dotdot");
-    Expect(!SafeJoinUnderRoot("/var/gamemesh/files", "..\\..\\windows\\system32\\config", &out),
+    Expect(!SafeJoinUnderRoot("/var/lunaserver/files", "..\\..\\windows\\system32\\config", &out),
            "reject windows dotdot");
-    Expect(!SafeJoinUnderRoot("/var/gamemesh/files", "/etc/passwd", &out), "reject absolute");
-    Expect(SafeJoinUnderRoot("/var/gamemesh/files", "readme.txt", &out) &&
-               out == "/var/gamemesh/files/readme.txt",
+    Expect(!SafeJoinUnderRoot("/var/lunaserver/files", "/etc/passwd", &out), "reject absolute");
+    Expect(SafeJoinUnderRoot("/var/lunaserver/files", "readme.txt", &out) &&
+               out == "/var/lunaserver/files/readme.txt",
            "plain name stays inside root");
     std::string base;
     Expect(SafeBasename("../../etc/passwd", &base) && base.find("..") == std::string::npos &&

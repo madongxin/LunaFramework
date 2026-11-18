@@ -119,11 +119,11 @@ def main():
     print("denominator %s" % (args.denominator if args.denominator else MISSING))
 
     move_count = delta(
-        'sum(gamemesh_reply_latency_ms_count{job="gamemesh",role="gateway",kind="move"})',
+        'sum(lunaserver_reply_latency_ms_count{job="lunaserver",role="gateway",kind="move"})',
         start, end)
     print("move_reply_count %s" % fmt(move_count))
     e2e = (
-        'sum(gamemesh_reply_latency_ms_bucket{job="gamemesh",role="gateway",kind="move",le="%s"})'
+        'sum(lunaserver_reply_latency_ms_bucket{job="lunaserver",role="gateway",kind="move",le="%s"})'
     )
     e2e_parts = []
     for name, q in (("p50", 0.50), ("p95", 0.95), ("p99", 0.99)):
@@ -137,7 +137,7 @@ def main():
 
     print("move_e2e_stages")
     bucket_q = (
-        'sum(gamemesh_pkt_stage_ms_bucket{job="gamemesh",kind="move",stage="%s",le="%s"})'
+        'sum(lunaserver_pkt_stage_ms_bucket{job="lunaserver",kind="move",stage="%s",le="%s"})'
     )
     for stage in STAGES:
         parts = []
@@ -147,7 +147,7 @@ def main():
         print("  %s %s" % (stage, " ".join(parts)))
 
     tx = delta(
-        'sum(gamemesh_gateway_tx_bytes_total{job="gamemesh",role="gateway"})', start, end)
+        'sum(lunaserver_gateway_tx_bytes_total{job="lunaserver",role="gateway"})', start, end)
     span = end - start
     if tx is None or span <= 0:
         print("egress_mbps %s" % MISSING)
@@ -156,19 +156,19 @@ def main():
 
     for label, query in (
         ("outbox_frames",
-         'sum(gamemesh_control_outbox_current_frames{job="gamemesh",role="gateway"})'),
-        ("aoi_backlog", 'sum(gamemesh_aoi_push_backlog{job="gamemesh"})'),
+         'sum(lunaserver_control_outbox_current_frames{job="lunaserver",role="gateway"})'),
+        ("aoi_backlog", 'sum(lunaserver_aoi_push_backlog{job="lunaserver"})'),
         ("send_pending_bytes",
-         'max(gamemesh_send_pending_max_bytes{job="gamemesh",role="gateway"})'),
+         'max(lunaserver_send_pending_max_bytes{job="lunaserver",role="gateway"})'),
     ):
         print("%s %s" % (label, fmt(scalar(prom(query, end)))))
 
     for label, query in (
-        ("move_drop", 'sum(gamemesh_move_drop_total{job="gamemesh",role="gateway"})'),
-        ("move_coalesce", 'sum(gamemesh_move_coalesce_total{job="gamemesh",role="gateway"})'),
-        ("aoi_shed", 'sum(gamemesh_aoi_move_shed_total{job="gamemesh"})'),
+        ("move_drop", 'sum(lunaserver_move_drop_total{job="lunaserver",role="gateway"})'),
+        ("move_coalesce", 'sum(lunaserver_move_coalesce_total{job="lunaserver",role="gateway"})'),
+        ("aoi_shed", 'sum(lunaserver_aoi_move_shed_total{job="lunaserver"})'),
         ("aoi_skip_retrans",
-         'sum(gamemesh_aoi_skip_retrans_total{job="gamemesh",role="gateway"})'),
+         'sum(lunaserver_aoi_skip_retrans_total{job="lunaserver",role="gateway"})'),
     ):
         print("%s %s" % (label, fmt(delta(query, start, end))))
 

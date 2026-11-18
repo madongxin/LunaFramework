@@ -15,14 +15,14 @@ inline int MoveEnvInt(const char *name, int fallback, int min_v, int max_v) {
     return v;
 }
 
-inline int SlowDegradeMs() { return MoveEnvInt("GAMEMESH_SLOW_DEGRADE_MS", 10000, 1000, 600000); }
-inline int SlowClearMs() { return MoveEnvInt("GAMEMESH_SLOW_CLEAR_MS", 30000, 1000, 600000); }
-inline int SlowCloseMs() { return MoveEnvInt("GAMEMESH_SLOW_CLOSE_MS", 90000, 1000, 600000); }
-inline int NearQuotaPercent() { return MoveEnvInt("GAMEMESH_NEAR_QUOTA_PERCENT", 60, 0, 100); }
-inline int NearHardSilenceMs() { return MoveEnvInt("GAMEMESH_NEAR_SILENCE_MS", 3000, 200, 120000); }
-inline int FarHardSilenceMs() { return MoveEnvInt("GAMEMESH_FAR_SILENCE_MS", 15000, 200, 120000); }
+inline int SlowDegradeMs() { return MoveEnvInt("LUNASERVER_SLOW_DEGRADE_MS", 10000, 1000, 600000); }
+inline int SlowClearMs() { return MoveEnvInt("LUNASERVER_SLOW_CLEAR_MS", 30000, 1000, 600000); }
+inline int SlowCloseMs() { return MoveEnvInt("LUNASERVER_SLOW_CLOSE_MS", 90000, 1000, 600000); }
+inline int NearQuotaPercent() { return MoveEnvInt("LUNASERVER_NEAR_QUOTA_PERCENT", 60, 0, 100); }
+inline int NearHardSilenceMs() { return MoveEnvInt("LUNASERVER_NEAR_SILENCE_MS", 3000, 200, 120000); }
+inline int FarHardSilenceMs() { return MoveEnvInt("LUNASERVER_FAR_SILENCE_MS", 15000, 200, 120000); }
 /** 外推打开时，远层速度没变才用这个间隔。外推关闭时，兴趣内的人不论远近都按约 200ms 发坐标。 */
-inline int FarMoveIntervalMs() { return MoveEnvInt("GAMEMESH_FAR_MOVE_INTERVAL_MS", 200, 200, 120000); }
+inline int FarMoveIntervalMs() { return MoveEnvInt("LUNASERVER_FAR_MOVE_INTERVAL_MS", 200, 200, 120000); }
 /** 显式 opt-in：仅当值为恰好 "1"。 */
 inline bool AoiV2Flag(const char *name) {
     const char *env = std::getenv(name);
@@ -39,13 +39,13 @@ inline bool EnvFlagDefaultOn(const char *name) {
 
 /**
  * AOI 速度外推（P1g@905 已验收优于纯 P0）。默认开。
- * 关闭：GAMEMESH_AOI_EXTRAPOLATE=0。
+ * 关闭：LUNASERVER_AOI_EXTRAPOLATE=0。
  */
-inline bool AoiExtrapolateEnabled() { return EnvFlagDefaultOn("GAMEMESH_AOI_EXTRAPOLATE"); }
+inline bool AoiExtrapolateEnabled() { return EnvFlagDefaultOn("LUNASERVER_AOI_EXTRAPOLATE"); }
 
 /** 未设置时返回 -1，表示不覆盖图实例上的半径。 */
 inline int AoiV2RadiusOverride() {
-    const char *env = std::getenv("GAMEMESH_AOI_V2_RADIUS_CELLS");
+    const char *env = std::getenv("LUNASERVER_AOI_V2_RADIUS_CELLS");
     if (!env || !*env)
         return -1;
     int v = std::atoi(env);
@@ -56,64 +56,64 @@ inline int AoiV2RadiusOverride() {
     return v;
 }
 
-inline bool AoiV2Layers() { return AoiV2Flag("GAMEMESH_AOI_V2_LAYERS"); }
-inline bool AoiV2VisibleSet() { return AoiV2Flag("GAMEMESH_AOI_V2_VISIBLE_SET"); }
-inline bool AoiV2Hysteresis() { return AoiV2Flag("GAMEMESH_AOI_V2_HYSTERESIS"); }
-inline int AoiV2NearMeters() { return MoveEnvInt("GAMEMESH_AOI_V2_NEAR_METERS", 32, 1, 512); }
-inline int AoiV2FarIntervalMs() { return MoveEnvInt("GAMEMESH_AOI_V2_FAR_INTERVAL_MS", 1000, 200, 120000); }
-inline int AoiV2CapSlack() { return MoveEnvInt("GAMEMESH_AOI_V2_CAP_SLACK", 8, 0, 64); }
-inline int AoiV2LeaveExtraCells() { return MoveEnvInt("GAMEMESH_AOI_V2_LEAVE_EXTRA_CELLS", 1, 0, 4); }
+inline bool AoiV2Layers() { return AoiV2Flag("LUNASERVER_AOI_V2_LAYERS"); }
+inline bool AoiV2VisibleSet() { return AoiV2Flag("LUNASERVER_AOI_V2_VISIBLE_SET"); }
+inline bool AoiV2Hysteresis() { return AoiV2Flag("LUNASERVER_AOI_V2_HYSTERESIS"); }
+inline int AoiV2NearMeters() { return MoveEnvInt("LUNASERVER_AOI_V2_NEAR_METERS", 32, 1, 512); }
+inline int AoiV2FarIntervalMs() { return MoveEnvInt("LUNASERVER_AOI_V2_FAR_INTERVAL_MS", 1000, 200, 120000); }
+inline int AoiV2CapSlack() { return MoveEnvInt("LUNASERVER_AOI_V2_CAP_SLACK", 8, 0, 64); }
+inline int AoiV2LeaveExtraCells() { return MoveEnvInt("LUNASERVER_AOI_V2_LEAVE_EXTRA_CELLS", 1, 0, 4); }
 /** 呈现线程一次持锁最多处理这么多人。待压测校准。 */
-inline int AoiPresentSliceEntities() { return MoveEnvInt("GAMEMESH_AOI_PRESENT_SLICE_N", 64, 1, 100000); }
+inline int AoiPresentSliceEntities() { return MoveEnvInt("LUNASERVER_AOI_PRESENT_SLICE_N", 64, 1, 100000); }
 /** 呈现线程一次持锁最多这么久，到点就放开锁。单位微秒。待压测校准。 */
-inline int AoiPresentSliceUs() { return MoveEnvInt("GAMEMESH_AOI_PRESENT_SLICE_US", 2000, 200, 50000); }
+inline int AoiPresentSliceUs() { return MoveEnvInt("LUNASERVER_AOI_PRESENT_SLICE_US", 2000, 200, 50000); }
 /**
  * 两片之间停一下，让正在等这把锁的 Move 进去。
  * 只调用 yield 时，本机调度会让呈现线程立刻把锁拿回来。待压测校准。
  */
-inline int AoiPresentSlicePauseUs() { return MoveEnvInt("GAMEMESH_AOI_PRESENT_SLICE_PAUSE_US", 200, 0, 5000); }
+inline int AoiPresentSlicePauseUs() { return MoveEnvInt("LUNASERVER_AOI_PRESENT_SLICE_PAUSE_US", 200, 0, 5000); }
 /** LEAVE 未确认时最长补发这么久，然后记指标并放弃。默认 10 分钟。 */
-inline int AoiLeaveRetryMaxMs() { return MoveEnvInt("GAMEMESH_AOI_LEAVE_RETRY_MAX_MS", 600000, 1000, 3600000); }
+inline int AoiLeaveRetryMaxMs() { return MoveEnvInt("LUNASERVER_AOI_LEAVE_RETRY_MAX_MS", 600000, 1000, 3600000); }
 /** 近处移动实体的关键帧间隔。待压测校准。 */
-inline int ExtrapKeyframeMs() { return MoveEnvInt("GAMEMESH_EXTRAP_KEYFRAME_MS", 4000, 3000, 5000); }
+inline int ExtrapKeyframeMs() { return MoveEnvInt("LUNASERVER_EXTRAP_KEYFRAME_MS", 4000, 3000, 5000); }
 /**
  * 远处移动实体关键帧间隔（C1）。默认 10s；比近处稀，避免远层刷满预算。
- * 环境变量：GAMEMESH_AOI_FAR_KEYFRAME_MS。
+ * 环境变量：LUNASERVER_AOI_FAR_KEYFRAME_MS。
  */
 inline int ExtrapFarKeyframeMs() {
-    return MoveEnvInt("GAMEMESH_AOI_FAR_KEYFRAME_MS", 10000, 3000, 60000);
+    return MoveEnvInt("LUNASERVER_AOI_FAR_KEYFRAME_MS", 10000, 3000, 60000);
 }
 /** 外推误差超过这么多厘米才补发。待压测校准。 */
-inline int ExtrapErrorCm() { return MoveEnvInt("GAMEMESH_EXTRAP_ERROR_CM", 100, 10, 10000); }
-inline int MoveBatchMinEvents() { return MoveEnvInt("GAMEMESH_MOVE_BATCH_MIN", 8, 1, 40); }
+inline int ExtrapErrorCm() { return MoveEnvInt("LUNASERVER_EXTRAP_ERROR_CM", 100, 10, 10000); }
+inline int MoveBatchMinEvents() { return MoveEnvInt("LUNASERVER_MOVE_BATCH_MIN", 8, 1, 40); }
 
 /**
  * 独立出口预算强制（P0 路由修复后验收通过；与外推叠加为正式默认）。
- * 默认开。关闭：GAMEMESH_EGRESS_ENFORCE=0。不依赖 AOI_V2_*。
+ * 默认开。关闭：LUNASERVER_EGRESS_ENFORCE=0。不依赖 AOI_V2_*。
  */
-inline bool EgressEnforce() { return EnvFlagDefaultOn("GAMEMESH_EGRESS_ENFORCE"); }
-/** tc 共用游戏类 ceil（kbit）。未设置时走 GAMEMESH_EGRESS_BUDGET_MBPS。0 表示未设置。 */
+inline bool EgressEnforce() { return EnvFlagDefaultOn("LUNASERVER_EGRESS_ENFORCE"); }
+/** tc 共用游戏类 ceil（kbit）。未设置时走 LUNASERVER_EGRESS_BUDGET_MBPS。0 表示未设置。 */
 inline int EgressSharedClassKbit() {
-    const char *env = std::getenv("GAMEMESH_EGRESS_SHARED_CLASS_KBIT");
+    const char *env = std::getenv("LUNASERVER_EGRESS_SHARED_CLASS_KBIT");
     if (!env || !*env)
         return 0;
-    return MoveEnvInt("GAMEMESH_EGRESS_SHARED_CLASS_KBIT", 0, 1, 1000000);
+    return MoveEnvInt("LUNASERVER_EGRESS_SHARED_CLASS_KBIT", 0, 1, 1000000);
 }
-inline int EgressHeadroomPercent() { return MoveEnvInt("GAMEMESH_EGRESS_HEADROOM_PERCENT", 85, 1, 100); }
-inline int EgressMoveFloorPercent() { return MoveEnvInt("GAMEMESH_EGRESS_MOVE_FLOOR_PERCENT", 20, 0, 100); }
+inline int EgressHeadroomPercent() { return MoveEnvInt("LUNASERVER_EGRESS_HEADROOM_PERCENT", 85, 1, 100); }
+inline int EgressMoveFloorPercent() { return MoveEnvInt("LUNASERVER_EGRESS_MOVE_FLOOR_PERCENT", 20, 0, 100); }
 /** 重传预留：可用额度乘 (100-该值)%。默认 5。 */
 inline int EgressRetransReservePercent() {
-    return MoveEnvInt("GAMEMESH_EGRESS_RETRANS_RESERVE_PERCENT", 5, 0, 90);
+    return MoveEnvInt("LUNASERVER_EGRESS_RETRANS_RESERVE_PERCENT", 5, 0, 90);
 }
 inline int EgressGatewayInstances() {
-    return MoveEnvInt("GAMEMESH_GATEWAY_INSTANCES", 2, 1, 64);
+    return MoveEnvInt("LUNASERVER_GATEWAY_INSTANCES", 2, 1, 64);
 }
-inline int FrameCapPreLogin() { return MoveEnvInt("GAMEMESH_FRAME_CAP_PRELOGIN", 16 * 1024, 1024, 1024 * 1024); }
-inline int FrameCapLogin() { return MoveEnvInt("GAMEMESH_FRAME_CAP_LOGIN", 64 * 1024, 1024, 4 * 1024 * 1024); }
-inline int FramesPerWake() { return MoveEnvInt("GAMEMESH_FRAMES_PER_WAKE", 64, 1, 1024); }
-inline int ReadPauseHighPercent() { return MoveEnvInt("GAMEMESH_READ_PAUSE_HIGH_PERCENT", 50, 1, 100); }
-inline int ReadPauseLowPercent() { return MoveEnvInt("GAMEMESH_READ_PAUSE_LOW_PERCENT", 25, 0, 99); }
-inline int ReadPauseMaxMs() { return MoveEnvInt("GAMEMESH_READ_PAUSE_MAX_MS", 3000, 100, 60000); }
+inline int FrameCapPreLogin() { return MoveEnvInt("LUNASERVER_FRAME_CAP_PRELOGIN", 16 * 1024, 1024, 1024 * 1024); }
+inline int FrameCapLogin() { return MoveEnvInt("LUNASERVER_FRAME_CAP_LOGIN", 64 * 1024, 1024, 4 * 1024 * 1024); }
+inline int FramesPerWake() { return MoveEnvInt("LUNASERVER_FRAMES_PER_WAKE", 64, 1, 1024); }
+inline int ReadPauseHighPercent() { return MoveEnvInt("LUNASERVER_READ_PAUSE_HIGH_PERCENT", 50, 1, 100); }
+inline int ReadPauseLowPercent() { return MoveEnvInt("LUNASERVER_READ_PAUSE_LOW_PERCENT", 25, 0, 99); }
+inline int ReadPauseMaxMs() { return MoveEnvInt("LUNASERVER_READ_PAUSE_MAX_MS", 3000, 100, 60000); }
 
 inline bool ReplyQueueHigh(size_t depth, size_t bytes) {
     const size_t high_frames =

@@ -12,7 +12,7 @@
 - `scripts/start_formal.sh` 不调用这个脚本，也不执行 `tc`。正式启动不会重新下发队列。
 - `deploy/` 下的 `compose.cluster.yml`、`compose.dev.yml`、`docker-entrypoint.sh`、`Dockerfile.runtime`、`prometheus/` 没有引用这个脚本，也没有 `tc`。`deploy/da700a4/` 是一份旧二进制目录，没有作为启动脚本来读。
 
-`scripts/start_formal.sh` 第 15–17 行：注释写「两个 Gateway 共用一条出口。这里的 Mbps 是整机预算，进程内再按实例数拆开。」默认 `GAMEMESH_EGRESS_BUDGET_MBPS=2.4`，`GAMEMESH_GATEWAY_INSTANCES=2`。
+`scripts/start_formal.sh` 第 15–17 行：注释写「两个 Gateway 共用一条出口。这里的 Mbps 是整机预算，进程内再按实例数拆开。」默认 `LUNASERVER_EGRESS_BUDGET_MBPS=2.4`，`LUNASERVER_GATEWAY_INSTANCES=2`。
 
 代码推断，`AoiMoveCoalesceLedger::EgressBudgetBytesPerSec`：`2.4 * 1000000 / 8 / 2 = 150000` 字节/秒，每个网关一份。两台加起来是 300000 字节/秒，也就是 2.4 Mbps。
 
@@ -22,7 +22,7 @@
 - 旧脚本把这个类写成 rate 1600 kbit、ceil 2000 kbit，也就是两台合计最高约 2.0 Mbps。
 - 应用预算 2.4 Mbps 大于这个旧 ceil。文档 `docs/perf_audit/aoi_move_egress.md` 写默认 2.4「留大约 20% 余量」。3 Mbps × 0.8 = 2.4 Mbps，和这句话对得上，但 `start_formal.sh` 里没有把 3 乘 0.8 的算式，3 Mbps 是这台机器云厂商公网出口的实测说明，不是脚本探测出来的。
 - 现在脚本默认改成 rate 2200 kbit、ceil 2600 kbit（仍是两台共用）。2.4 Mbps 低于 2600 kbit（2.6 Mbps），高于旧的 2000 kbit。
-- 代码推断：`SetEnforceByteBudget` 只有 `GAMEMESH_AOI_V2_LAYERS=1` 才为真，默认关。关的时候 `Pick` 会把名额抬到「间隔不少于 200ms 的实体数」（`AoiMoveCoalesceLedger.h` 约 160–173 行）。预算数字只在 `NoteKernelWrite` 里对 MOVE 帧累加，不挡住发送。所以 2.4 这个数默认不限制线上字节。
+- 代码推断：`SetEnforceByteBudget` 只有 `LUNASERVER_AOI_V2_LAYERS=1` 才为真，默认关。关的时候 `Pick` 会把名额抬到「间隔不少于 200ms 的实体数」（`AoiMoveCoalesceLedger.h` 约 160–173 行）。预算数字只在 `NoteKernelWrite` 里对 MOVE 帧累加，不挡住发送。所以 2.4 这个数默认不限制线上字节。
 
 手动改当前正在跑的队列（由操作者执行，本轮没有执行）：
 
@@ -37,7 +37,7 @@ tc class change dev eth0 parent 1:1 classid 1:30 htb rate 400kbit ceil 500kbit p
 
 代码推断。
 
-`MoveBatchMinEvents` 在 `runtime/MoveSendConfig.h`，读 `GAMEMESH_MOVE_BATCH_MIN`，默认 8。唯一的使用点是 `AoiMoveCoalesceLedger::Pick`：
+`MoveBatchMinEvents` 在 `runtime/MoveSendConfig.h`，读 `LUNASERVER_MOVE_BATCH_MIN`，默认 8。唯一的使用点是 `AoiMoveCoalesceLedger::Pick`：
 
 ```text
 batch_wait = 没有硬静默 && 候选数 < 8 && 候选数 < limit && 最老等待 < 发送间隔
@@ -67,14 +67,14 @@ MOVE 帧由 `FlushMoveSlot` 编成一帧后调用 `TrySendLatestMove`。缓冲�
 
 | 名称 | 含义 | 单位 |
 | --- | --- | --- |
-| `gamemesh_move_frame_events{quantile}` | 一帧里的事件数。分位 0.5、0.9、0.99、1 | events |
-| `gamemesh_move_frame_events_count` | 上面分位所用的样本数。环形缓冲最多 4096，满了丢掉最旧的 | frames |
-| `gamemesh_move_frame_payload_bytes{quantile}` | 这一帧的 payload，含 4 字节长度头 | bytes |
-| `gamemesh_move_frame_payload_bytes_count` | 同上，样本数 | frames |
+| `lunaserver_move_frame_events{quantile}` | 一帧里的事件数。分位 0.5、0.9、0.99、1 | events |
+| `lunaserver_move_frame_events_count` | 上面分位所用的样本数。环形缓冲最多 4096，满了丢掉最旧的 | frames |
+| `lunaserver_move_frame_payload_bytes{quantile}` | 这一帧的 payload，含 4 字节长度头 | bytes |
+| `lunaserver_move_frame_payload_bytes_count` | 同上，样本数 | frames |
 
 没有样本时这四条都不输出，不是 0。
 
-`gamemesh_tx_frames_by_frame{frame}` 原来就有，按帧种类计数，数值本身就是帧数，没有再加一条 `_count`。空的时候仍然输出，包括 `frame="move"` 的 0。这是已有计数器，0 表示还没接受过这种帧。
+`lunaserver_tx_frames_by_frame{frame}` 原来就有，按帧种类计数，数值本身就是帧数，没有再加一条 `_count`。空的时候仍然输出，包括 `frame="move"` 的 0。这是已有计数器，0 表示还没接受过这种帧。
 
 本轮没有新的压测，这四个分位的线上值无数据。
 

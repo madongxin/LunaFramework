@@ -6,16 +6,16 @@
 #   ./scripts/install_deps.sh --check-only
 #
 # 环境:
-#   GAMEMESH_DEPS_PREFIX   默认 $HOME/.local/gamemesh-deps
-#   GAMEMESH_BRPC_VERSION  默认 1.9.0
+#   LUNASERVER_DEPS_PREFIX   默认 $HOME/.local/lunaserver-deps
+#   LUNASERVER_BRPC_VERSION  默认 1.9.0
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-PREFIX="${GAMEMESH_DEPS_PREFIX:-$HOME/.local/gamemesh-deps}"
-BRPC_VER="${GAMEMESH_BRPC_VERSION:-1.9.0}"
+PREFIX="${LUNASERVER_DEPS_PREFIX:-$HOME/.local/lunaserver-deps}"
+BRPC_VER="${LUNASERVER_BRPC_VERSION:-1.9.0}"
 # apache/brpc 1.9.0 tarball sha256 (github tags/1.9.0); bump with version
-BRPC_SHA256="${GAMEMESH_BRPC_SHA256:-85856da0216773e1296834116f69f9e80007b7ff421db3be5c9d1890ecfaea74}"
+BRPC_SHA256="${LUNASERVER_BRPC_SHA256:-85856da0216773e1296834116f69f9e80007b7ff421db3be5c9d1890ecfaea74}"
 SKIP_CHECKSUM=0
 BUILD_BRPC=0
 CHECK_ONLY=0

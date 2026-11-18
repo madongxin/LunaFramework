@@ -223,40 +223,40 @@ public:
         }
         if (parked <= 0)
             return;
-        os << "# HELP gamemesh_aoi_parked_kernel_conns Connections whose position frame is parked because kernel unsent is above 16KB. Unit: connections.\n"
-              "# TYPE gamemesh_aoi_parked_kernel_conns gauge\n"
-              "gamemesh_aoi_parked_kernel_conns "
+        os << "# HELP lunaserver_aoi_parked_kernel_conns Connections whose position frame is parked because kernel unsent is above 16KB. Unit: connections.\n"
+              "# TYPE lunaserver_aoi_parked_kernel_conns gauge\n"
+              "lunaserver_aoi_parked_kernel_conns "
            << parked << "\n";
-        EmitQuantiles(os, "gamemesh_latest_move_hold_ms",
+        EmitQuantiles(os, "lunaserver_latest_move_hold_ms",
                       "Age of the current parked position frame. Cleared when that frame enters the kernel or is swapped. An unrelated drain does not clear it. Unit: milliseconds.",
                       frame_age);
-        EmitQuantiles(os, "gamemesh_aoi_parked_episode_ms",
+        EmitQuantiles(os, "lunaserver_aoi_parked_episode_ms",
                       "How long the connection has stayed parked with kernel unsent above 16KB. Cleared only when a position byte enters the kernel. Unit: milliseconds.",
                       episode);
-        EmitQuantiles(os, "gamemesh_aoi_parked_tcp_unacked",
+        EmitQuantiles(os, "lunaserver_aoi_parked_tcp_unacked",
                       "tcpi_unacked on parked connections. Unit: segments.", unacked);
-        EmitQuantiles(os, "gamemesh_aoi_parked_tcp_retrans",
+        EmitQuantiles(os, "lunaserver_aoi_parked_tcp_retrans",
                       "tcpi_retrans on parked connections. Unit: segments.", retrans);
-        EmitQuantiles(os, "gamemesh_aoi_parked_tcp_rto_us",
+        EmitQuantiles(os, "lunaserver_aoi_parked_tcp_rto_us",
                       "tcpi_rto on parked connections. Unit: microseconds.", rto);
-        EmitQuantiles(os, "gamemesh_aoi_parked_tcp_snd_cwnd",
+        EmitQuantiles(os, "lunaserver_aoi_parked_tcp_snd_cwnd",
                       "tcpi_snd_cwnd on parked connections. Unit: segments.", cwnd);
-        EmitQuantiles(os, "gamemesh_aoi_parked_tcp_rtt_us",
+        EmitQuantiles(os, "lunaserver_aoi_parked_tcp_rtt_us",
                       "tcpi_rtt on parked connections. Unit: microseconds.", rtt);
-        EmitQuantiles(os, "gamemesh_aoi_parked_tcp_rcv_space_bytes",
+        EmitQuantiles(os, "lunaserver_aoi_parked_tcp_rcv_space_bytes",
                       "tcpi_rcv_space on parked connections. This is the local receive window estimate, not the peer advertised window. Unit: bytes.",
                       rcv_space);
-        EmitQuantiles(os, "gamemesh_aoi_parked_tcp_notsent_bytes",
+        EmitQuantiles(os, "lunaserver_aoi_parked_tcp_notsent_bytes",
                       "Bytes not yet handed to the NIC (SIOCOUTQNSD) on parked connections. Unit: bytes.",
                       notsent);
         auto emit_bytes = [&](const char *cls, int n) {
             if (n <= 0)
                 return;
-            os << "gamemesh_aoi_parked_unsent_bytes{class=\"" << cls << "\"} " << n << "\n";
+            os << "lunaserver_aoi_parked_unsent_bytes{class=\"" << cls << "\"} " << n << "\n";
         };
         if (move_b > 0 || control_b > 0 || snap_b > 0 || reliable_b > 0 || prior > 0) {
-            os << "# HELP gamemesh_aoi_parked_unsent_bytes Bytes still not on the wire for parked connections, tagged when accepted. prior means kernel unsent that was already queued before this park. Unit: bytes.\n"
-                  "# TYPE gamemesh_aoi_parked_unsent_bytes gauge\n";
+            os << "# HELP lunaserver_aoi_parked_unsent_bytes Bytes still not on the wire for parked connections, tagged when accepted. prior means kernel unsent that was already queued before this park. Unit: bytes.\n"
+                  "# TYPE lunaserver_aoi_parked_unsent_bytes gauge\n";
             emit_bytes("move", move_b);
             emit_bytes("control", control_b);
             emit_bytes("snapshot", snap_b);

@@ -10,7 +10,7 @@
 namespace {
 
 bool EnvForceNotReady() {
-    const char *v = std::getenv("GAMEMESH_FORCE_NOT_READY");
+    const char *v = std::getenv("LUNASERVER_FORCE_NOT_READY");
     return v && (std::strcmp(v, "1") == 0 || std::strcmp(v, "true") == 0);
 }
 
@@ -20,7 +20,7 @@ HealthDepsResult EvaluateHealthDeps(const std::string &role) {
     HealthDepsResult r;
     if (EnvForceNotReady()) {
         r.ok = false;
-        r.detail = "GAMEMESH_FORCE_NOT_READY";
+        r.detail = "LUNASERVER_FORCE_NOT_READY";
         return r;
     }
     if (ServiceHealth::Instance().draining()) {

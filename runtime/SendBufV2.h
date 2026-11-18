@@ -8,7 +8,7 @@
 #include <vector>
 
 /**
- * 写缓冲三段。默认不接入 TcpConnection，GAMEMESH_SENDBUF_V2=1 时才切换。
+ * 写缓冲三段。默认不接入 TcpConnection，LUNASERVER_SENDBUF_V2=1 时才切换。
  * A 已经开始写的半帧，不能改。
  * B 回包和 ENTER/LEAVE，先进先出。
  * C 一帧位置。第一个字节写出前可以被整帧换掉。
@@ -102,11 +102,11 @@ private:
 };
 
 inline bool SendBufV2Enabled() {
-    const char *env = std::getenv("GAMEMESH_SENDBUF_V2");
+    const char *env = std::getenv("LUNASERVER_SENDBUF_V2");
     return env && env[0] == '1';
 }
 
 inline bool ReadBackpressureEnabled() {
-    const char *env = std::getenv("GAMEMESH_READ_BACKPRESSURE");
+    const char *env = std::getenv("LUNASERVER_READ_BACKPRESSURE");
     return env && env[0] == '1';
 }

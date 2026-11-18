@@ -5,13 +5,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/cluster}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/cluster}"
 if [[ ! -f "$RUN_DIR/pids" ]]; then
   RUN_DIR="$ROOT/run/formal"
 fi
-HOST="${GAMEMESH_SMOKE_HOST:-127.0.0.1}"
-GW0_HTTP="${GAMEMESH_SMOKE_GW0:-8080}"
-GW1_HTTP="${GAMEMESH_SMOKE_GW1:-8082}"
+HOST="${LUNASERVER_SMOKE_HOST:-127.0.0.1}"
+GW0_HTTP="${LUNASERVER_SMOKE_GW0:-8080}"
+GW1_HTTP="${LUNASERVER_SMOKE_GW1:-8082}"
 
 if [[ ! -f "$RUN_DIR/pids" ]]; then
   echo "ERROR: cluster not running. Start: ./scripts/run_cluster_local.sh" >&2
@@ -20,7 +20,7 @@ fi
 
 # shellcheck disable=SC1090
 source "$ROOT/scripts/e2e_inventory.sh"
-export GAMEMESH_RUN_DIR="$RUN_DIR"
+export LUNASERVER_RUN_DIR="$RUN_DIR"
 GW0_PID="${GATEWAY0_PID:-}"
 if [[ -z "$GW0_PID" ]]; then
   GW0_PID="$(e2e_pid_of gateway gw-0 2>/dev/null || true)"

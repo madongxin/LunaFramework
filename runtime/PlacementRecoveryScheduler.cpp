@@ -56,7 +56,7 @@ void PlacementRecoveryScheduler::SetLeaderLeaseSec(int sec) {
 
 bool PlacementRecoveryScheduler::TryAcquireOrRenewLeader() {
     if (instance_id_.empty()) {
-        if (const char *env = std::getenv("GAMEMESH_INSTANCE_ID"))
+        if (const char *env = std::getenv("LUNASERVER_INSTANCE_ID"))
             instance_id_ = env;
     }
     if (instance_id_.empty()) {

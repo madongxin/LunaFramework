@@ -6,7 +6,7 @@ cd "$ROOT"
 
 GIT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 GIT_DIRTY="$(git status --porcelain 2>/dev/null | head -1 | wc -l | tr -d ' ')"
-BUILD_DIR="${GAMEMESH_BUILD_DIR:-${MMO_BUILD_DIR:-$ROOT/build}}"
+BUILD_DIR="${LUNASERVER_BUILD_DIR:-${MMO_BUILD_DIR:-$ROOT/build}}"
 BUILD_TYPE="unknown"
 if [[ -f "${BUILD_DIR}/CMakeCache.txt" ]]; then
   BUILD_TYPE="$(grep -E '^CMAKE_BUILD_TYPE:' "${BUILD_DIR}/CMakeCache.txt" | head -1 | cut -d= -f2 || true)"
@@ -15,7 +15,7 @@ else
   CXX_STD=17
 fi
 
-echo "GameMesh version"
+echo "LunaServer version"
 echo "  git_sha     : ${GIT_SHA}${GIT_DIRTY:+ (dirty)}"
 echo "  build_type  : ${BUILD_TYPE}"
 echo "  cxx_standard: C++${CXX_STD}"

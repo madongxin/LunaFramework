@@ -1,7 +1,7 @@
-# 阶段 3 状态（GameMesh_Cursor_All_Phases）
+# 阶段 3 状态（LunaServer_Cursor_All_Phases）
 
 > 更新：2026-08-08
-> 对照：`docs/GameMesh_Cursor_All_Phases.md` 阶段 3
+> 对照：`docs/LunaServer_Cursor_All_Phases.md` 阶段 3
 
 ## 已落地
 
@@ -13,7 +13,7 @@
 - 旧无密码账号：仅非 FORMAL 可空凭证登录
 
 ### 3.2 数据所有权
-- `GAMEMESH_FORMAL=1` fail-closed（见 `data-ownership.md`）
+- `LUNASERVER_FORMAL=1` fail-closed（见 `data-ownership.md`）
 - Auth 正式模式禁止本地 MySQL 降级
 
 ### 3.3 GameDB
@@ -21,8 +21,8 @@
 - ClaimMail 既有幂等；Register 带 idempotency_key 字段（存储侧可扩展）
 
 ### 3.4 内部安全
-- 危险 HTTP（GM/asan/db ping）默认关闭；`GAMEMESH_ENABLE_ADMIN=1` 开启
-- ASan 崩溃接口需 `GAMEMESH_ENABLE_ASAN_CRASH=1`
+- 危险 HTTP（GM/asan/db ping）默认关闭；`LUNASERVER_ENABLE_ADMIN=1` 开启
+- ASan 崩溃接口需 `LUNASERVER_ENABLE_ASAN_CRASH=1`
 - FORMAL 默认 HTTP 管理口绑定 `127.0.0.1`
 - brpc `ssl_enable` 配置入口保留（`BrpcSslUtil`）
 

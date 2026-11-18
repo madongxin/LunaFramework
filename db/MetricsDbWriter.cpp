@@ -119,7 +119,7 @@ bool MetricsDbWriter::EnsureTable() {
     if (!conn)
         return false;
     const char *sql =
-        "CREATE TABLE IF NOT EXISTS gamemesh_metrics ("
+        "CREATE TABLE IF NOT EXISTS lunaserver_metrics ("
         "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
         "ts_unix BIGINT NOT NULL,"
         "cpu_seconds_total DOUBLE,"
@@ -137,7 +137,7 @@ bool MetricsDbWriter::EnsureTable() {
     const bool ok = conn->update(sql);
     if (ok && !logged_ready) {
         logged_ready = true;
-        LOG_INFO << "MetricsDbWriter: table gamemesh_metrics ready";
+        LOG_INFO << "MetricsDbWriter: table lunaserver_metrics ready";
     }
     return ok;
 }
@@ -155,7 +155,7 @@ bool MetricsDbWriter::InsertSnapshot() {
         m.thread_states_json.empty() ? "{}" : m.thread_states_json;
 
     std::ostringstream sql;
-    sql << "INSERT INTO gamemesh_metrics ("
+    sql << "INSERT INTO lunaserver_metrics ("
            "ts_unix,cpu_seconds_total,rss_bytes,vm_size_bytes,open_fds,process_threads,"
            "eventloop_tick_sec,eventloop_tick_peak_sec,thread_states_json,"
            "tcp_send_queue_bytes,tcp_recv_queue_bytes) VALUES ("
@@ -206,7 +206,7 @@ bool MetricsDbWriter::QueryHistory(int hours, int limit, MetricsHistoryQuery *ou
     }
     out->mysql = true;
     if (!EnsureTable()) {
-        out->error = "gamemesh_metrics unavailable";
+        out->error = "lunaserver_metrics unavailable";
         return true;
     }
     auto conn = pool->getConnection();
@@ -214,7 +214,7 @@ bool MetricsDbWriter::QueryHistory(int hours, int limit, MetricsHistoryQuery *ou
         out->error = "no connection";
         return true;
     }
-    MYSQL_RES *sum = conn->query("SELECT COUNT(*), MAX(ts_unix) FROM gamemesh_metrics");
+    MYSQL_RES *sum = conn->query("SELECT COUNT(*), MAX(ts_unix) FROM lunaserver_metrics");
     if (sum) {
         MYSQL_ROW row = mysql_fetch_row(sum);
         if (row) {
@@ -239,7 +239,7 @@ bool MetricsDbWriter::QueryHistory(int hours, int limit, MetricsHistoryQuery *ou
            "tcp_send_queue_bytes,tcp_recv_queue_bytes FROM ("
            "SELECT ts_unix,cpu_seconds_total,rss_bytes,vm_size_bytes,open_fds,process_threads,"
            "eventloop_tick_sec,eventloop_tick_peak_sec,thread_states_json,"
-           "tcp_send_queue_bytes,tcp_recv_queue_bytes FROM gamemesh_metrics WHERE ts_unix>="
+           "tcp_send_queue_bytes,tcp_recv_queue_bytes FROM lunaserver_metrics WHERE ts_unix>="
         << since << " ORDER BY ts_unix DESC LIMIT " << limit
         << ") t ORDER BY ts_unix ASC";
     MYSQL_RES *res = conn->query(sql.str());

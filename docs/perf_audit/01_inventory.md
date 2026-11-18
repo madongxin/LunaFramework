@@ -9,7 +9,7 @@
 | 正式集群启动 | 2026-10-15 **11:47:30–11:47:31** | OBSERVED `ps -o lstart` pid 22270…22448 |
 | 压测时二进制 | `build/test/gateway` / `gamelogic` **(deleted)**，仍为 11:47 启动映像 | OBSERVED `readlink /proc/<pid>/exe` |
 | 磁盘上新构建 | gateway/gamelogic mtime **14:39–14:42**（压测之后） | OBSERVED `ls -la build/test/` |
-| `GAMEMESH_ADVERTISE_HOST` | 历史约定 `10.0.0.2`；本轮未改启动参数 | INFERRED from prior ops |
+| `LUNASERVER_ADVERTISE_HOST` | 历史约定 `10.0.0.2`；本轮未改启动参数 | INFERRED from prior ops |
 
 **结论**：13:39 压测跑在 **11:47 映像**上；14:35 起合入的 AOI 抽样/`TooFast` 钳位 **未生效于本次压测**。
 

@@ -8,18 +8,18 @@ cd "$ROOT"
 "$ROOT/scripts/test_session_ha.sh"
 
 # 若本地集群在跑：再杀集群 session0，断言 session1 ready
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/cluster}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/cluster}"
 if [[ ! -f "$RUN_DIR/pids" ]]; then
   RUN_DIR="$ROOT/run/formal"
 fi
-HOST="${GAMEMESH_SMOKE_HOST:-127.0.0.1}"
-S0="${GAMEMESH_SMOKE_SESSION0:-8093}"
-S1="${GAMEMESH_SMOKE_SESSION1:-8096}"
+HOST="${LUNASERVER_SMOKE_HOST:-127.0.0.1}"
+S0="${LUNASERVER_SMOKE_SESSION0:-8093}"
+S1="${LUNASERVER_SMOKE_SESSION1:-8096}"
 
 if [[ -f "$RUN_DIR/pids" ]]; then
   # shellcheck disable=SC1090
   source "$ROOT/scripts/e2e_inventory.sh"
-  export GAMEMESH_RUN_DIR="$RUN_DIR"
+  export LUNASERVER_RUN_DIR="$RUN_DIR"
   S0_PID="${SESSION0_PID:-}"
   if [[ -z "$S0_PID" ]]; then
     S0_PID="$(e2e_pid_of session sess-0 2>/dev/null || true)"

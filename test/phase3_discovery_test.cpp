@@ -58,7 +58,7 @@ int main() {
         std::printf("FAIL: Redis unavailable\n");
         return 1;
     }
-    RedisServiceRegistry::Get().Configure("gamemesh:p3test:");
+    RedisServiceRegistry::Get().Configure("lunaserver:p3test:");
     Expect(RedisServiceRegistry::Get().InitFromRedisConfig(), "redis registry init");
 
     IServiceRegistry::ServiceInstance a;

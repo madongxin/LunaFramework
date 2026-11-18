@@ -231,12 +231,12 @@ void GameDbServiceImpl::ApplyAssetMutation(::google::protobuf::RpcController *co
         return;
     }
     // 测试 failpoint：提交后、响应前延迟/退出（正式环境勿设）
-    if (const char *delay = std::getenv("GAMEMESH_FAILPOINT_DELAY_MS")) {
+    if (const char *delay = std::getenv("LUNASERVER_FAILPOINT_DELAY_MS")) {
         const int ms = std::atoi(delay);
         if (ms > 0)
             ::usleep(static_cast<useconds_t>(ms) * 1000);
     }
-    if (const char *abort = std::getenv("GAMEMESH_FAILPOINT_ABORT_AFTER_COMMIT")) {
+    if (const char *abort = std::getenv("LUNASERVER_FAILPOINT_ABORT_AFTER_COMMIT")) {
         if (abort[0] == '1') {
             LOG_ERROR << "FAILPOINT abort after commit player=" << request->player_id();
             ::_exit(97);

@@ -5,7 +5,7 @@
 ## 准备
 
 1. 记录 `git rev-parse HEAD`、`build/test/gateway` mtime、`/proc/pid/exe`。  
-2. `stop_formal.sh` && `GAMEMESH_ADVERTISE_HOST=10.0.0.2 start_formal.sh`（仅隔离约定主机）。  
+2. `stop_formal.sh` && `LUNASERVER_ADVERTISE_HOST=10.0.0.2 start_formal.sh`（仅隔离约定主机）。  
 3. 客户端 schema = `e6668114…`（含 AoiEvent.server_time_ms）。  
 4. 压测前：`for p in 8080 8082 8090 8091 8093 8096; do curl -s localhost:$p/metrics > /tmp/m0_$p.txt; done`  
 5. 机器人：405、40ms、20min、8081+8083；记录 bot_sha；打开 JSONL。  

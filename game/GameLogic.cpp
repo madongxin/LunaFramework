@@ -500,7 +500,7 @@ void GameLogic::AdvancePresentedMotion() {
 
 void GameLogic::SweepDisconnected() {
     int grace_sec = 45;
-    if (const char *env = std::getenv("GAMEMESH_SESSION_GRACE_SEC")) {
+    if (const char *env = std::getenv("LUNASERVER_SESSION_GRACE_SEC")) {
         const int v = std::atoi(env);
         if (v >= 1 && v <= 3600)
             grace_sec = v;
@@ -976,7 +976,7 @@ bool GameLogic::BuildFullStateSnapshot(uint64_t player_id, uint64_t baseline_ser
 #endif
     // 与 MapRuntime 可见上限 200 对齐。128 会在密集视野里直接 ERR_SNAPSHOT_TOO_LARGE，恢复不了周围的人。
     uint32_t aoi_max = 200;
-    if (const char *e = std::getenv("GAMEMESH_SNAPSHOT_AOI_MAX")) {
+    if (const char *e = std::getenv("LUNASERVER_SNAPSHOT_AOI_MAX")) {
         const int v = std::atoi(e);
         if (v > 0 && v <= 4096)
             aoi_max = static_cast<uint32_t>(v);
@@ -1107,12 +1107,12 @@ void GameLogic::MaybePersistLastSafe(uint64_t player_id, const MapEntity &e,
         return;
     int64_t flush_ms = 5000;
     float flush_dist = 4.f;
-    if (const char *v = std::getenv("GAMEMESH_SAFE_POS_FLUSH_MS")) {
+    if (const char *v = std::getenv("LUNASERVER_SAFE_POS_FLUSH_MS")) {
         const int n = std::atoi(v);
         if (n >= 0 && n <= 120000)
             flush_ms = n;
     }
-    if (const char *v = std::getenv("GAMEMESH_SAFE_POS_FLUSH_DIST")) {
+    if (const char *v = std::getenv("LUNASERVER_SAFE_POS_FLUSH_DIST")) {
         const float d = std::strtof(v, nullptr);
         if (d > 0.f && d < 1000.f)
             flush_dist = d;
@@ -2838,9 +2838,9 @@ bool GameLogic::HandleChatSend(const game::ChatSendReq &req, game::GameResponse 
 #ifndef WEBSERVER_ENABLE_BRPC
     (void)hide_whisper;
 #endif
-    const size_t max_cp = static_cast<size_t>(EnvBoundedInt("GAMEMESH_CHAT_MAX_CP", 200, 8, 2000));
+    const size_t max_cp = static_cast<size_t>(EnvBoundedInt("LUNASERVER_CHAT_MAX_CP", 200, 8, 2000));
     const size_t max_bytes =
-        static_cast<size_t>(EnvBoundedInt("GAMEMESH_CHAT_MAX_BYTES", 800, 16, 4096));
+        static_cast<size_t>(EnvBoundedInt("LUNASERVER_CHAT_MAX_BYTES", 800, 16, 4096));
     std::string tec;
     if (!social::ValidWorldChatText(req.text(), max_cp, max_bytes, &tec))
         return fail(tec.empty() ? "ERR_TEXT_LENGTH" : tec.c_str(), "invalid chat text");
@@ -2849,8 +2849,8 @@ bool GameLogic::HandleChatSend(const game::ChatSendReq &req, game::GameResponse 
 #else
     if (!SessionStore::Instance().Available())
         return fail("ERR_DEPENDENCY_UNAVAILABLE", "chat requires redis");
-    const int limit = EnvBoundedInt("GAMEMESH_CHAT_PER_PLAYER", 5, 1, 60);
-    const int win = EnvBoundedInt("GAMEMESH_CHAT_WINDOW_SEC", 2, 1, 60);
+    const int limit = EnvBoundedInt("LUNASERVER_CHAT_PER_PLAYER", 5, 1, 60);
+    const int win = EnvBoundedInt("LUNASERVER_CHAT_WINDOW_SEC", 2, 1, 60);
     if (!SessionStore::Instance().ConsumeChatQuota(req.player_id(), limit, win))
         return fail("ERR_RATE_LIMITED", "chat rate limited");
     const uint64_t mid = SessionStore::Instance().NextWorldChatMessageId();
@@ -3024,8 +3024,8 @@ bool GameLogic::HandleGetPlayerBrief(const game::GetPlayerBriefReq &req, game::G
         if (!social::NormalizePlayerName(req.player_name(), &name, &nec))
             return fail(nec.empty() ? "ERR_TEXT_LENGTH" : nec.c_str(), "invalid player_name");
 #ifdef WEBSERVER_ENABLE_REDIS
-        const int limit = EnvBoundedInt("GAMEMESH_NAME_QUERY_PER_PLAYER", 8, 1, 60);
-        const int win = EnvBoundedInt("GAMEMESH_NAME_QUERY_WINDOW_SEC", 10, 1, 120);
+        const int limit = EnvBoundedInt("LUNASERVER_NAME_QUERY_PER_PLAYER", 8, 1, 60);
+        const int win = EnvBoundedInt("LUNASERVER_NAME_QUERY_WINDOW_SEC", 10, 1, 120);
         if (!SessionStore::Instance().Available() ||
             !SessionStore::Instance().ConsumeNameQueryQuota(querier, limit, win))
             return fail("ERR_RATE_LIMITED", "name query rate limited");
@@ -3420,7 +3420,7 @@ bool GameLogic::Handle(const game::GameRequest &req, game::GameResponse *rsp) {
     rsp->Clear();
     rsp->set_seq(req.seq());  // 与请求 seq 对齐，便于客户端匹配异步响应
 #ifdef WEBSERVER_ENABLE_MYSQL
-    // Redis/Session 不可用时拒绝邮件。只有非正式环境显式 GAMEMESH_MAIL_DEV_SKIP_SESSION=1 才放行。
+    // Redis/Session 不可用时拒绝邮件。只有非正式环境显式 LUNASERVER_MAIL_DEV_SKIP_SESSION=1 才放行。
     auto mail_session = [&](uint64_t player_id) -> bool {
         if (!MailDevSkipSession()) {
 #if defined(WEBSERVER_ENABLE_BRPC)

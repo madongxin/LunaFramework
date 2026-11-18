@@ -65,7 +65,7 @@ int main() {
         return 1;
     }
     const std::string prefix =
-        "gamemesh:test:map_dungeon:" + std::to_string(static_cast<unsigned long long>(::getpid())) +
+        "lunaserver:test:map_dungeon:" + std::to_string(static_cast<unsigned long long>(::getpid())) +
         ":";
     if (!PlacementStore::Instance().InitFromSessionPrefix(prefix))
         return Fail("PlacementStore init");

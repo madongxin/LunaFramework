@@ -580,9 +580,9 @@ std::string ReadAvailable(int fd) {
 
 std::string CaptureIdleSendOrder(bool v2) {
     if (v2)
-        ::setenv("GAMEMESH_SENDBUF_V2", "1", 1);
+        ::setenv("LUNASERVER_SENDBUF_V2", "1", 1);
     else
-        ::unsetenv("GAMEMESH_SENDBUF_V2");
+        ::unsetenv("LUNASERVER_SENDBUF_V2");
     int fds[2];
     if (!MakeNonBlockingPair(fds))
         return {};
@@ -603,14 +603,14 @@ std::string CaptureIdleSendOrder(bool v2) {
 void TestSendBufV2MatchesIdleOrder() {
     const std::string old_bytes = CaptureIdleSendOrder(false);
     const std::string new_bytes = CaptureIdleSendOrder(true);
-    ::unsetenv("GAMEMESH_SENDBUF_V2");
+    ::unsetenv("LUNASERVER_SENDBUF_V2");
     std::cout << "idle send bytes old=" << old_bytes.size() << " v2=" << new_bytes.size() << "\n";
     Expect(old_bytes == "CCCCMMMMMMMM", "old path writes control then the move");
     Expect(new_bytes == old_bytes, "v2 idle byte stream matches the old path");
 }
 
 void TestSendBufV2LeaveDropsUnwrittenMove() {
-    ::setenv("GAMEMESH_SENDBUF_V2", "1", 1);
+    ::setenv("LUNASERVER_SENDBUF_V2", "1", 1);
     int lfd = ::socket(AF_INET, SOCK_STREAM, 0);
     Expect(lfd >= 0, "tcp listen v2");
     int yes = 1;
@@ -663,7 +663,7 @@ void TestSendBufV2LeaveDropsUnwrittenMove() {
     Expect(committed == 0, "dropped move was not committed");
     const std::string queued = conn->CopySendBuf();
     Expect(queued.find(frame) == std::string::npos, "dropped move is not in the app buffer");
-    ::unsetenv("GAMEMESH_SENDBUF_V2");
+    ::unsetenv("LUNASERVER_SENDBUF_V2");
     conn->HandleClose();
     conn->ConnectionDestructor();
     ::close(afd);

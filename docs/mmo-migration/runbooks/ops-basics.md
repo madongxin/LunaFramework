@@ -7,7 +7,7 @@
 ./scripts/build.sh Debug
 ./scripts/run_cluster_local.sh   # 或 start_formal.sh / docker compose up
 ./scripts/smoke_test.sh
-./scripts/stop_formal.sh         # SIGTERM → 等待 → SIGKILL（GAMEMESH_RUN_DIR）
+./scripts/stop_formal.sh         # SIGTERM → 等待 → SIGKILL（LUNASERVER_RUN_DIR）
 ```
 
 ## 健康检查
@@ -20,8 +20,8 @@
 | `GET /metrics` | Prometheus（含 OpsMetrics） | 200 |
 
 正式模式 HTTP 默认 `127.0.0.1`；探活请本机 curl。
-`GAMEMESH_FORCE_NOT_READY=1`：强制 ready 失败（演练）。
-`GAMEMESH_DRAIN_SEC`：SIGTERM 后等待在途秒数（默认 2）。
+`LUNASERVER_FORCE_NOT_READY=1`：强制 ready 失败（演练）。
+`LUNASERVER_DRAIN_SEC`：SIGTERM 后等待在途秒数（默认 2）。
 
 ## 优雅停服（SIGTERM）
 
@@ -29,7 +29,7 @@
 SetDraining → ready=false
 → 注册中心 DRAINING
 → Gateway StopAccept + 拒 Login/Register/EnterMap
-→ 等待 GAMEMESH_DRAIN_SEC
+→ 等待 LUNASERVER_DRAIN_SEC
 → Unregister → Stop brpc → Quit GameTCP
 ```
 
@@ -65,4 +65,4 @@ SetDraining → ready=false
 
 ## 灰度 / 回滚
 
-见 `gray-rollback.md`。扩缩容：改 `*_addrs` 或注册表后 Gateway 轮询刷新（`GAMEMESH_DISCOVERY_POLL_SEC`）。
+见 `gray-rollback.md`。扩缩容：改 `*_addrs` 或注册表后 Gateway 轮询刷新（`LUNASERVER_DISCOVERY_POLL_SEC`）。

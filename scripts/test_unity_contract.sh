@@ -4,7 +4,7 @@
 # 用法：
 #   LUNA_REPO=/path/to/luna ./scripts/test_unity_contract.sh
 #   ./scripts/test_unity_contract.sh /path/to/luna
-# client_ready / 发布门禁设置 GAMEMESH_REQUIRE_LUNA_CONTRACT=1：缺少 luna 即失败。
+# client_ready / 发布门禁设置 LUNASERVER_REQUIRE_LUNA_CONTRACT=1：缺少 luna 即失败。
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
@@ -21,24 +21,24 @@ source "$ROOT/scripts/e2e_inventory.sh"
 CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
 [[ -x "$CLIENT" ]] || { echo "ERROR: missing $CLIENT (./scripts/build.sh Debug)" >&2; exit 1; }
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/unity-e2e}"
-export GAMEMESH_MAP_SHA256_FILE="${GAMEMESH_MAP_SHA256_FILE:-$ROOT/config/maps/map_1001.json.sha256}"
-export GAMEMESH_MAP_DATA_VERSION="${GAMEMESH_MAP_DATA_VERSION:-1}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/unity-e2e}"
+export LUNASERVER_MAP_SHA256_FILE="${LUNASERVER_MAP_SHA256_FILE:-$ROOT/config/maps/map_1001.json.sha256}"
+export LUNASERVER_MAP_DATA_VERSION="${LUNASERVER_MAP_DATA_VERSION:-1}"
 
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME:?}"
 e2e_wait_login "$CLIENT" "$HOST" "$GW0"
 
-PROTO_OUT="${GAMEMESH_RUN_DIR}/protocol"
+PROTO_OUT="${LUNASERVER_RUN_DIR}/protocol"
 "$ROOT/scripts/export_unity_protocol.sh" "$PROTO_OUT"
 [[ -s "$PROTO_OUT/game.proto.sha256" ]] || { echo "ERROR: missing proto sha256" >&2; exit 1; }
 [[ -s "$PROTO_OUT/protocol_manifest.json" ]] || { echo "ERROR: missing protocol_manifest.json" >&2; exit 1; }
-[[ -s "$GAMEMESH_MAP_SHA256_FILE" ]] || { echo "ERROR: missing map sha256" >&2; exit 1; }
+[[ -s "$LUNASERVER_MAP_SHA256_FILE" ]] || { echo "ERROR: missing map sha256" >&2; exit 1; }
 echo "game_proto_sha256=$(tr -d ' \n' <"$PROTO_OUT/game.proto.sha256")"
-echo "map_sha256=$(awk '{print $1; exit}' "$GAMEMESH_MAP_SHA256_FILE")"
+echo "map_sha256=$(awk '{print $1; exit}' "$LUNASERVER_MAP_SHA256_FILE")"
 
 require() {
   local hay="$1" needle="$2"
@@ -90,16 +90,16 @@ if kill -0 "$PID_L0" 2>/dev/null; then
   kill -9 "$PID_L0" 2>/dev/null || true
   sleep 1
 fi
-mkdir -p "$GAMEMESH_RUN_DIR/logs"
+mkdir -p "$LUNASERVER_RUN_DIR/logs"
 if [[ "$(basename "$LOGIC_BIN")" == "server" ]]; then
-  GAMEMESH_FORMAL=1 GAMEMESH_INSTANCE_ID=gl-0 nohup "$LOGIC_BIN" gamelogic "$HTTP_L0" "$LOGIC_PORT" \
-    >>"$GAMEMESH_RUN_DIR/logs/logic0.log" 2>&1 &
+  LUNASERVER_FORMAL=1 LUNASERVER_INSTANCE_ID=gl-0 nohup "$LOGIC_BIN" gamelogic "$HTTP_L0" "$LOGIC_PORT" \
+    >>"$LUNASERVER_RUN_DIR/logs/logic0.log" 2>&1 &
 else
-  GAMEMESH_FORMAL=1 GAMEMESH_INSTANCE_ID=gl-0 nohup "$LOGIC_BIN" "$HTTP_L0" "$LOGIC_PORT" \
-    >>"$GAMEMESH_RUN_DIR/logs/logic0.log" 2>&1 &
+  LUNASERVER_FORMAL=1 LUNASERVER_INSTANCE_ID=gl-0 nohup "$LOGIC_BIN" "$HTTP_L0" "$LOGIC_PORT" \
+    >>"$LUNASERVER_RUN_DIR/logs/logic0.log" 2>&1 &
 fi
 newpid=$!
-echo "$newpid" >>"$GAMEMESH_RUN_DIR/pids"
+echo "$newpid" >>"$LUNASERVER_RUN_DIR/pids"
 e2e_inv_replace gamelogic gl-0 "$newpid" "$RPC_L0" "$HTTP_L0" -
 ready=0
 for _ in $(seq 1 50); do

@@ -1,9 +1,9 @@
-# GameMesh 场景管理方案（主图分线 + 动态副本 / 10 万同时在线）
+# LunaServer 场景管理方案（主图分线 + 动态副本 / 10 万同时在线）
 
 > **文档性质：** 10 万 CCU **评估稿**（数字推演 / 评审题）。**施工权威已换成** `scene-management-construction.md`（P0–P2，保守定额）。
 > **版本：** v1.0-draft（评估）；施工请用 construction v1.1
 > **日期：** 2026-09-06
-> **仓库：** GameMesh（CppWebServer），分支以评审时 `main` 为准。
+> **仓库：** LunaServer（CppWebServer），分支以评审时 `main` 为准。
 > **合成来源：**
 > 1. 仓库正式基线 `docs/mmo-distributed-architecture.md`（控制面 / 单一 Owner / 同构 Logic 池）
 > 2. 历史任务书 `docs/archive/mmo_distributed_architecture_cpp17_gamelogic.md`（MapScheduler、epoch、Transfer、可选 Partition）
@@ -88,7 +88,7 @@
 | 能力 | 现状 | 文件 / 键 |
 |------|------|-----------|
 | 多 Gateway / 多 GameLogic / Session / World / GameDB | 正式集群脚本 | `scripts/start_formal.sh` |
-| Session fence / ONLINE / DISCONNECTED | Redis Hash + Lua | `gamemesh:dev:session:{playerId}` |
+| Session fence / ONLINE / DISCONNECTED | Redis Hash + Lua | `lunaserver:dev:session:{playerId}` |
 | 公共池占位 | Lua 原子选房或新建 | `map:inst:` / `map:occ:` / `map:pres:` |
 | 指定 `map_instance_id` 满员 | `ERR_MAP_FULL`，不换图 | `PlacementStore` |
 | 进图跨 Logic | Gateway Transfer Saga | `GatewayEnterMapOrchestrator` |
@@ -273,7 +273,7 @@ MOVE 可合并；ENTER/LEAVE 可靠 Push。
 
 ## 6. 控制面数据（Redis）
 
-前缀沿用 `gamemesh:{env}:`（现网 `gamemesh:dev:`）。以下为提案键，实施时以 Lua 为准。
+前缀沿用 `lunaserver:{env}:`（现网 `lunaserver:dev:`）。以下为提案键，实施时以 Lua 为准。
 
 ### 6.1 键设计
 
@@ -527,7 +527,7 @@ Session 或 Logic 租约心跳线程（已有 `MapLeaseKeeper` 方向）：
 
 - 仅同 instance、connected、落在 `(2R+1)²` 格内。
 - 进图回 `aoi_snapshot`（不含自己）。
-- 快照人数上限沿用 `GAMEMESH_SNAPSHOT_AOI_MAX`（默认 128）；超限 `ERR_SNAPSHOT_TOO_LARGE`——因此主城 **必须** 把 p95 可见压到远小于 128。
+- 快照人数上限沿用 `LUNASERVER_SNAPSHOT_AOI_MAX`（默认 128）；超限 `ERR_SNAPSHOT_TOO_LARGE`——因此主城 **必须** 把 p95 可见压到远小于 128。
 
 ### 9.3 NPC / 怪物（提案开口，第一期可只玩家）
 
@@ -539,7 +539,7 @@ Session 或 Logic 租约心跳线程（已有 `MapLeaseKeeper` 方向）：
 
 ## 10. 可观测性与验收
 
-### 10.1 指标（扩展 `gamemesh_*`）
+### 10.1 指标（扩展 `lunaserver_*`）
 
 - `map_instances{kind,template,logic}`  
 - `map_occupancy{instance,template,line}`  
@@ -678,6 +678,6 @@ Session 或 Logic 租约心跳线程（已有 `MapLeaseKeeper` 方向）：
 
 ## 16. 一句话立场（供评审打分）
 
-> **控制面遵守 GameMesh 基线（同构 Logic、单 Owner/epoch、Session 占位、断线≠登出、World 不跑图）；数据面把场景分成常驻分线与短寿命副本，用线号和队员名单替代 50 人公共池；10 万靠「几十个 GameLogic × 每线数百到一千人 × 裁剪后的 AOI」，而不是一张无缝大地图。**
+> **控制面遵守 LunaServer 基线（同构 Logic、单 Owner/epoch、Session 占位、断线≠登出、World 不跑图）；数据面把场景分成常驻分线与短寿命副本，用线号和队员名单替代 50 人公共池；10 万靠「几十个 GameLogic × 每线数百到一千人 × 裁剪后的 AOI」，而不是一张无缝大地图。**
 
 评审请对这句话：同意 / 修正 / 反对，并给出可执行的修正段落（仍遵守 §2）。

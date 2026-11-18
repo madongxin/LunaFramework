@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# 将 build/test 角色二进制打包为 gamemesh:local（供 compose 使用）
+# 将 build/test 角色二进制打包为 lunaserver:local（供 compose 使用）
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 BIN="${ROOT}/build/test"
 STAGE="${ROOT}/build/docker_stage"
-TAG="${GAMEMESH_IMAGE_TAG:-gamemesh:local}"
+TAG="${LUNASERVER_IMAGE_TAG:-lunaserver:local}"
 
 for b in gateway session gamelogic globalservice gamedb; do
   if [[ ! -x "$BIN/$b" ]]; then

@@ -209,12 +209,12 @@ void GatewayPushServiceImpl::KickConnection(::google::protobuf::RpcController *c
     if (!notify.SerializeToString(&payload) || !gameproto::EncodeFrame(payload, &frame))
         frame.clear();
     double grace = 3.0;
-    if (const char *e = std::getenv("GAMEMESH_SESSION_REPLACE_GRACE_SEC")) {
+    if (const char *e = std::getenv("LUNASERVER_SESSION_REPLACE_GRACE_SEC")) {
         char *end = nullptr;
         const double sec = std::strtod(e, &end);
         if (end != e && sec >= 0.0 && sec <= 30.0)
             grace = sec;
-    } else if (const char *ms_env = std::getenv("GAMEMESH_KICK_NOTIFY_GRACE_MS")) {
+    } else if (const char *ms_env = std::getenv("LUNASERVER_KICK_NOTIFY_GRACE_MS")) {
         char *end = nullptr;
         const unsigned long ms = std::strtoul(ms_env, &end, 10);
         if (end != ms_env && ms <= 30000)

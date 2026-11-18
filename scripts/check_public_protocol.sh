@@ -10,8 +10,8 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 [[ -f game/game.pb.h ]] || die "missing game/game.pb.h"
 command -v protoc >/dev/null 2>&1 || die "protoc not found"
 
-grep -q 'option csharp_namespace = "GameMesh.Protocol";' proto/game.proto \
-  || die "csharp_namespace must be GameMesh.Protocol"
+grep -q 'option csharp_namespace = "LunaServer.Protocol";' proto/game.proto \
+  || die "csharp_namespace must be LunaServer.Protocol"
 grep -q '^package game;' proto/game.proto || die "package game missing"
 
 required_msgs=(

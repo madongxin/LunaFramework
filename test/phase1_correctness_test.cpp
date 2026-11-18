@@ -143,7 +143,7 @@ void TestLeaseAndFormalNoLocalClaim() {
     Expect(reg.CheckWrite(201, 2) == MapWriteFence::LeaseMissing, "lease missing formal");
     Expect(reg.CheckWrite(201, 9) == MapWriteFence::StaleEpoch, "stale epoch");
 
-    ::setenv("GAMEMESH_FORMAL", "1", 1);
+    ::setenv("LUNASERVER_FORMAL", "1", 1);
     Expect(FormalModeEnabled(), "formal on");
     reg.SetLocalInstanceId("gl-test");
     MapPlacement::Instance().ConfigureOwners({"gl-test"});
@@ -160,7 +160,7 @@ void TestLeaseAndFormalNoLocalClaim() {
                    m.find("placement") != std::string::npos,
                "formal message placement required/unavailable");
     }
-    ::unsetenv("GAMEMESH_FORMAL");
+    ::unsetenv("LUNASERVER_FORMAL");
     reg.SetRequireLease(false);
     reg.ClearForTest();
 }

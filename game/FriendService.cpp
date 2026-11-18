@@ -98,7 +98,7 @@ void AttachOnline(std::vector<game::FriendBrief *> briefs) {
 
 #ifdef WEBSERVER_ENABLE_BRPC
 int FriendPageLimit() {
-    const char *e = std::getenv("GAMEMESH_FRIEND_MAX_COUNT");
+    const char *e = std::getenv("LUNASERVER_FRIEND_MAX_COUNT");
     int v = (e && *e) ? std::atoi(e) : 100;
     if (v <= 0)
         v = 100;
@@ -799,7 +799,7 @@ bool LoadBlockSet(uint64_t player_id, std::unordered_set<uint64_t> *out) {
     std::vector<uint64_t> ids;
     std::string cursor;
     int page = 100;
-    if (const char *e = std::getenv("GAMEMESH_FRIEND_BLOCK_MAX_COUNT")) {
+    if (const char *e = std::getenv("LUNASERVER_FRIEND_BLOCK_MAX_COUNT")) {
         const int v = std::atoi(e);
         if (v > 0 && v <= 500)
             page = v;
@@ -931,7 +931,7 @@ void RunPresenceFanout(uint64_t player_id, bool online) {
         by_id[target.player_id] = target;
     }
     const size_t batch_max =
-        static_cast<size_t>(EnvInt("GAMEMESH_FRIEND_PRESENCE_BATCH_MAX", 200, 1, 1000));
+        static_cast<size_t>(EnvInt("LUNASERVER_FRIEND_PRESENCE_BATCH_MAX", 200, 1, 1000));
     const auto batches = SplitPresenceBatches(dests, batch_max);
     for (const auto &batch : batches) {
         ServerStats::friend_presence_batch_size.store(batch.player_ids.size(),
@@ -1034,8 +1034,8 @@ void EnsurePresenceFanoutThread() {
     std::lock_guard<std::mutex> lk(q.mu);
     if (q.started || q.stop)
         return;
-    q.cap = static_cast<size_t>(EnvInt("GAMEMESH_FRIEND_PRESENCE_QUEUE_MAX", 4096, 1, 100000));
-    q.window_ms = EnvInt("GAMEMESH_FRIEND_PRESENCE_WINDOW_MS", 400, 50, 5000);
+    q.cap = static_cast<size_t>(EnvInt("LUNASERVER_FRIEND_PRESENCE_QUEUE_MAX", 4096, 1, 100000));
+    q.window_ms = EnvInt("LUNASERVER_FRIEND_PRESENCE_WINDOW_MS", 400, 50, 5000);
     q.started = true;
     q.worker = std::thread(PresenceFanoutLoop);
 }

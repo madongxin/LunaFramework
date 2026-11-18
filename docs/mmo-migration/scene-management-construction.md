@@ -1,4 +1,4 @@
-# GameMesh 场景管理施工版（P0–P2）
+# LunaServer 场景管理施工版（P0–P2）
 
 > **本文是施工权威。** 开始改 Placement / EnterMap / 副本时以本文为准。  
 > 10 万 CCU 评估稿（数字推演、评审题）见 `scene-management-proposal-100k.md`，**不阻塞本施工包**。  
@@ -9,7 +9,7 @@
 
 ## 0. 本包做什么
 
-做成类天龙的 **主图分线 + 动态副本**，控制面继续走 GameMesh：
+做成类天龙的 **主图分线 + 动态副本**，控制面继续走 LunaServer：
 
 - 单一 Owner / epoch，Session Redis Lua 占位，Gateway Transfer，World 不跑 Tick。
 - 不引入 gRPC，不重写 Reactor，GameLogic 不接受密码，`MarkDisconnected` ≠ `Logout`。
@@ -242,7 +242,7 @@ Client EnterMap / CreateDungeon
 | `SwitchLine` | Session Lua 同模板原子迁占位；指定线满员 `ERR_MAP_LINE_FULL`；Gateway 再走 EnterMap Transfer |
 | 排队票 | `EnqueueMap` 发 `queue_token`；队首且有空位后 `EnterMap(queue_token)` 兑换 |
 | DRAINING / 热迁 | `DrainMap` 拒新进；`LiveMigrateMap` Drain→换 Owner→改 Session 路由；旧 Logic Unload |
-| Session ×2 | `start_formal.sh` 默认 `GAMEMESH_SESSION2=8402`；Gateway `list://` + rr |
+| Session ×2 | `start_formal.sh` 默认 `LUNASERVER_SESSION2=8402`；Gateway `list://` + rr |
 | 图邮箱 | GameLogic `PlayerSerialQueue::MapMailbox()` 按 `map_instance_id` 串行 Enter/Move/Leave |
 | 跨 Logic / 跨线通讯 | **不走 AOI**；World 聊天/私聊/邮件；`QueryOnlineState` 带线号后 `SwitchLine` 见面。见 `player-comms.md` |
 
@@ -254,10 +254,10 @@ Client EnterMap / CreateDungeon
 
 **P0–P3 已落地。** 1001 仍为 `LEGACY_POOL`。1002 为 LINE（苏州，soft 200 / hard 400）。演示 **1101=LINE**、**2101=DUNGEON**。
 
-空线回收：Session **正式常开** `CloseIdle`（默认 5s 扫 `map:idle`）。LINE 空超过 `empty_close_delay`（1002=300s）且 READY 线数 > `min_lines`（1）才 `CLOSED`。`GAMEMESH_EXPERIMENTAL_PLACEMENT_RECOVERY` 只控制失联热迁。
+空线回收：Session **正式常开** `CloseIdle`（默认 5s 扫 `map:idle`）。LINE 空超过 `empty_close_delay`（1002=300s）且 READY 线数 > `min_lines`（1）才 `CLOSED`。`LUNASERVER_EXPERIMENTAL_PLACEMENT_RECOVERY` 只控制失联热迁。
 
 客户端分线：`QueryMapLines`；`EnterMapRsp.lines` / `SwitchLineRsp.lines` 快照；Push `map.lines.v1`（内层 `QueryMapLinesRsp`，可合并、不可靠）。切线：`SwitchLine`（`line_no>0`，满员 `ERR_MAP_LINE_FULL`）。
 
 主城传送门进本：模板 **2102** 复用 1001 网格与 MainScene。Hello 仍下发 `spawn_to_dungeon` / `dungeon_to_spawn`。公网允许 `CreateDungeon(2102)`（只建本+队员，不切 occupancy），再 `EnterMap` 指定实例；`InteractPortal` 仍可一次完成建本+进图。`EnterMap(2102, 0)` 禁止。空本 30s `CloseIdle`。
 
-监控：`/metrics` 导出 `gamemesh_map_line_occupancy` / `gamemesh_map_line_count`（label `owner`=`gl-*`）以及 `gamemesh_map_dungeon_occupancy` / `gamemesh_map_dungeon_members` / `gamemesh_map_dungeon_count`（按 `map_instance_id`）。`/monitor` 有分线表和副本表。
+监控：`/metrics` 导出 `lunaserver_map_line_occupancy` / `lunaserver_map_line_count`（label `owner`=`gl-*`）以及 `lunaserver_map_dungeon_occupancy` / `lunaserver_map_dungeon_members` / `lunaserver_map_dungeon_count`（按 `map_instance_id`）。`/monitor` 有分线表和副本表。

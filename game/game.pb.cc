@@ -4881,7 +4881,8 @@ const char descriptor_table_protodef_game_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "END_RELATION_FRIEND\020\001\022 \n\034FRIEND_RELATION"
   "_SENT_PENDING\020\002\022$\n FRIEND_RELATION_RECEI"
   "VED_PENDING\020\003\022#\n\037FRIEND_RELATION_BLOCKED"
-  "_BY_SELF\020\004B\024\252\002\021GameMesh.Protocolb\006proto3"
+  "_BY_SELF\020\004B\026\252\002\023LunaServer.Protocolb\006prot"
+  "o3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_game_2eproto_deps[1] = {
 };
@@ -5015,7 +5016,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_gam
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_game_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_game_2eproto = {
-  false, false, descriptor_table_protodef_game_2eproto, "game.proto", 21640,
+  false, false, descriptor_table_protodef_game_2eproto, "game.proto", 21642,
   &descriptor_table_game_2eproto_once, descriptor_table_game_2eproto_sccs, descriptor_table_game_2eproto_deps, 126, 0,
   schemas, file_default_instances, TableStruct_game_2eproto::offsets,
   file_level_metadata_game_2eproto, 126, file_level_enum_descriptors_game_2eproto, file_level_service_descriptors_game_2eproto,

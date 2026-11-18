@@ -4,6 +4,6 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/unity-e2e}"
-export GAMEMESH_FORMAL="${GAMEMESH_FORMAL:-1}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/unity-e2e}"
+export LUNASERVER_FORMAL="${LUNASERVER_FORMAL:-1}"
 exec "$ROOT/scripts/run_e2e_cluster.sh"

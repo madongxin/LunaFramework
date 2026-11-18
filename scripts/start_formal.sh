@@ -9,61 +9,61 @@ cd "$ROOT"
 
 ulimit -n 65535 || true
 # 苏州 3000 压测：单 IP 连入 + 长连接保活（默认 45s idle 撑不到进完）
-export GAMEMESH_CONNECT_RATE_MAX="${GAMEMESH_CONNECT_RATE_MAX:-5000}"
-export GAMEMESH_IDLE_TIMEOUT_MS="${GAMEMESH_IDLE_TIMEOUT_MS:-3600000}"
-export GAMEMESH_FORMAL="${GAMEMESH_FORMAL:-1}"
+export LUNASERVER_CONNECT_RATE_MAX="${LUNASERVER_CONNECT_RATE_MAX:-5000}"
+export LUNASERVER_IDLE_TIMEOUT_MS="${LUNASERVER_IDLE_TIMEOUT_MS:-3600000}"
+export LUNASERVER_FORMAL="${LUNASERVER_FORMAL:-1}"
 # 两个 Gateway 共用一条出口。这里的 Mbps 是整机预算，进程内再按实例数拆开。
-export GAMEMESH_EGRESS_BUDGET_MBPS="${GAMEMESH_EGRESS_BUDGET_MBPS:-2.4}"
-export GAMEMESH_GATEWAY_INSTANCES="${GAMEMESH_GATEWAY_INSTANCES:-2}"
+export LUNASERVER_EGRESS_BUDGET_MBPS="${LUNASERVER_EGRESS_BUDGET_MBPS:-2.4}"
+export LUNASERVER_GATEWAY_INSTANCES="${LUNASERVER_GATEWAY_INSTANCES:-2}"
 # P0 enforce + P1 外推：905 验收后正式默认开（可用 =0 关闭）。
-export GAMEMESH_EGRESS_ENFORCE="${GAMEMESH_EGRESS_ENFORCE:-1}"
-export GAMEMESH_EGRESS_SHARED_CLASS_KBIT="${GAMEMESH_EGRESS_SHARED_CLASS_KBIT:-2600}"
-export GAMEMESH_AOI_EXTRAPOLATE="${GAMEMESH_AOI_EXTRAPOLATE:-1}"
-export GAMEMESH_LOG_JSON="${GAMEMESH_LOG_JSON:-1}"
-export GAMEMESH_SESSION_REPLACE_GRACE_SEC="${GAMEMESH_SESSION_REPLACE_GRACE_SEC:-3}"
+export LUNASERVER_EGRESS_ENFORCE="${LUNASERVER_EGRESS_ENFORCE:-1}"
+export LUNASERVER_EGRESS_SHARED_CLASS_KBIT="${LUNASERVER_EGRESS_SHARED_CLASS_KBIT:-2600}"
+export LUNASERVER_AOI_EXTRAPOLATE="${LUNASERVER_AOI_EXTRAPOLATE:-1}"
+export LUNASERVER_LOG_JSON="${LUNASERVER_LOG_JSON:-1}"
+export LUNASERVER_SESSION_REPLACE_GRACE_SEC="${LUNASERVER_SESSION_REPLACE_GRACE_SEC:-3}"
 # 重连风暴：抬高 Login/Reconnect 并发与 reconnect 预留，避免「账在线满却连不回来」。
-export GAMEMESH_LOGIN_INFLIGHT_MAX="${GAMEMESH_LOGIN_INFLIGHT_MAX:-512}"
-export GAMEMESH_LOGIN_RECONNECT_RESERVE="${GAMEMESH_LOGIN_RECONNECT_RESERVE:-128}"
-export GAMEMESH_LOGIN_BIND_INFLIGHT="${GAMEMESH_LOGIN_BIND_INFLIGHT:-512}"
-export GAMEMESH_LOGIN_ENTER_INFLIGHT="${GAMEMESH_LOGIN_ENTER_INFLIGHT:-512}"
+export LUNASERVER_LOGIN_INFLIGHT_MAX="${LUNASERVER_LOGIN_INFLIGHT_MAX:-512}"
+export LUNASERVER_LOGIN_RECONNECT_RESERVE="${LUNASERVER_LOGIN_RECONNECT_RESERVE:-128}"
+export LUNASERVER_LOGIN_BIND_INFLIGHT="${LUNASERVER_LOGIN_BIND_INFLIGHT:-512}"
+export LUNASERVER_LOGIN_ENTER_INFLIGHT="${LUNASERVER_LOGIN_ENTER_INFLIGHT:-512}"
 
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/formal}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/formal}"
 mkdir -p "$RUN_DIR/logs"
 # 公网观察页令牌。文件在 run/formal，不进 git。未设置时回环仍可开，公网 403。
-if [[ -z "${GAMEMESH_HTTP_ACCESS_TOKEN:-}" && -f "$RUN_DIR/http_access_token" ]]; then
-  GAMEMESH_HTTP_ACCESS_TOKEN="$(tr -d '[:space:]' < "$RUN_DIR/http_access_token")"
-  export GAMEMESH_HTTP_ACCESS_TOKEN
+if [[ -z "${LUNASERVER_HTTP_ACCESS_TOKEN:-}" && -f "$RUN_DIR/http_access_token" ]]; then
+  LUNASERVER_HTTP_ACCESS_TOKEN="$(tr -d '[:space:]' < "$RUN_DIR/http_access_token")"
+  export LUNASERVER_HTTP_ACCESS_TOKEN
 fi
 
 # ---- 端口（可用环境变量覆盖）----
 # Gateway ×2（★ 客户端连 GAME 口）
-HTTP_G0="${GAMEMESH_HTTP_G0:-8080}"
-GAME_G0="${GAMEMESH_GAME_G0:-8081}"
-HTTP_G1="${GAMEMESH_HTTP_G1:-8082}"
-GAME_G1="${GAMEMESH_GAME_G1:-8083}"
+HTTP_G0="${LUNASERVER_HTTP_G0:-8080}"
+GAME_G0="${LUNASERVER_GAME_G0:-8081}"
+HTTP_G1="${LUNASERVER_HTTP_G1:-8082}"
+GAME_G1="${LUNASERVER_GAME_G1:-8083}"
 
 # GameLogic ×2
-HTTP_L0="${GAMEMESH_HTTP_L0:-8090}"
-LOGIC0="${GAMEMESH_LOGIC0:-8201}"
-HTTP_L1="${GAMEMESH_HTTP_L1:-8091}"
-LOGIC1="${GAMEMESH_LOGIC1:-8202}"
+HTTP_L0="${LUNASERVER_HTTP_L0:-8090}"
+LOGIC0="${LUNASERVER_LOGIC0:-8201}"
+HTTP_L1="${LUNASERVER_HTTP_L1:-8091}"
+LOGIC1="${LUNASERVER_LOGIC1:-8202}"
 
 # GlobalService ×1 / Session ×2（Redis 权威；Placement 无状态）
-HTTP_W="${GAMEMESH_HTTP_W:-8092}"
-WORLD="${GAMEMESH_WORLD:-8301}"
-HTTP_S="${GAMEMESH_HTTP_S:-8093}"
-SESSION="${GAMEMESH_SESSION:-8401}"
-HTTP_S2="${GAMEMESH_HTTP_S2:-8096}"
-: "${GAMEMESH_SESSION2:=8402}"
-SESSION2="${GAMEMESH_SESSION2}"
+HTTP_W="${LUNASERVER_HTTP_W:-8092}"
+WORLD="${LUNASERVER_WORLD:-8301}"
+HTTP_S="${LUNASERVER_HTTP_S:-8093}"
+SESSION="${LUNASERVER_SESSION:-8401}"
+HTTP_S2="${LUNASERVER_HTTP_S2:-8096}"
+: "${LUNASERVER_SESSION2:=8402}"
+SESSION2="${LUNASERVER_SESSION2}"
 PUSH_G0=$((GAME_G0 + 100))
 PUSH_G1=$((GAME_G1 + 100))
 
 # GameDB ×2
-HTTP_D0="${GAMEMESH_HTTP_D0:-8094}"
-GAMEDB0="${GAMEMESH_GAMEDB0:-8501}"
-HTTP_D1="${GAMEMESH_HTTP_D1:-8095}"
-GAMEDB1="${GAMEMESH_GAMEDB1:-8502}"
+HTTP_D0="${LUNASERVER_HTTP_D0:-8094}"
+GAMEDB0="${LUNASERVER_GAMEDB0:-8501}"
+HTTP_D1="${LUNASERVER_HTTP_D1:-8095}"
+GAMEDB1="${LUNASERVER_GAMEDB1:-8502}"
 
 pick_bin() {
   local name="$1"
@@ -106,8 +106,8 @@ if [[ -f "$ROOT/config/mysql.cnf" ]]; then
 fi
 
 detect_advertise_host() {
-  if [[ -n "${GAMEMESH_ADVERTISE_HOST:-}" ]]; then
-    echo "$GAMEMESH_ADVERTISE_HOST"
+  if [[ -n "${LUNASERVER_ADVERTISE_HOST:-}" ]]; then
+    echo "$LUNASERVER_ADVERTISE_HOST"
     return
   fi
   local ip=""
@@ -120,7 +120,7 @@ detect_advertise_host() {
 }
 
 ADVERTISE_HOST="$(detect_advertise_host)"
-export GAMEMESH_ADVERTISE_HOST="${GAMEMESH_ADVERTISE_HOST:-$ADVERTISE_HOST}"
+export LUNASERVER_ADVERTISE_HOST="${LUNASERVER_ADVERTISE_HOST:-$ADVERTISE_HOST}"
 
 backup_cnf() {
   local f="$1"
@@ -145,8 +145,8 @@ printf '%s\n' \
   "logic_addrs=127.0.0.1:${LOGIC0},127.0.0.1:${LOGIC1}" \
   "logic_instance_ids=gl-0,gl-1" \
   "globalservice_addrs=127.0.0.1:${WORLD}" \
-  "session_addrs=127.0.0.1:${SESSION}${GAMEMESH_SESSION2:+,127.0.0.1:${GAMEMESH_SESSION2}}" \
-  "session_instance_ids=sess-0${GAMEMESH_SESSION2:+,sess-1}" \
+  "session_addrs=127.0.0.1:${SESSION}${LUNASERVER_SESSION2:+,127.0.0.1:${LUNASERVER_SESSION2}}" \
+  "session_instance_ids=sess-0${LUNASERVER_SESSION2:+,sess-1}" \
   "gamedb_addrs=127.0.0.1:${GAMEDB0},127.0.0.1:${GAMEDB1}" \
   "etcd_endpoints=" \
   "rpc_timeout_ms=3000" \
@@ -156,7 +156,7 @@ printf '%s\n' \
   "listen_addr=0.0.0.0:${WORLD}" \
   "idle_timeout_sec=30" \
   "gamedb_addrs=127.0.0.1:${GAMEDB0},127.0.0.1:${GAMEDB1}" \
-  "gateway_push_addrs=gw-0=${GAMEMESH_ADVERTISE_HOST}:${PUSH_G0},gw-1=${GAMEMESH_ADVERTISE_HOST}:${PUSH_G1}" \
+  "gateway_push_addrs=gw-0=${LUNASERVER_ADVERTISE_HOST}:${PUSH_G0},gw-1=${LUNASERVER_ADVERTISE_HOST}:${PUSH_G1}" \
   "ssl_enable=0" >"$WORLD_CNF"
 
 printf '%s\n' \
@@ -164,7 +164,7 @@ printf '%s\n' \
   "idle_timeout_sec=30" \
   "logic_instance_ids=gl-0,gl-1" \
   "gamedb_addrs=127.0.0.1:${GAMEDB0},127.0.0.1:${GAMEDB1}" \
-  "gateway_push_addrs=gw-0=${GAMEMESH_ADVERTISE_HOST}:${PUSH_G0},gw-1=${GAMEMESH_ADVERTISE_HOST}:${PUSH_G1}" \
+  "gateway_push_addrs=gw-0=${LUNASERVER_ADVERTISE_HOST}:${PUSH_G0},gw-1=${LUNASERVER_ADVERTISE_HOST}:${PUSH_G1}" \
   "ssl_enable=0" >"$SESSION_CNF"
 
 # gamedb/gamelogic 的 listen 以进程 argv 覆盖为准；cnf 写主实例便于手工启
@@ -172,17 +172,17 @@ printf '%s\n' \
   "listen_addr=0.0.0.0:${GAMEDB0}" \
   "idle_timeout_sec=30" \
   "nats_url=" \
-  "session_addrs=127.0.0.1:${SESSION}${GAMEMESH_SESSION2:+,127.0.0.1:${GAMEMESH_SESSION2}}" \
-  "gateway_push_addrs=gw-0=${GAMEMESH_ADVERTISE_HOST}:${PUSH_G0},gw-1=${GAMEMESH_ADVERTISE_HOST}:${PUSH_G1}" \
+  "session_addrs=127.0.0.1:${SESSION}${LUNASERVER_SESSION2:+,127.0.0.1:${LUNASERVER_SESSION2}}" \
+  "gateway_push_addrs=gw-0=${LUNASERVER_ADVERTISE_HOST}:${PUSH_G0},gw-1=${LUNASERVER_ADVERTISE_HOST}:${PUSH_G1}" \
   "ssl_enable=0" >"$GAMEDB_CNF"
 
 printf '%s\n' \
   "listen_addr=127.0.0.1:${LOGIC0}" \
   "idle_timeout_sec=30" \
   "instance_id=gl-0" \
-  "session_addrs=127.0.0.1:${SESSION}${GAMEMESH_SESSION2:+,127.0.0.1:${GAMEMESH_SESSION2}}" \
+  "session_addrs=127.0.0.1:${SESSION}${LUNASERVER_SESSION2:+,127.0.0.1:${LUNASERVER_SESSION2}}" \
   "gamedb_addrs=127.0.0.1:${GAMEDB0},127.0.0.1:${GAMEDB1}" \
-  "gateway_push_addrs=gw-0=${GAMEMESH_ADVERTISE_HOST}:${PUSH_G0},gw-1=${GAMEMESH_ADVERTISE_HOST}:${PUSH_G1}" \
+  "gateway_push_addrs=gw-0=${LUNASERVER_ADVERTISE_HOST}:${PUSH_G0},gw-1=${LUNASERVER_ADVERTISE_HOST}:${PUSH_G1}" \
   "ssl_enable=0" \
   "map_data_dir=${ROOT}/config/maps" \
   "public_map_capacity=50" \
@@ -207,7 +207,7 @@ start_proc() {
 : >"$RUN_DIR/pids"
 # shellcheck disable=SC1090
 source "$ROOT/scripts/e2e_inventory.sh"
-export GAMEMESH_RUN_DIR="$RUN_DIR"
+export LUNASERVER_RUN_DIR="$RUN_DIR"
 e2e_inv_init
 
 wait_log() {
@@ -225,17 +225,17 @@ wait_log() {
   return 1
 }
 
-echo "== GameMesh formal start (2×gw + 2×logic + 2×gamedb + globalservice + session×2) =="
-GAMEMESH_INSTANCE_ID=sess-0 start_proc "$SESSION_BIN" session "$RUN_DIR/logs/session.log" \
+echo "== LunaServer formal start (2×gw + 2×logic + 2×gamedb + globalservice + session×2) =="
+LUNASERVER_INSTANCE_ID=sess-0 start_proc "$SESSION_BIN" session "$RUN_DIR/logs/session.log" \
   sess-0 "127.0.0.1:${SESSION}" "$HTTP_S" - "$HTTP_S" "$SESSION"
 if [[ -n "${SESSION2}" ]]; then
-  GAMEMESH_INSTANCE_ID=sess-1 start_proc "$SESSION_BIN" session "$RUN_DIR/logs/session1.log" \
+  LUNASERVER_INSTANCE_ID=sess-1 start_proc "$SESSION_BIN" session "$RUN_DIR/logs/session1.log" \
     sess-1 "127.0.0.1:${SESSION2}" "$HTTP_S2" - "$HTTP_S2" "$SESSION2"
 fi
 # 监控页需从公网 EIP:8094 打开；仅 gamedb-0 的 HTTP 管理口离开 loopback
-GAMEMESH_HTTP_BIND=0.0.0.0 GAMEMESH_ALLOW_PUBLIC_BIND=1 GAMEMESH_INSTANCE_ID=gamedb-0 start_proc "$GAMEDB_BIN" gamedb "$RUN_DIR/logs/gamedb0.log" \
+LUNASERVER_HTTP_BIND=0.0.0.0 LUNASERVER_ALLOW_PUBLIC_BIND=1 LUNASERVER_INSTANCE_ID=gamedb-0 start_proc "$GAMEDB_BIN" gamedb "$RUN_DIR/logs/gamedb0.log" \
   gamedb-0 "127.0.0.1:${GAMEDB0}" "$HTTP_D0" - "$HTTP_D0" "$GAMEDB0"
-GAMEMESH_INSTANCE_ID=gamedb-1 start_proc "$GAMEDB_BIN" gamedb "$RUN_DIR/logs/gamedb1.log" \
+LUNASERVER_INSTANCE_ID=gamedb-1 start_proc "$GAMEDB_BIN" gamedb "$RUN_DIR/logs/gamedb1.log" \
   gamedb-1 "127.0.0.1:${GAMEDB1}" "$HTTP_D1" - "$HTTP_D1" "$GAMEDB1"
 wait_log session "$RUN_DIR/logs/session.log" \
   'SessionBrpcServer\(\+Auth\) listening|SessionBrpcServer listening|role=session'
@@ -246,19 +246,19 @@ fi
 wait_log gamedb0 "$RUN_DIR/logs/gamedb0.log" 'GameDbBrpcServer listening|role=gamedb'
 wait_log gamedb1 "$RUN_DIR/logs/gamedb1.log" 'GameDbBrpcServer listening|role=gamedb'
 
-GAMEMESH_INSTANCE_ID=globalservice-1 start_proc "$WORLD_BIN" globalservice "$RUN_DIR/logs/globalservice.log" \
+LUNASERVER_INSTANCE_ID=globalservice-1 start_proc "$WORLD_BIN" globalservice "$RUN_DIR/logs/globalservice.log" \
   globalservice-1 "127.0.0.1:${WORLD}" "$HTTP_W" - "$HTTP_W"
-GAMEMESH_INSTANCE_ID=gl-0 start_proc "$LOGIC_BIN" gamelogic "$RUN_DIR/logs/logic0.log" \
+LUNASERVER_INSTANCE_ID=gl-0 start_proc "$LOGIC_BIN" gamelogic "$RUN_DIR/logs/logic0.log" \
   gl-0 "127.0.0.1:${LOGIC0}" "$HTTP_L0" - "$HTTP_L0" "$LOGIC0"
-GAMEMESH_INSTANCE_ID=gl-1 start_proc "$LOGIC_BIN" gamelogic "$RUN_DIR/logs/logic1.log" \
+LUNASERVER_INSTANCE_ID=gl-1 start_proc "$LOGIC_BIN" gamelogic "$RUN_DIR/logs/logic1.log" \
   gl-1 "127.0.0.1:${LOGIC1}" "$HTTP_L1" - "$HTTP_L1" "$LOGIC1"
 wait_log globalservice "$RUN_DIR/logs/globalservice.log" 'GlobalServiceBrpcServer listening|role=globalservice'
 wait_log gamelogic0 "$RUN_DIR/logs/logic0.log" 'GameLogicBrpcServer listening|role=gamelogic'
 wait_log gamelogic1 "$RUN_DIR/logs/logic1.log" 'GameLogicBrpcServer listening|role=gamelogic'
 
-GAMEMESH_INSTANCE_ID=gw-0 start_proc "$GW_BIN" gateway "$RUN_DIR/logs/gw0.log" \
+LUNASERVER_INSTANCE_ID=gw-0 start_proc "$GW_BIN" gateway "$RUN_DIR/logs/gw0.log" \
   gw-0 - "$HTTP_G0" "$GAME_G0" "$HTTP_G0" "$GAME_G0"
-GAMEMESH_INSTANCE_ID=gw-1 start_proc "$GW_BIN" gateway "$RUN_DIR/logs/gw1.log" \
+LUNASERVER_INSTANCE_ID=gw-1 start_proc "$GW_BIN" gateway "$RUN_DIR/logs/gw1.log" \
   gw-1 - "$HTTP_G1" "$GAME_G1" "$HTTP_G1" "$GAME_G1"
 wait_log gateway0 "$RUN_DIR/logs/gw0.log" 'GameTcpGateway ready|Game protobuf TCP'
 wait_log gateway1 "$RUN_DIR/logs/gw1.log" 'GameTcpGateway ready|Game protobuf TCP'
@@ -278,7 +278,7 @@ if [[ -x "$ROOT/scripts/sync_prometheus_sd.sh" ]]; then
 fi
 
 cat >"$RUN_DIR/CLIENT.txt" <<EOF
-# Windows / 测试客户端连接信息（GameMesh Gateway ×2）
+# Windows / 测试客户端连接信息（LunaServer Gateway ×2）
 Host=${ADVERTISE_HOST}
 Port=${GAME_G0}
 PortAlt=${GAME_G1}
@@ -287,9 +287,9 @@ PortAlt=${GAME_G1}
 # 内网 Push Logic→Gateway: ${PUSH_G0}/${PUSH_G1}
 Protocol=TCP ProtoFraming + game.proto
 LoginPath=Client→Gateway→Auth→Session.AcquireSession→GameLogic.BindPlayer
-# 本机观察页（HTTP 管理口默认不对公网；经 nginx /gamemesh/ 反代）
+# 本机观察页（HTTP 管理口默认不对公网；经 nginx /lunaserver/ 反代）
 MetricsUI=http://127.0.0.1:${HTTP_D0}/monitor
-MetricsBackend=Prometheus job=gamemesh (file_sd from inventory.tsv)
+MetricsBackend=Prometheus job=lunaserver (file_sd from inventory.tsv)
 EOF
 
 echo
@@ -300,8 +300,8 @@ echo "  Port0 : ${GAME_G0}   ← 推荐默认"
 echo "  Port1 : ${GAME_G1}"
 echo "  安全组只需 TCP ${GAME_G0},${GAME_G1}"
 echo "  登录: Gateway→Auth→Session→BindPlayer"
-echo "  观察页: http://127.0.0.1:${HTTP_D0}/monitor  （Prometheus job=gamemesh，按实例）"
-echo "  采集  : /etc/prometheus/file_sd/gamemesh.json  ← scripts/sync_prometheus_sd.sh"
+echo "  观察页: http://127.0.0.1:${HTTP_D0}/monitor  （Prometheus job=lunaserver，按实例）"
+echo "  采集  : /etc/prometheus/file_sd/lunaserver.json  ← scripts/sync_prometheus_sd.sh"
 echo "=============================================="
 echo
 echo "拓扑: 2×gateway + 2×gamelogic + 2×gamedb + globalservice + session×2(+Auth)"

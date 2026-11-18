@@ -28,7 +28,7 @@
 
 - 症状：`MoveRsp` 要等 AOI 推送。`PushBatch` 超时配置是 2000ms，和客户端 2 秒重合。
 - 代码：`3ff3d93` 的 `EnqueueAoi` 在 `RpcOffloadPool::TryPost` 失败时直接 `DrainAoiQueue()`。`PushGrouped` 调用 `GatewayPushClient::PushBatch`，`done=nullptr`。`HandleMove` 在 `EmitAoi` 之后才填成功应答。
-- 测量：这一条没有单独的 PushBatch 耗时，因为旧进程没有 `pushbatch_*`。同一窗口 `gamemesh_aoi_move_events_total` 速率峰值是 gl-0 16229/秒、gl-1 15927/秒（按观察者计）。`move_hold` 峰值 1262/秒和 1273/秒，`move_flush` 峰值 301/秒和 277/秒。这是 Gateway 发送跟不上，不能单独证明邮箱线程正在同步等 `PushBatch`。
+- 测量：这一条没有单独的 PushBatch 耗时，因为旧进程没有 `pushbatch_*`。同一窗口 `lunaserver_aoi_move_events_total` 速率峰值是 gl-0 16229/秒、gl-1 15927/秒（按观察者计）。`move_hold` 峰值 1262/秒和 1273/秒，`move_flush` 峰值 301/秒和 277/秒。这是 Gateway 发送跟不上，不能单独证明邮箱线程正在同步等 `PushBatch`。
 - 修复：工作区改为一个 AOI 发布线程。邮箱只入队。队列超过 64 批时从最旧的纯 MOVE 批次丢起，ENTER/LEAVE 保留。`PushBatch` 仍同步，但只堵发布线程。新二进制未换上，线上仍会在池满时同步排空。
 - 测试：`map_runtime_aoi_test` 断言丢 3 个纯 MOVE、留下 op=3。通过。没有 600 人对比。
 - 回滚：删掉发布线程，恢复 `TryPost` 失败时的原地 `DrainAoiQueue`。

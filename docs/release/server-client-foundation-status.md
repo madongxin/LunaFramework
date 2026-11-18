@@ -1,7 +1,7 @@
 # Server/Client Foundation Status
 
 Date: 2026-09-16
-Audit prompt: `docs/GameMesh_Server_Cursor_Login_AOI_Move_Prompt.md`
+Audit prompt: `docs/LunaServer_Server_Cursor_Login_AOI_Move_Prompt.md`
 Server current HEAD: `c8550639c75b97abce6ed137a6354a7e151a8a45`
 Unity sparse checkout: `/root/project/projects/luna` @ `f830c097347da7b973809c64486e2b6a25c8c261`
 
@@ -18,7 +18,7 @@ Worktree is **dirty** (CentOS 7 `git -C` protocol export, E2E duplicate sess-1, 
 
 | 项 | 值 |
 | --- | --- |
-| 协议 namespace | `GameMesh.Protocol` |
+| 协议 namespace | `LunaServer.Protocol` |
 | `proto/game.proto` SHA-256 | `e57e2c4afad4d5434ae398508da1ccb9c455078da9bca26a3b570b3f06695f6f` |
 | descriptor SHA-256 (export) | `f37faa1f9e05472c500a366a1ac298fa426e513ba11ae9a0d6060880a9ff602e` |
 | 已发布兼容基线 | `docs/protocol/published/v1/game.desc`（未覆盖；compat fields=415） |
@@ -35,7 +35,7 @@ server schema = e57e2c4afad4d5434ae398508da1ccb9c455078da9bca26a3b570b3f06695f6f
 client schema = f16462b65fa998a1c1d63be4710b2be927c9ec1b8ef47756803b12798d6e8665  (luna f830c09 / source_commit 17912f2)
 ```
 
-Unity 正式 Hello 会收到 `ERR_SCHEMA_MISMATCH`。不要用 `GAMEMESH_ALLOW_LEGACY_NO_HELLO=1`。
+Unity 正式 Hello 会收到 `ERR_SCHEMA_MISMATCH`。不要用 `LUNASERVER_ALLOW_LEGACY_NO_HELLO=1`。
 
 ## 2. Verdicts (do not mix)
 
@@ -46,7 +46,7 @@ Unity 正式 Hello 会收到 `ERR_SCHEMA_MISMATCH`。不要用 `GAMEMESH_ALLOW_L
 | AOI visibility (C++ TCP) | mutual Enter with player_id/name/state_seq/map | **PASS** |
 | Move sync (C++ TCP) | bidirectional coords + monotonic `state_seq` | **PASS** |
 | Protocol vs Unity | byte-identical `game.proto` + matching manifest | **FAIL**（见上表 hash 差） |
-| Unity two-client E2E | real binaries, Hello/login/AOI/move/logout | **BLOCKED**（无 `GameMeshClient` 二进制） |
+| Unity two-client E2E | real binaries, Hello/login/AOI/move/logout | **BLOCKED**（无 `LunaServerClient` 二进制） |
 | CLIENT READY | `client_ready_gate.sh` with luna hash match | **NOT RUN**（协议未对齐） |
 | STABLE CANDIDATE | clean-tree `stable_gate.sh --full` | **NOT RUN** |
 
@@ -62,7 +62,7 @@ CentOS 7 git 1.8 无 `git -C`：`export_unity_protocol.sh` / `check_public_proto
 | --- | ---: |
 | `bash -n scripts/*.sh` | 0 |
 | `./scripts/check_public_protocol.sh` | 0 schema `e57e2c4a…` fields=415 |
-| `./scripts/export_unity_protocol.sh /tmp/gamemesh-protocol-c855063` | 0 commit=`c855063` |
+| `./scripts/export_unity_protocol.sh /tmp/lunaserver-protocol-c855063` | 0 commit=`c855063` |
 | `LUNA_REPO=/root/project/projects/luna ./scripts/check_luna_protocol_contract.sh` | **1 FAIL** hash mismatch |
 | `./scripts/check_deps.sh --full` | 0 |
 
@@ -103,10 +103,10 @@ C++ `two-player-aoi` (two Gateways, map 1001 LEGACY_POOL) this session:
 ## 6. S3 — Unity two-client gate / CI
 
 - `scripts/test_unity_two_clients.sh`：要求 `LUNA_REPO` + `UNITY_CLIENT_BIN`；缺则 BLOCKED。
-- `.github/workflows/ci.yml` full job：`GAMEMESH_CI_TCP_ONLY=1`，不宣称 CLIENT READY；Luna 在 `unity-contract.yml`。
+- `.github/workflows/ci.yml` full job：`LUNASERVER_CI_TCP_ONLY=1`，不宣称 CLIENT READY；Luna 在 `unity-contract.yml`。
 - `client_ready_gate.sh` TCP-only 不再把 Luna hash 失败当成 TCP 失败。
 
-本轮 `./scripts/test_unity_two_clients.sh` → **BLOCKED**（无 `GameMeshClient`）。
+本轮 `./scripts/test_unity_two_clients.sh` → **BLOCKED**（无 `LunaServerClient`）。
 
 ## 7. Tests this session (dirty tree on `c855063`)
 
@@ -140,7 +140,7 @@ descriptor_sha256 f37faa1f9e05472c500a366a1ac298fa426e513ba11ae9a0d6060880a9ff60
 ```bash
 ./scripts/export_unity_protocol.sh /path/to/export_dir
 # Luna:
-#   Tools/GameMesh/import_server_contract.sh <server-repo-or-export-dir> c8550639c75b97abce6ed137a6354a7e151a8a45
+#   Tools/LunaServer/import_server_contract.sh <server-repo-or-export-dir> c8550639c75b97abce6ed137a6354a7e151a8a45
 ```
 
-Do not use `GAMEMESH_ALLOW_LEGACY_NO_HELLO=1`. This machine has no Unity Editor / StandaloneLinux64 build.
+Do not use `LUNASERVER_ALLOW_LEGACY_NO_HELLO=1`. This machine has no Unity Editor / StandaloneLinux64 build.

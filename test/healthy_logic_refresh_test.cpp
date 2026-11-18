@@ -83,7 +83,7 @@ int main() {
         return 1;
     }
     const std::string prefix =
-        "gamemesh:test:hl:" + std::to_string(static_cast<unsigned long long>(::getpid())) + ":";
+        "lunaserver:test:hl:" + std::to_string(static_cast<unsigned long long>(::getpid())) + ":";
     if (!PlacementStore::Instance().InitFromSessionPrefix(prefix, 30)) {
         std::printf("FAIL: PlacementStore init\n");
         return 1;

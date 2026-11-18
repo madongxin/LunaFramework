@@ -3,7 +3,7 @@
 标注：下表是**代码推断**的算术结果，不是压测实测。tc 由操作者手动设置；本仓库脚本不执行 `tc`。
 
 口径：线上字节 = payload + `kOnWireHeaderBytes`（66）。  
-`GAMEMESH_EGRESS_SHARED_CLASS_KBIT` = 共用类 ceil（kbit）。  
+`LUNASERVER_EGRESS_SHARED_CLASS_KBIT` = 共用类 ceil（kbit）。  
 每网关份额 = `ceil_kbit × 1000/8 × HEADROOM% ÷ GATEWAY_INSTANCES`。  
 默认 `HEADROOM=85`，`GATEWAY_INSTANCES=2`，`RETRANS_RESERVE=5`（可用位置额度再乘 95%）。  
 每连接份额 = 每网关份额 ÷ 该网关绑定连接数（下表用「在线总数 / 2」近似均分）。

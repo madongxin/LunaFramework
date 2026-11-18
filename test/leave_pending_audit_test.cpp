@@ -441,7 +441,7 @@ void TestInconsistentGauge(const std::shared_ptr<const MapStaticData> &data) {
     std::ostringstream os;
     AoiEvidenceWritePrometheus(os);
     const std::string text = os.str();
-    Expect(text.find("gamemesh_aoi_leave_pending_inconsistent 1") != std::string::npos,
+    Expect(text.find("lunaserver_aoi_leave_pending_inconsistent 1") != std::string::npos,
            "orphan evidence is inconsistent");
     uint64_t ver = 0;
     Expect(FailOneLeave(&rt, data, 8000000, &ver), "consistent setup");
@@ -450,7 +450,7 @@ void TestInconsistentGauge(const std::shared_ptr<const MapStaticData> &data) {
     os.str("");
     os.clear();
     AoiEvidenceWritePrometheus(os);
-    Expect(os.str().find("gamemesh_aoi_leave_pending_inconsistent 0") != std::string::npos,
+    Expect(os.str().find("lunaserver_aoi_leave_pending_inconsistent 0") != std::string::npos,
            "queued leave is consistent");
 }
 
@@ -467,9 +467,9 @@ void TestOldestSplit() {
     std::ostringstream os;
     AoiEvidenceWritePrometheus(os);
     const std::string text = os.str();
-    Expect(text.find("gamemesh_aoi_leave_write_pending_oldest_ms{viewer=\"offline\"} 4000") != std::string::npos,
+    Expect(text.find("lunaserver_aoi_leave_write_pending_oldest_ms{viewer=\"offline\"} 4000") != std::string::npos,
            "oldest offline split");
-    Expect(text.find("gamemesh_aoi_leave_write_pending_oldest_ms{viewer=\"online\"}") == std::string::npos,
+    Expect(text.find("lunaserver_aoi_leave_write_pending_oldest_ms{viewer=\"online\"}") == std::string::npos,
            "oldest online omitted when empty");
     AoiSetViewerOnlineFn(nullptr);
 }

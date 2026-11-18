@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  GAMEMESH_WERROR: "ON"
+  LUNASERVER_WERROR: "ON"
 
 jobs:
   lowlevel:
@@ -57,7 +57,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: gamemesh
+          MYSQL_DATABASE: lunaserver
         ports: ["3306:3306"]
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
@@ -89,40 +89,40 @@ jobs:
           if [[ ${#SAN_PKGS[@]} -gt 0 ]]; then
             sudo apt-get install -y "${SAN_PKGS[@]}"
           fi
-      - name: cache gamemesh-deps (brpc)
+      - name: cache lunaserver-deps (brpc)
         uses: actions/cache@v4
         with:
           path: |
-            ~/.local/gamemesh-deps
+            ~/.local/lunaserver-deps
             .deps
-          key: gamemesh-brpc-1.9.0-${{ runner.os }}-v1
+          key: lunaserver-brpc-1.9.0-${{ runner.os }}-v1
           restore-keys: |
-            gamemesh-brpc-1.9.0-${{ runner.os }}-
+            lunaserver-brpc-1.9.0-${{ runner.os }}-
       - name: install brpc if missing
         run: |
-          export GAMEMESH_DEPS_PREFIX="${HOME}/.local/gamemesh-deps"
-          export GAMEMESH_JOBS="${GAMEMESH_JOBS:-2}"
+          export LUNASERVER_DEPS_PREFIX="${HOME}/.local/lunaserver-deps"
+          export LUNASERVER_JOBS="${LUNASERVER_JOBS:-2}"
           need=0
-          if [[ ! -f /usr/local/include/brpc/server.h && ! -f "${GAMEMESH_DEPS_PREFIX}/include/brpc/server.h" ]]; then
+          if [[ ! -f /usr/local/include/brpc/server.h && ! -f "${LUNASERVER_DEPS_PREFIX}/include/brpc/server.h" ]]; then
             need=1
-          elif [[ ! -f "${GAMEMESH_DEPS_PREFIX}/lib/libbrpc.a" && ! -f "${GAMEMESH_DEPS_PREFIX}/lib64/libbrpc.a" && ! -f /usr/local/lib/libbrpc.a && ! -f /usr/local/lib64/libbrpc.a ]]; then
+          elif [[ ! -f "${LUNASERVER_DEPS_PREFIX}/lib/libbrpc.a" && ! -f "${LUNASERVER_DEPS_PREFIX}/lib64/libbrpc.a" && ! -f /usr/local/lib/libbrpc.a && ! -f /usr/local/lib64/libbrpc.a ]]; then
             need=1
           fi
           if [[ "$need" -eq 1 ]]; then
             ./scripts/install_deps.sh --build-brpc
           fi
-          if [[ ! -f /usr/local/include/brpc/server.h && ! -f "${GAMEMESH_DEPS_PREFIX}/include/brpc/server.h" ]]; then
+          if [[ ! -f /usr/local/include/brpc/server.h && ! -f "${LUNASERVER_DEPS_PREFIX}/include/brpc/server.h" ]]; then
             echo "ERROR: brpc install failed"; exit 1
           fi
-          if [[ -w /usr/local/include && ! -f /usr/local/include/brpc/server.h && -d "${GAMEMESH_DEPS_PREFIX}/include/brpc" ]]; then
-            sudo ln -sfn "${GAMEMESH_DEPS_PREFIX}/include/brpc" /usr/local/include/brpc
-            sudo ln -sfn ${GAMEMESH_DEPS_PREFIX}/lib/libbrpc* /usr/local/lib/ 2>/dev/null || true
-            sudo ln -sfn ${GAMEMESH_DEPS_PREFIX}/lib64/libbrpc* /usr/local/lib/ 2>/dev/null || true
+          if [[ -w /usr/local/include && ! -f /usr/local/include/brpc/server.h && -d "${LUNASERVER_DEPS_PREFIX}/include/brpc" ]]; then
+            sudo ln -sfn "${LUNASERVER_DEPS_PREFIX}/include/brpc" /usr/local/include/brpc
+            sudo ln -sfn ${LUNASERVER_DEPS_PREFIX}/lib/libbrpc* /usr/local/lib/ 2>/dev/null || true
+            sudo ln -sfn ${LUNASERVER_DEPS_PREFIX}/lib64/libbrpc* /usr/local/lib/ 2>/dev/null || true
           fi
-          echo "GAMEMESH_DEPS_PREFIX=${GAMEMESH_DEPS_PREFIX}" >> "$GITHUB_ENV"
-          echo "CMAKE_PREFIX_PATH=${GAMEMESH_DEPS_PREFIX}" >> "$GITHUB_ENV"
-          echo "CPATH=${GAMEMESH_DEPS_PREFIX}/include" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=${GAMEMESH_DEPS_PREFIX}/lib:${GAMEMESH_DEPS_PREFIX}/lib64" >> "$GITHUB_ENV"
+          echo "LUNASERVER_DEPS_PREFIX=${LUNASERVER_DEPS_PREFIX}" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=${LUNASERVER_DEPS_PREFIX}" >> "$GITHUB_ENV"
+          echo "CPATH=${LUNASERVER_DEPS_PREFIX}/include" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=${LUNASERVER_DEPS_PREFIX}/lib:${LUNASERVER_DEPS_PREFIX}/lib64" >> "$GITHUB_ENV"
       - name: protoc vs generated pb
         run: |
           protoc --version
@@ -138,7 +138,7 @@ jobs:
             sed -i 's/^password=.*/password=root/' config/mysql.cnf
             sed -i 's/^username=.*/username=root/' config/mysql.cnf || true
             grep -q '^username=' config/mysql.cnf || echo 'username=root' >> config/mysql.cnf
-            sed -i 's/^dbname=.*/dbname=gamemesh/' config/mysql.cnf
+            sed -i 's/^dbname=.*/dbname=lunaserver/' config/mysql.cnf
           fi
           for i in $(seq 1 60); do
             redis-cli ping 2>/dev/null | grep -q PONG && break
@@ -177,12 +177,12 @@ jobs:
         run: docker compose -f compose.yml config >/dev/null
       - name: sanitizers
         env:
-          GAMEMESH_REQUIRE_BRPC_TSAN: "1"
+          LUNASERVER_REQUIRE_BRPC_TSAN: "1"
         run: ./scripts/test_sanitizers.sh all
       - name: client-ready TCP
         env:
-          GAMEMESH_JOBS: "2"
-          GAMEMESH_CI_TCP_ONLY: "1"
+          LUNASERVER_JOBS: "2"
+          LUNASERVER_CI_TCP_ONLY: "1"
         run: ./scripts/client_ready_gate.sh
         # Luna/Unity 双端门禁在 unity-contract.yml（需显式 checkout + 客户端 artifact）；本 job 不宣称 CLIENT READY。
       - name: export unity protocol artifact
@@ -195,7 +195,7 @@ jobs:
           echo "PROTOCOL_SHA=$SHA" >> "$GITHUB_ENV"
       - uses: actions/upload-artifact@v4
         with:
-          name: gamemesh-protocol-${{ github.sha }}
+          name: lunaserver-protocol-${{ github.sha }}
           path: ${{ env.PROTOCOL_ARTIFACT_DIR }}
       - name: shellcheck
         run: shellcheck -x scripts/*.sh deploy/docker-entrypoint.sh

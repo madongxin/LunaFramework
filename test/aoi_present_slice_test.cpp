@@ -47,8 +47,8 @@ MapEntity Ent(uint64_t id) {
 
 int main() {
     Logger::setLogLevel(Logger::ERROR);
-    ::unsetenv("GAMEMESH_AOI_MEMBERSHIP_UNIFIED");
-    ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
+    ::unsetenv("LUNASERVER_AOI_MEMBERSHIP_UNIFIED");
+    ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
     auto data = MakeMap();
     if (!data)
         return 1;

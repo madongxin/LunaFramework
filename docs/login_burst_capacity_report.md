@@ -7,7 +7,7 @@
 ## 本轮代码里有、但没有压出来的保护
 
 - 外层 `LoginAdmission`：默认 in-flight 256，重连预留 32。新登录不能占用预留。拒绝码仍是 `ERR_OVERLOADED`，文案 `login admission`。
-- 分阶段 `StagePermit`：Auth、Session、Bind、Enter。环境变量 `GAMEMESH_LOGIN_AUTH_INFLIGHT`、`GAMEMESH_LOGIN_SESSION_INFLIGHT`、`GAMEMESH_LOGIN_BIND_INFLIGHT`、`GAMEMESH_LOGIN_ENTER_INFLIGHT`，默认都是 256。许可只包住对应 RPC。重连的 Bind 使用 `reconnect=true`，可以使用该阶段满额；新登录不能用预留尾部。重连路径上的 Auth 和 Session 没有单独包 StagePermit。
+- 分阶段 `StagePermit`：Auth、Session、Bind、Enter。环境变量 `LUNASERVER_LOGIN_AUTH_INFLIGHT`、`LUNASERVER_LOGIN_SESSION_INFLIGHT`、`LUNASERVER_LOGIN_BIND_INFLIGHT`、`LUNASERVER_LOGIN_ENTER_INFLIGHT`，默认都是 256。许可只包住对应 RPC。重连的 Bind 使用 `reconnect=true`，可以使用该阶段满额；新登录不能用预留尾部。重连路径上的 Auth 和 Session 没有单独包 StagePermit。
 - 拒绝计数：`login_stage_reject_auth/session/bind/enter`。
 - 没有新增集群队列，没有 `retry_after` 字段。队列长度没有被放大来掩盖积压。
 - GameDB：多个 `gamedb_addrs` 走已有的 `BuildListNamingUrl` + `SessionLoadBalancerName`（多于一个地址时为 `rr`），一条 channel 覆盖整份列表。单地址仍是裸 `host:port`。这不是 Init 成功之后的运行时健康摘除。没有 MySQL 吞吐测量。多个 GameDB 进程不等于 MySQL 吞吐乘以 N。
@@ -28,4 +28,4 @@
 
 ## 脚本实际做了什么
 
-`scripts/load_game_login_stress.sh` 在放行前计算 `PRESS_SPACING_MS`：`max(1000/target_rps, ramp_seconds*1000/users)`。`move_hz > 0` 时设置 `PRESS_MOVE_STEPS` 和 `PRESS_MOVE_GAP_MS`。`users > 20` 仍要求 `GAMEMESH_STRESS_ALLOW_LARGE=1`。本轮没有执行该脚本。
+`scripts/load_game_login_stress.sh` 在放行前计算 `PRESS_SPACING_MS`：`max(1000/target_rps, ramp_seconds*1000/users)`。`move_hz > 0` 时设置 `PRESS_MOVE_STEPS` 和 `PRESS_MOVE_GAP_MS`。`users > 20` 仍要求 `LUNASERVER_STRESS_ALLOW_LARGE=1`。本轮没有执行该脚本。

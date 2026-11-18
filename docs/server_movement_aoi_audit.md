@@ -83,7 +83,7 @@
 | SRV-02 | `client_seq` 不递增返回 `ERR_STALE_SEQ`。旧 session generation 在 Gateway/Session 绑定路径拒绝，不在 Move 里另开机器人规则 |
 | SRV-03 | 没有 Bot 身份开关 |
 | SRV-04 | 无 Hz 上限；速度见上。拒绝码是现有 `ERR_*` |
-| SRV-05 | MoveRsp 成功 = 权威提交。AOI 下发看 `gamemesh_aoi_move_events_total` 与 Gateway `move_flush` / `move_hold` |
+| SRV-05 | MoveRsp 成功 = 权威提交。AOI 下发看 `lunaserver_aoi_move_events_total` 与 Gateway `move_flush` / `move_hold` |
 | SRV-06 / 07 | 同实例才互相可见。本轮未跑 1 真人 + 1 Bot |
 | SRV-08 | 格子用 `WorldToAoiCell`，原点可以不是 0。1002 的 X/Z 可以为负。本轮未新跑边界用例 |
 | SRV-09 | 可见人数不含自己，上限 200。单线超过 400 人被 `ERR_MAP_LINE_FULL` |

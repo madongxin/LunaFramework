@@ -9,9 +9,9 @@ source "$ROOT/scripts/e2e_inventory.sh"
 CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
 [[ -x "$CLIENT" ]] || { echo "ERROR: missing $CLIENT (./scripts/build.sh Debug)" >&2; exit 1; }
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/unity-e2e}"
-export GAMEMESH_MAP_SHA256_FILE="${GAMEMESH_MAP_SHA256_FILE:-$ROOT/config/maps/map_1001.json.sha256}"
-export GAMEMESH_MAP_DATA_VERSION="${GAMEMESH_MAP_DATA_VERSION:-1}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/unity-e2e}"
+export LUNASERVER_MAP_SHA256_FILE="${LUNASERVER_MAP_SHA256_FILE:-$ROOT/config/maps/map_1001.json.sha256}"
+export LUNASERVER_MAP_DATA_VERSION="${LUNASERVER_MAP_DATA_VERSION:-1}"
 
 # 清掉本测试模板的公共池，避免历史 occupancy 把 51 人拆成 45+6。
 python3 - "$ROOT/config/redis.cnf" <<'PY'
@@ -25,10 +25,10 @@ if os.path.isfile(cnf):
             continue
         k, v = line.split("=", 1)
         kv[k.strip()] = v.strip()
-host = os.environ.get("GAMEMESH_REDIS_HOST", kv.get("ip", "127.0.0.1"))
-port = os.environ.get("GAMEMESH_REDIS_PORT", kv.get("port", "6379"))
-pw = os.environ.get("GAMEMESH_REDIS_PASSWORD", kv.get("password", ""))
-prefix = kv.get("key_prefix", "gamemesh:dev")
+host = os.environ.get("LUNASERVER_REDIS_HOST", kv.get("ip", "127.0.0.1"))
+port = os.environ.get("LUNASERVER_REDIS_PORT", kv.get("port", "6379"))
+pw = os.environ.get("LUNASERVER_REDIS_PASSWORD", kv.get("password", ""))
+prefix = kv.get("key_prefix", "lunaserver:dev")
 if not prefix.endswith(":"):
     prefix += ":"
 key = prefix + "map:pool:1:1001"
@@ -45,7 +45,7 @@ PY
 
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME:?}"
 e2e_wait_login "$CLIENT" "$HOST" "$GW0"

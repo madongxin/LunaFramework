@@ -33,7 +33,7 @@ class PlayerProfileStore {
 public:
     static PlayerProfileStore &Instance();
 
-    /** 结构存在性检查。生产建表走 scripts/migrate_db.sh；仅 GAMEMESH_BOOTSTRAP_DDL=1 时才 CREATE。 */
+    /** 结构存在性检查。生产建表走 scripts/migrate_db.sh；仅 LUNASERVER_BOOTSTRAP_DDL=1 时才 CREATE。 */
     bool EnsureTable();
     bool Available() const { return available_; }
 

@@ -11,7 +11,7 @@
 | `runtime/brpc/GatewayPushServer.cpp` | 会话匹配通过后、写入发送缓冲前分配序号 |
 | `test/world_snapshot_test.cpp` | 不在图上的玩家必须失败，且实体数为 0 |
 | `CMakeLists.txt` | 该测试补上 `PacketTiming.cpp` 和 `EventLoopMetrics.cpp`，否则 `HandleMove` 链不上 |
-| `base/PacketTiming.cpp` | `gamemesh_move_hold_total` 的 HELP 从 8KB 改为 1KB |
+| `base/PacketTiming.cpp` | `lunaserver_move_hold_total` 的 HELP 从 8KB 改为 1KB |
 
 ## 已运行
 

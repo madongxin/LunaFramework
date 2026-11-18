@@ -125,7 +125,7 @@ int main() {
 
     // Formal：无 Placement 时禁止本地随意 Claim（与 phase1_correctness_test 互补）
     {
-        ::setenv("GAMEMESH_FORMAL", "1", 1);
+        ::setenv("LUNASERVER_FORMAL", "1", 1);
         MapInstanceRegistry::Instance().ClearForTest();
         MapInstanceRegistry::Instance().SetLocalInstanceId("gl-0");
         MapPlacement::Instance().ConfigureOwners({"gl-0"});
@@ -136,7 +136,7 @@ int main() {
         game::GameResponse rsp;
         Expect(!GameLogic::Instance().Handle(req, &rsp),
                "formal EnterMap without Placement rejected");
-        ::unsetenv("GAMEMESH_FORMAL");
+        ::unsetenv("LUNASERVER_FORMAL");
         MapInstanceRegistry::Instance().ClearForTest();
     }
 

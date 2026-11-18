@@ -17,7 +17,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: gamemesh
+          MYSQL_DATABASE: lunaserver
         ports: ["3306:3306"]
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
@@ -45,29 +45,29 @@ jobs:
             if apt-cache show "$c" >/dev/null 2>&1; then SAN_PKGS+=("$c"); break; fi
           done
           [[ ${#SAN_PKGS[@]} -gt 0 ]] && sudo apt-get install -y "${SAN_PKGS[@]}"
-      - name: cache gamemesh-deps (brpc)
+      - name: cache lunaserver-deps (brpc)
         uses: actions/cache@v4
         with:
           path: |
-            ~/.local/gamemesh-deps
+            ~/.local/lunaserver-deps
             .deps
-          key: gamemesh-brpc-1.9.0-${{ runner.os }}-v1
+          key: lunaserver-brpc-1.9.0-${{ runner.os }}-v1
       - name: install brpc
         run: |
-          export GAMEMESH_DEPS_PREFIX="${HOME}/.local/gamemesh-deps"
-          export GAMEMESH_JOBS="${GAMEMESH_JOBS:-2}"
+          export LUNASERVER_DEPS_PREFIX="${HOME}/.local/lunaserver-deps"
+          export LUNASERVER_JOBS="${LUNASERVER_JOBS:-2}"
           ./scripts/install_deps.sh --build-brpc
-          if [[ ! -f /usr/local/include/brpc/server.h && ! -f "${GAMEMESH_DEPS_PREFIX}/include/brpc/server.h" ]]; then
+          if [[ ! -f /usr/local/include/brpc/server.h && ! -f "${LUNASERVER_DEPS_PREFIX}/include/brpc/server.h" ]]; then
             echo "ERROR: brpc install failed"; exit 1
           fi
-          if [[ -d "${GAMEMESH_DEPS_PREFIX}/include/brpc" && ! -f /usr/local/include/brpc/server.h ]]; then
-            sudo ln -sfn "${GAMEMESH_DEPS_PREFIX}/include/brpc" /usr/local/include/brpc
-            sudo ln -sfn ${GAMEMESH_DEPS_PREFIX}/lib/libbrpc* /usr/local/lib/ 2>/dev/null || true
-            sudo ln -sfn ${GAMEMESH_DEPS_PREFIX}/lib64/libbrpc* /usr/local/lib/ 2>/dev/null || true
+          if [[ -d "${LUNASERVER_DEPS_PREFIX}/include/brpc" && ! -f /usr/local/include/brpc/server.h ]]; then
+            sudo ln -sfn "${LUNASERVER_DEPS_PREFIX}/include/brpc" /usr/local/include/brpc
+            sudo ln -sfn ${LUNASERVER_DEPS_PREFIX}/lib/libbrpc* /usr/local/lib/ 2>/dev/null || true
+            sudo ln -sfn ${LUNASERVER_DEPS_PREFIX}/lib64/libbrpc* /usr/local/lib/ 2>/dev/null || true
           fi
-          echo "GAMEMESH_DEPS_PREFIX=${GAMEMESH_DEPS_PREFIX}" >> "$GITHUB_ENV"
-          echo "CMAKE_PREFIX_PATH=${GAMEMESH_DEPS_PREFIX}" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=${GAMEMESH_DEPS_PREFIX}/lib:${GAMEMESH_DEPS_PREFIX}/lib64" >> "$GITHUB_ENV"
+          echo "LUNASERVER_DEPS_PREFIX=${LUNASERVER_DEPS_PREFIX}" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=${LUNASERVER_DEPS_PREFIX}" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=${LUNASERVER_DEPS_PREFIX}/lib:${LUNASERVER_DEPS_PREFIX}/lib64" >> "$GITHUB_ENV"
       - name: bootstrap + mysql cnf + readiness
         run: |
           ./scripts/bootstrap_local_config.sh
@@ -76,7 +76,7 @@ jobs:
             sed -i 's/^password=.*/password=root/' config/mysql.cnf
             sed -i 's/^username=.*/username=root/' config/mysql.cnf || true
             grep -q '^username=' config/mysql.cnf || echo 'username=root' >> config/mysql.cnf
-            sed -i 's/^dbname=.*/dbname=gamemesh/' config/mysql.cnf
+            sed -i 's/^dbname=.*/dbname=lunaserver/' config/mysql.cnf
           fi
           for i in $(seq 1 60); do
             redis-cli ping 2>/dev/null | grep -q PONG && break
@@ -90,8 +90,8 @@ jobs:
           done
       - name: stable_gate --full
         env:
-          GAMEMESH_REQUIRE_BRPC_TSAN: "1"
-          GAMEMESH_JOBS: "2"
+          LUNASERVER_REQUIRE_BRPC_TSAN: "1"
+          LUNASERVER_JOBS: "2"
         run: ./scripts/stable_gate.sh --full
       - name: upload release reports
         if: always()

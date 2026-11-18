@@ -110,8 +110,8 @@ int main() {
         Expect(pipe.sent.empty(), "overflow does not dump replies out of order");
         Expect(pipe.drops > 0, "overflow drops pending move first");
         const auto text = ControlResponseOutbox::Prometheus();
-        Expect(Metric(text, "gamemesh_control_outbox_overflow_total ") >= 1, "overflow counted");
-        Expect(Metric(text, "gamemesh_control_outbox_peak_frames ") >=
+        Expect(Metric(text, "lunaserver_control_outbox_overflow_total ") >= 1, "overflow counted");
+        Expect(Metric(text, "lunaserver_control_outbox_peak_frames ") >=
                    static_cast<long long>(ControlResponseOutbox::kMaxFrames),
                "frame peak recorded");
         ControlResponseOutbox::Instance().Forget(72);
@@ -124,17 +124,17 @@ int main() {
                "reply writes when the buffer accepts it");
         Expect(pipe.sent.size() == 1 && pipe.sent[0] == "ok", "accepted reply is sent");
         const auto text = ReplyStage::Prometheus();
-        Expect(Metric(text, "gamemesh_response_soft_drop_total ") == 0, "no silent reply drop");
-        Expect(Metric(text, "gamemesh_reply_stage_total{kind=\"move\",stage=\"socket_write_accepted\"} ") >=
+        Expect(Metric(text, "lunaserver_response_soft_drop_total ") == 0, "no silent reply drop");
+        Expect(Metric(text, "lunaserver_reply_stage_total{kind=\"move\",stage=\"socket_write_accepted\"} ") >=
                    1,
                "socket accept counted");
-        Expect(Metric(text, "gamemesh_reply_stage_total{kind=\"move\",stage=\"response_soft_drop\"} ") == 0,
+        Expect(Metric(text, "lunaserver_reply_stage_total{kind=\"move\",stage=\"response_soft_drop\"} ") == 0,
                "soft-drop stage stays zero");
-        Expect(Metric(text, "gamemesh_reply_latency_ms_count{kind=\"move\"} ") >= 1,
+        Expect(Metric(text, "lunaserver_reply_latency_ms_count{kind=\"move\"} ") >= 1,
                "move latency sample recorded");
-        const auto p50 = Metric(text, "gamemesh_reply_latency_p50_ms{kind=\"move\"} ");
-        const auto p95 = Metric(text, "gamemesh_reply_latency_p95_ms{kind=\"move\"} ");
-        const auto p99 = Metric(text, "gamemesh_reply_latency_p99_ms{kind=\"move\"} ");
+        const auto p50 = Metric(text, "lunaserver_reply_latency_p50_ms{kind=\"move\"} ");
+        const auto p95 = Metric(text, "lunaserver_reply_latency_p95_ms{kind=\"move\"} ");
+        const auto p99 = Metric(text, "lunaserver_reply_latency_p99_ms{kind=\"move\"} ");
         Expect(p50 >= 5 && p95 >= p50 && p99 >= p95, "percentiles are bucket edges from the sample");
         ControlResponseOutbox::Instance().Forget(73);
     }
@@ -186,7 +186,7 @@ int main() {
     }
 
     auto stage = [](const std::string &text, const char *kind, const char *name) {
-        return Metric(text, std::string("gamemesh_reply_stage_total{kind=\"") + kind +
+        return Metric(text, std::string("lunaserver_reply_stage_total{kind=\"") + kind +
                                 "\",stage=\"" + name + "\"} ");
     };
 
@@ -210,8 +210,8 @@ int main() {
         Expect(stage(after, "move", "connection_closed_before_reply") ==
                    stage(before, "move", "connection_closed_before_reply"),
                "direct write is not a close");
-        Expect(Metric(after, "gamemesh_reply_conservation_residual ") ==
-                   Metric(before, "gamemesh_reply_conservation_residual "),
+        Expect(Metric(after, "lunaserver_reply_conservation_residual ") ==
+                   Metric(before, "lunaserver_reply_conservation_residual "),
                "paired request and write_complete keep the residual");
         ControlResponseOutbox::Instance().Forget(91);
         const auto gone = ReplyStage::Prometheus();
@@ -242,7 +242,7 @@ int main() {
                "buffered reply is accepted");
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         const auto held = ControlResponseOutbox::Prometheus();
-        Expect(Metric(held, "gamemesh_control_outbox_oldest_held_ms ") == 0,
+        Expect(Metric(held, "lunaserver_control_outbox_oldest_held_ms ") == 0,
                "buffered reply does not age a hold");
         Expect(!ControlResponseOutbox::Instance().BlocksMove(92), "buffered reply does not block move");
         const auto mid = ReplyStage::Prometheus();
@@ -270,12 +270,12 @@ int main() {
         Expect(ControlResponseOutbox::Instance().Submit(93, 5, "heartbeat", "queued", Env(&pipe)) == 0,
                "blocked reply stays queued");
         const auto queued = ControlResponseOutbox::Prometheus();
-        Expect(Metric(queued, "gamemesh_control_outbox_current_frames ") >= 1, "current frames");
-        Expect(Metric(queued, "gamemesh_control_outbox_drain_stalls_total ") >
-                   Metric(box_before, "gamemesh_control_outbox_drain_stalls_total "),
+        Expect(Metric(queued, "lunaserver_control_outbox_current_frames ") >= 1, "current frames");
+        Expect(Metric(queued, "lunaserver_control_outbox_drain_stalls_total ") >
+                   Metric(box_before, "lunaserver_control_outbox_drain_stalls_total "),
                "drain stall counted");
-        Expect(Metric(queued, "gamemesh_control_outbox_drain_runs_total ") >= 1, "drain ran");
-        Expect(queued.find("gamemesh_control_outbox_wakeup_missed_total ") != std::string::npos,
+        Expect(Metric(queued, "lunaserver_control_outbox_drain_runs_total ") >= 1, "drain ran");
+        Expect(queued.find("lunaserver_control_outbox_wakeup_missed_total ") != std::string::npos,
                "wakeup metric is exported");
         ControlResponseOutbox::Instance().Forget(93);
         const auto after = ReplyStage::Prometheus();
@@ -285,11 +285,11 @@ int main() {
         Expect(stage(after, "heartbeat", "write_complete") ==
                    stage(before, "heartbeat", "write_complete"),
                "closed reply is not write_complete");
-        Expect(Metric(after, "gamemesh_reply_conservation_residual ") ==
-                   Metric(before, "gamemesh_reply_conservation_residual "),
+        Expect(Metric(after, "lunaserver_reply_conservation_residual ") ==
+                   Metric(before, "lunaserver_reply_conservation_residual "),
                "close keeps the residual");
         const auto empty = ControlResponseOutbox::Prometheus();
-        Expect(Metric(empty, "gamemesh_control_outbox_current_frames ") == 0,
+        Expect(Metric(empty, "lunaserver_control_outbox_current_frames ") == 0,
                "forget clears the queue");
     }
 
@@ -375,7 +375,7 @@ int main() {
                    stage(before, "move", "write_complete") + 305,
                "each recovered reply completes once");
         const auto box = ControlResponseOutbox::Prometheus();
-        Expect(Metric(box, "gamemesh_control_outbox_current_frames ") == 0, "outbox empty after recovery");
+        Expect(Metric(box, "lunaserver_control_outbox_current_frames ") == 0, "outbox empty after recovery");
     }
 
     {
@@ -399,7 +399,7 @@ int main() {
         for (const char *name : names) {
             Expect(text.find(std::string("stage=\"") + name + "\"") != std::string::npos, name);
         }
-        Expect(Metric(text, "gamemesh_reply_inflight ") >= 0, "inflight exported");
+        Expect(Metric(text, "lunaserver_reply_inflight ") >= 0, "inflight exported");
     }
 
     if (fails != 0) {

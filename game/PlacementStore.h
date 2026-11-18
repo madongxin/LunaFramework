@@ -247,7 +247,7 @@ private:
     bool available_ = false;
     int default_lease_sec_ = 30;
     uint32_t public_capacity_ = 50;
-    std::string key_prefix_ = "gamemesh:dev:";
+    std::string key_prefix_ = "lunaserver:dev:";
     mutable std::mutex cfg_mu_;
     std::vector<std::string> owners_{"gl-0"};
     mutable size_t rr_ = 0;

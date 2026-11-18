@@ -5,7 +5,7 @@
 #include "FormalMode.h"
 #include "GameLogicForwardServiceImpl.h"
 #include "GameLogicServiceImpl.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "Logging.h"
 #include "OpsMetrics.h"
 #include "MapCatalog.h"
@@ -80,7 +80,7 @@ const std::string &LogicCnfPath() {
     if (!once) {
         once = true;
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/gamelogic.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/gamelogic.cnf", &resolved))
             path = std::move(resolved);
     }
     return path;
@@ -143,7 +143,7 @@ bool GameLogicBrpcServer::StartFromConfig() {
     // FormalMode.h 轻量；避免循环依赖时仅 env
 #endif
     {
-        const char *v = std::getenv("GAMEMESH_FORMAL");
+        const char *v = std::getenv("LUNASERVER_FORMAL");
         if (v && (std::strcmp(v, "1") == 0 || std::strcmp(v, "true") == 0))
             MapInstanceRegistry::Instance().SetRequireLease(true);
     }

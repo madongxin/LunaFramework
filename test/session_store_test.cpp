@@ -369,7 +369,7 @@ int main() {
     }
 
     {
-        const char *setk = "gamemesh:dev:online:players";
+        const char *setk = "lunaserver:dev:online:players";
         auto lease = RedisPool::Instance().Acquire();
         if (!lease)
             return Fail("online-set lease");

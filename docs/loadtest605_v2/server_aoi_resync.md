@@ -6,7 +6,7 @@
 
 09:41 的逻辑在调用 Gateway 之前就执行 `AppendReliable`。Gateway 在 `FindBySession` 失败，或玩家、网关实例、fence、代际对不上时直接拒绝，不发送。回放里已经有这个序号，客户端下一次 `PushAck` 发现不连续，Gateway 把 `AckStatus::Gap` 和 `Stale` 都映射成 `ERR_AOI_RESYNC_REQUIRED`。
 
-09:44–09:56 窗口里两台逻辑的 `gamemesh_push_rejected_total` 速率峰值大约是 40/秒 和 44/秒。这和玩家 819 的 `ERR_AOI_RESYNC_REQUIRED` 是同一条路径。移动超时不是这条错误码的来源。
+09:44–09:56 窗口里两台逻辑的 `lunaserver_push_rejected_total` 速率峰值大约是 40/秒 和 44/秒。这和玩家 819 的 `ERR_AOI_RESYNC_REQUIRED` 是同一条路径。移动超时不是这条错误码的来源。
 
 本轮修改后，拒绝发生在分配序号之前。只有会话匹配通过、帧即将写入该连接发送缓冲时，Gateway 才分配序号并包进 `server_push`。逻辑侧不再预分配。两边要一起换；只换逻辑、Gateway 仍是旧二进制时，可靠帧会以序号 0 按原始业务帧发出。
 

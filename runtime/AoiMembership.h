@@ -8,7 +8,7 @@
  * 人数上限固定 200，名次滞回用 AoiV2CapSlack。
  */
 inline bool AoiMembershipUnified() {
-    const char *env = std::getenv("GAMEMESH_AOI_MEMBERSHIP_UNIFIED");
+    const char *env = std::getenv("LUNASERVER_AOI_MEMBERSHIP_UNIFIED");
     return env && env[0] == '1' && env[1] == '\0';
 }
 

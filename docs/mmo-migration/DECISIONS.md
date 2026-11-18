@@ -45,12 +45,12 @@
 - **1B**：etcd / NATS / mTLS 均可选；空配置回退静态 `*.cnf` / 本地 outbox；附 kill/gray runbook。
 - **2B**：`apps/<role>_main.cpp` → 零前缀多二进制（`gateway`/`gamelogic`/`world`/`session`/`gamedb`）；核心仍在 `runtime/`/`game/`/`db/`；`server role=all|…` 共用 `ServerBootstrap`。
 
-## D-NAME-001（2026-08-07）工程更名 GameMesh
+## D-NAME-001（2026-08-07）工程更名 LunaServer
 
-- 产品/框架名：**GameMesh**（原 CppWebServer）。
+- 产品/框架名：**LunaServer**（原 CppWebServer）。
 - 二进制：零前缀角色名；单体入口 `server`。
-- API：`RunServer` / `LaunchOpts` / `ParseLaunchArgs`；路径助手 `GameMeshPaths`。
-- Prometheus 指标前缀：`gamemesh_*`；etcd 默认 prefix：`gamemesh`。
+- API：`RunServer` / `LaunchOpts` / `ParseLaunchArgs`；路径助手 `LunaServerPaths`。
+- Prometheus 指标前缀：`lunaserver_*`；etcd 默认 prefix：`lunaserver`。
 - Session：进程内仅 Redis + `SessionStore`；Gateway/Logic 配 `session_addrs` 时 RPC，否则本地 Store。
 - GameDB：包装 `AsyncMysqlGameDbRepository`；World/Logic 配 `gamedb_addrs` 时 `BrpcGameDbRepository`。
 - 不做整仓 `services/<role>/`、不做强制编译依赖 etcd/NATS、不做 Chat/Friend 产品与 AOI/Tick/K8s。

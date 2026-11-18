@@ -75,13 +75,13 @@
 
 ### 2.3 根因 R3：预算「数字在、强制不在」
 
-- `GAMEMESH_EGRESS_BUDGET_MBPS=2.4` 默认只作日志/统计语义时，**不挡住**超期实体发送（历史审计已写清）。
+- `LUNASERVER_EGRESS_BUDGET_MBPS=2.4` 默认只作日志/统计语义时，**不挡住**超期实体发送（历史审计已写清）。
 - D1 `EGRESS_ENFORCE=1` 验收：**admitted/defer 全程 0**，AOI 帧率与基线同量级 → **未把 R1 转成「AOI 让路给 move_reply」**。
 - 文档解释口径：大量帧停放换帧可能从未 `NoteKernelWrite`；D1 本应补记，但本轮生产指标仍为 0 → **实施/接线仍有缺口，需单独查清后再依赖 enforce**。
 
 ### 2.4 根因 R4：外推开关现在不能省流量（H1）
 
-- `GAMEMESH_AOI_EXTRAPOLATE` 默认关；打开后误差用**权威坐标**算、发出的是**呈现坐标** → 匀速/到点仍 `vx≠0` 时 **每 tick drifted**（`extrapolate_audit.md` H1，单测已钉）。
+- `LUNASERVER_AOI_EXTRAPOLATE` 默认关；打开后误差用**权威坐标**算、发出的是**呈现坐标** → 匀速/到点仍 `vx≠0` 时 **每 tick drifted**（`extrapolate_audit.md` H1，单测已钉）。
 - 因此「开外推少发」在修 C1 **之前**不能当作方案。
 
 ### 2.5 放大项（非第一因）
@@ -129,7 +129,7 @@
 
 **机制（设计意图）：**
 
-1. `GAMEMESH_EGRESS_ENFORCE=1` + `SHARED_CLASS_KBIT=2600`（或与现网 tc ceil 对齐）。
+1. `LUNASERVER_EGRESS_ENFORCE=1` + `SHARED_CLASS_KBIT=2600`（或与现网 tc ceil 对齐）。
 2. `Pick`：超连接配额则 **defer AOI**，取消 due-raise / batch_wait 抬额。
 3. `move_reply` / 心跳等控制路径 **不按 AOI 配额卡死**（已有 control 分类方向，D2）。
 4. `egress_admitted` 仅在内核确认写出后增加；`budget_defer` 在拒发/推迟时增加。
@@ -162,9 +162,9 @@
 
 1. 漂移误差与 last 记录改为 **呈现坐标**（或「上次实际发出的坐标」），禁止用权威点算 pred 再和权威比。  
 2. ENTER / 快照显式带 `vx/vz/move_start_ms`，否则客户端无法外推。  
-3. 远层 keyframe：`GAMEMESH_AOI_FAR_KEYFRAME_MS` 默认 10000（评估值）。  
+3. 远层 keyframe：`LUNASERVER_AOI_FAR_KEYFRAME_MS` 默认 10000（评估值）。  
 4. **客户端确认支持按速度外推之前，不默认打开。**  
-5. 复压看 `gamemesh_aoi_move_emit_reason_total`：`interval`/`drifted` 应下降，`vel_changed`/`keyframe`/`arrival_stop` 成主导。
+5. 复压看 `lunaserver_aoi_move_emit_reason_total`：`interval`/`drifted` 应下降，`vel_changed`/`keyframe`/`arrival_stop` 成主导。
 
 **预期效果：**
 
@@ -188,7 +188,7 @@
 
 **机制：**
 
-- `GAMEMESH_AOI_V2_LAYERS=1`
+- `LUNASERVER_AOI_V2_LAYERS=1`
 - 近：`AOI_V2_NEAR_METERS`（默认 32）保持较高频
 - 远：`AOI_V2_FAR_INTERVAL_MS`（默认 1000，可评估 2000–5000）
 - 可与外推 keyframe、静默上限一起调
@@ -271,7 +271,7 @@
 
 ## 6. 每阶段共用复测清单
 
-1. 环境：`GAMEMESH_ADVERTISE_HOST=10.0.0.2`；记录全部相关 `GAMEMESH_*`。  
+1. 环境：`LUNASERVER_ADVERTISE_HOST=10.0.0.2`；记录全部相关 `LUNASERVER_*`。  
 2. 服务端：A（稳态）→B（≥120s）→C（停测）；`tc 1:10` + gw/logic `/metrics`。  
 3. 必看指标：  
    - `tx_frames_by_frame{move|move_reply}`  

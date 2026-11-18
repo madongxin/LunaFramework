@@ -113,18 +113,18 @@ void defaultFlush(){
 
 namespace {
 
-char g_log_service[32] = "gamemesh";
+char g_log_service[32] = "lunaserver";
 thread_local uint64_t t_log_player = 0;
 thread_local std::string t_log_session;
 thread_local std::string t_log_error;
 
 bool JsonLogsEnabled() {
-    const char *flag = std::getenv("GAMEMESH_LOG_JSON");
+    const char *flag = std::getenv("LUNASERVER_LOG_JSON");
     if (flag && flag[0] == '0')
         return false;
     if (flag && flag[0] == '1')
         return true;
-    const char *formal = std::getenv("GAMEMESH_FORMAL");
+    const char *formal = std::getenv("LUNASERVER_FORMAL");
     return formal && formal[0] == '1';
 }
 

@@ -4,7 +4,7 @@
 # shellcheck shell=bash
 
 e2e_inv_file() {
-  echo "${GAMEMESH_RUN_DIR:-}/inventory.tsv"
+  echo "${LUNASERVER_RUN_DIR:-}/inventory.tsv"
 }
 
 e2e_inv_init() {
@@ -98,7 +98,7 @@ e2e_inv_remove() {
 # 关键角色进程仍存活；缺 inventory 时回退检查 pids 非空且至少 8 行进程存活
 # 实验实例 gl-2：未开 DYNAMIC_SCALE 时忽略死进程，避免污染健康检查
 e2e_cluster_healthy() {
-  local run="${GAMEMESH_RUN_DIR:-}"
+  local run="${LUNASERVER_RUN_DIR:-}"
   local f host="${E2E_HOST:-127.0.0.1}"
   [[ -n "$run" && -f "$run/pids" ]] || return 1
   f="$run/inventory.tsv"
@@ -115,7 +115,7 @@ e2e_cluster_healthy() {
         session|gamedb|gamelogic|gateway|globalservice) ;;
         *) continue ;;
       esac
-      if [[ "$r" == "gamelogic" && "$i" == "gl-2" && "${GAMEMESH_EXPERIMENTAL_DYNAMIC_SCALE:-0}" != "1" ]]; then
+      if [[ "$r" == "gamelogic" && "$i" == "gl-2" && "${LUNASERVER_EXPERIMENTAL_DYNAMIC_SCALE:-0}" != "1" ]]; then
         continue
       fi
       if [[ -z "$p" ]] || ! kill -0 "$p" 2>/dev/null; then
@@ -146,11 +146,11 @@ e2e_cluster_healthy() {
 # 不健康则 stop+start；需要调用方已设置端口环境
 e2e_ensure_cluster() {
   local root="${1:-}"
-  export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$root/run/e2e}"
+  export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$root/run/e2e}"
   local i
   for i in 1 2 3 4 5 6; do
     if e2e_cluster_healthy; then
-      echo "e2e cluster healthy at $GAMEMESH_RUN_DIR"
+      echo "e2e cluster healthy at $LUNASERVER_RUN_DIR"
       return 0
     fi
     sleep 1
@@ -158,11 +158,11 @@ e2e_ensure_cluster() {
   echo "e2e cluster unhealthy or missing — restarting..."
   "$root/scripts/stop_e2e_cluster.sh" 2>/dev/null || true
   sleep 1
-  rm -f "$GAMEMESH_RUN_DIR/pids" "$GAMEMESH_RUN_DIR/inventory.tsv"
+  rm -f "$LUNASERVER_RUN_DIR/pids" "$LUNASERVER_RUN_DIR/inventory.tsv"
   "$root/scripts/run_e2e_cluster.sh"
   sleep 3
   # shellcheck disable=SC1090
-  [[ -f "$GAMEMESH_RUN_DIR/E2E_PORTS.env" ]] && source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+  [[ -f "$LUNASERVER_RUN_DIR/E2E_PORTS.env" ]] && source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
   for i in 1 2 3 4 5 6 7 8 9 10; do
     if e2e_cluster_healthy; then
       return 0

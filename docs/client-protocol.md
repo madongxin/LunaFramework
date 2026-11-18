@@ -15,7 +15,7 @@
 - `protocol_manifest.json`（Git SHA、帧格式、schema SHA-256）
 - `game.proto.sha256` / `game.desc.sha256`
 
-C# namespace：`GameMesh.Protocol`（`package game` 不变）。不要把 Unity 工程路径写进服务器脚本。
+C# namespace：`LunaServer.Protocol`（`package game` 不变）。不要把 Unity 工程路径写进服务器脚本。
 
 ## 帧格式
 

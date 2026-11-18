@@ -99,23 +99,23 @@ void TestC1Steady20sEmitBudget() {
 }
 
 void TestExtrapolateOnDefault() {
-    unsetenv("GAMEMESH_AOI_EXTRAPOLATE");
+    unsetenv("LUNASERVER_AOI_EXTRAPOLATE");
     Expect(AoiExtrapolateEnabled(), "extrapolate default on");
-    setenv("GAMEMESH_AOI_EXTRAPOLATE", "0", 1);
+    setenv("LUNASERVER_AOI_EXTRAPOLATE", "0", 1);
     Expect(!AoiExtrapolateEnabled(), "extrapolate explicit 0 off");
-    unsetenv("GAMEMESH_AOI_EXTRAPOLATE");
+    unsetenv("LUNASERVER_AOI_EXTRAPOLATE");
 }
 
 void TestEgressEnforceOnDefault() {
-    unsetenv("GAMEMESH_EGRESS_ENFORCE");
+    unsetenv("LUNASERVER_EGRESS_ENFORCE");
     Expect(EgressEnforce(), "egress enforce default on");
-    setenv("GAMEMESH_EGRESS_ENFORCE", "0", 1);
+    setenv("LUNASERVER_EGRESS_ENFORCE", "0", 1);
     Expect(!EgressEnforce(), "egress enforce explicit 0 off");
-    unsetenv("GAMEMESH_EGRESS_ENFORCE");
+    unsetenv("LUNASERVER_EGRESS_ENFORCE");
 }
 
 void TestFarKeyframeDefault() {
-    unsetenv("GAMEMESH_AOI_FAR_KEYFRAME_MS");
+    unsetenv("LUNASERVER_AOI_FAR_KEYFRAME_MS");
     Expect(ExtrapFarKeyframeMs() == 10000, "far keyframe default 10000");
 }
 

@@ -3,11 +3,11 @@
 #include <chrono>
 #include <sstream>
 
-#ifndef GAMEMESH_GIT_SHA
-#define GAMEMESH_GIT_SHA "unknown"
+#ifndef LUNASERVER_GIT_SHA
+#define LUNASERVER_GIT_SHA "unknown"
 #endif
-#ifndef GAMEMESH_BUILD_TIME
-#define GAMEMESH_BUILD_TIME __DATE__ " " __TIME__
+#ifndef LUNASERVER_BUILD_TIME
+#define LUNASERVER_BUILD_TIME __DATE__ " " __TIME__
 #endif
 
 namespace {
@@ -26,7 +26,7 @@ ServiceHealth &ServiceHealth::Instance() {
 }
 
 void ServiceHealth::Configure(const std::string &service, const std::string &server_id) {
-    service_ = service.empty() ? "gamemesh" : service;
+    service_ = service.empty() ? "lunaserver" : service;
     server_id_ = server_id.empty() ? "local" : server_id;
 }
 
@@ -59,7 +59,7 @@ bool ServiceHealth::IsLive(int max_stale_sec) const {
 std::string ServiceHealth::VersionJson() const {
     std::ostringstream os;
     os << "{\"service\":\"" << service_ << "\",\"server_id\":\"" << server_id_
-       << "\",\"git_sha\":\"" << GAMEMESH_GIT_SHA << "\",\"build_time\":\"" << GAMEMESH_BUILD_TIME
+       << "\",\"git_sha\":\"" << LUNASERVER_GIT_SHA << "\",\"build_time\":\"" << LUNASERVER_BUILD_TIME
        << "\",\"protocol\":\"game.proto+brpc\"}";
     return os.str();
 }

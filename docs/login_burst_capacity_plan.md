@@ -8,7 +8,7 @@
 
 - 单连接同时只允许一个 Login 或 Reconnect（`GatewayAuthFlow`）。
 - `PlayerSerialQueue` 与 `RpcOffloadPool`（待处理上限 256）满了返回 `ERR_OVERLOADED`。
-- 每来源 IP 每 2 秒最多 80 个新连接（`GAMEMESH_CONNECT_RATE_MAX` 可调）。不读取客户端自己填的 XFF。
+- 每来源 IP 每 2 秒最多 80 个新连接（`LUNASERVER_CONNECT_RATE_MAX` 可调）。不读取客户端自己填的 XFF。
 - `AuthLoginRateLimit` 只锁失败的 `player_id`，防止撞库。
 
 ## 本轮新增
@@ -17,12 +17,12 @@
 
 | 变量 | 默认 | 含义 |
 | --- | --- | --- |
-| `GAMEMESH_LOGIN_INFLIGHT_MAX` | 256 | 该进程同时进行中的 Login+Reconnect |
-| `GAMEMESH_LOGIN_RECONNECT_RESERVE` | 32 | 其中留给 Reconnect 的名额。新 Login 用剩下的 |
+| `LUNASERVER_LOGIN_INFLIGHT_MAX` | 256 | 该进程同时进行中的 Login+Reconnect |
+| `LUNASERVER_LOGIN_RECONNECT_RESERVE` | 32 | 其中留给 Reconnect 的名额。新 Login 用剩下的 |
 
 超限返回已有 `ERR_OVERLOADED`，文案 `login admission`。没有新增 proto 字段，也没有 `retry_after`。客户端把 `ERR_OVERLOADED` 当作可稍后重试。
 
-回滚：去掉 `GameTcpGateway.cpp` 里 `LoginAdmission` 的获取/释放，或把 `GAMEMESH_LOGIN_INFLIGHT_MAX` 调回 256。不要把它设成 0，0 会拒绝全部登录。
+回滚：去掉 `GameTcpGateway.cpp` 里 `LoginAdmission` 的获取/释放，或把 `LUNASERVER_LOGIN_INFLIGHT_MAX` 调回 256。不要把它设成 0，0 会拒绝全部登录。
 
 ## GameDB
 

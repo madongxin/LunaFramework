@@ -49,7 +49,7 @@ const char *AoiWriteFrameName(AoiWriteFrame frame);
 const char *AoiWriteFailReasonName(AoiWriteFailReason reason);
 const char *AoiMoveStageName(AoiMoveStage stage);
 
-/** 默认关。GAMEMESH_AOI_TRACE=1 才记。热路径上先看这个，关着就不再解析。 */
+/** 默认关。LUNASERVER_AOI_TRACE=1 才记。热路径上先看这个，关着就不再解析。 */
 bool AoiTraceEnabled();
 
 void AoiNoteWriteFail(uint64_t conn_id, AoiWriteFrame frame, AoiWriteFailReason reason);

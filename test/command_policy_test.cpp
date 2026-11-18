@@ -110,24 +110,24 @@ int main() {
                CommandDecision::Allow,
            "friend_search allowlisted");
 
-    ::unsetenv("GAMEMESH_ALLOW_UNSAFE_DEBUG_COMMANDS");
-    ::unsetenv("GAMEMESH_FORMAL");
+    ::unsetenv("LUNASERVER_ALLOW_UNSAFE_DEBUG_COMMANDS");
+    ::unsetenv("LUNASERVER_FORMAL");
     Expect(!gameproto::AllowUnsafeDebugCommands(), "unsafe default off");
 
-    ::setenv("GAMEMESH_ALLOW_UNSAFE_DEBUG_COMMANDS", "1", 1);
+    ::setenv("LUNASERVER_ALLOW_UNSAFE_DEBUG_COMMANDS", "1", 1);
     Expect(gameproto::AllowUnsafeDebugCommands(), "unsafe on when non-formal");
     Expect(ValidateCommandPolicy(game::GameRequest::kGrantItem,
                                  CommandTrustLevel::AuthenticatedClient, false, &code) ==
                CommandDecision::Allow,
            "dev grant when unsafe");
-    ::setenv("GAMEMESH_FORMAL", "1", 1);
+    ::setenv("LUNASERVER_FORMAL", "1", 1);
     Expect(!gameproto::AllowUnsafeDebugCommands(), "formal forces unsafe off");
     Expect(ValidateCommandPolicy(game::GameRequest::kGrantItem,
                                  CommandTrustLevel::AuthenticatedClient, true, &code) ==
                CommandDecision::Forbid,
            "formal still forbids with env mis-set");
-    ::unsetenv("GAMEMESH_FORMAL");
-    ::unsetenv("GAMEMESH_ALLOW_UNSAFE_DEBUG_COMMANDS");
+    ::unsetenv("LUNASERVER_FORMAL");
+    ::unsetenv("LUNASERVER_ALLOW_UNSAFE_DEBUG_COMMANDS");
 
     game::GameRequest req;
     req.mutable_grant_item()->set_player_id(1);

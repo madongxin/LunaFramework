@@ -65,7 +65,7 @@ int main() {
         std::printf("FAIL consume dirty message=%s\n", crsp.message().c_str());
         return 1;
     }
-    ::setenv("GAMEMESH_ALLOW_UNSAFE_DEBUG_COMMANDS", "1", 1);
+    ::setenv("LUNASERVER_ALLOW_UNSAFE_DEBUG_COMMANDS", "1", 1);
     game::GrantItemReq greq;
     greq.set_player_id(pid);
     greq.set_item_id(1);

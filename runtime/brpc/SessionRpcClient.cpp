@@ -2,7 +2,7 @@
 
 #include "BrpcNamingUtil.h"
 #include "BrpcSslUtil.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "GatewayConfigPath.h"
 #include "Logging.h"
 
@@ -57,7 +57,7 @@ bool SessionRpcClient::Init(const std::vector<std::string> &addrs, int timeout_m
     if (!ssl.enable) {
         std::string session_cnf = "../config/session.cnf";
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/session.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/session.cnf", &resolved))
             session_cnf = resolved;
         BrpcSslUtil::LoadFromCnf(session_cnf, &ssl);
     }

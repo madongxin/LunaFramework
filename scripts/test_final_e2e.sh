@@ -19,8 +19,8 @@ SEED="${ROOT}/build/test/placement_seed_tool"
 [[ -x "$CLIENT" ]] || { echo "ERROR: missing $CLIENT (./scripts/build.sh Debug)"; exit 1; }
 
 if [[ "$START_CLUSTER" -eq 1 ]]; then
-  export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
-  if [[ -f "$GAMEMESH_RUN_DIR/pids" ]]; then
+  export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
+  if [[ -f "$LUNASERVER_RUN_DIR/pids" ]]; then
     "$ROOT/scripts/stop_e2e_cluster.sh" || true
     sleep 1
   fi
@@ -28,7 +28,7 @@ if [[ "$START_CLUSTER" -eq 1 ]]; then
   sleep 2
   # 冷启动：等 Register/Login 真正可用（Session 先于 GameLogic 注册 Redis）
   # shellcheck disable=SC1090
-  [[ -f "$GAMEMESH_RUN_DIR/E2E_PORTS.env" ]] && source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+  [[ -f "$LUNASERVER_RUN_DIR/E2E_PORTS.env" ]] && source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
   GW="${E2E_GW0_GAME:-19081}"
   ready=0
   last=""
@@ -49,7 +49,7 @@ if [[ "$START_CLUSTER" -eq 1 ]]; then
   fi
 fi
 
-RUN_DIR="${GAMEMESH_RUN_DIR:-}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-}"
 if [[ -z "$RUN_DIR" || ! -f "$RUN_DIR/pids" ]]; then
   if [[ -f "$ROOT/run/e2e/pids" ]]; then
     RUN_DIR="$ROOT/run/e2e"
@@ -62,23 +62,23 @@ if [[ -z "$RUN_DIR" || ! -f "$RUN_DIR/pids" ]]; then
     exit 1
   fi
 fi
-export GAMEMESH_RUN_DIR="$RUN_DIR"
+export LUNASERVER_RUN_DIR="$RUN_DIR"
 if [[ -f "$RUN_DIR/E2E_PORTS.env" ]]; then
   # shellcheck disable=SC1090
   source "$RUN_DIR/E2E_PORTS.env"
 fi
 
 HOST="${E2E_HOST:-127.0.0.1}"
-GW0_HTTP="${E2E_GW0_HTTP:-${GAMEMESH_HTTP_G0:-8080}}"
-GW1_HTTP="${E2E_GW1_HTTP:-${GAMEMESH_HTTP_G1:-8082}}"
-GW0_GAME="${E2E_GW0_GAME:-${GAMEMESH_GAME_G0:-8081}}"
-GW1_GAME="${E2E_GW1_GAME:-${GAMEMESH_GAME_G1:-8083}}"
-S0_HTTP="${E2E_S0_HTTP:-${GAMEMESH_HTTP_S:-8093}}"
-S1_HTTP="${E2E_S1_HTTP:-${GAMEMESH_HTTP_S2:-8096}}"
-L0_HTTP="${E2E_L0_HTTP:-${GAMEMESH_HTTP_L0:-8090}}"
-L1_HTTP="${E2E_L1_HTTP:-${GAMEMESH_HTTP_L1:-8091}}"
-DB0_HTTP="${E2E_DB0_HTTP:-${GAMEMESH_HTTP_D0:-8094}}"
-DB1_HTTP="${E2E_DB1_HTTP:-${GAMEMESH_HTTP_D1:-8095}}"
+GW0_HTTP="${E2E_GW0_HTTP:-${LUNASERVER_HTTP_G0:-8080}}"
+GW1_HTTP="${E2E_GW1_HTTP:-${LUNASERVER_HTTP_G1:-8082}}"
+GW0_GAME="${E2E_GW0_GAME:-${LUNASERVER_GAME_G0:-8081}}"
+GW1_GAME="${E2E_GW1_GAME:-${LUNASERVER_GAME_G1:-8083}}"
+S0_HTTP="${E2E_S0_HTTP:-${LUNASERVER_HTTP_S:-8093}}"
+S1_HTTP="${E2E_S1_HTTP:-${LUNASERVER_HTTP_S2:-8096}}"
+L0_HTTP="${E2E_L0_HTTP:-${LUNASERVER_HTTP_L0:-8090}}"
+L1_HTTP="${E2E_L1_HTTP:-${LUNASERVER_HTTP_L1:-8091}}"
+DB0_HTTP="${E2E_DB0_HTTP:-${LUNASERVER_HTTP_D0:-8094}}"
+DB1_HTTP="${E2E_DB1_HTTP:-${LUNASERVER_HTTP_D1:-8095}}"
 
 mapfile -t PIDS <"$RUN_DIR/pids"
 # start_formal 顺序: session,gamedb0,gamedb1,globalservice,logic0,logic1,gw0,gw1[,session2]
@@ -286,16 +286,16 @@ run_sc 9 "SIGTERM drain ready" sc9
 run_sc 8 "kill gamedb0" sc8
 
 # 场景 7：动态发现 / DRAINING（experimental；默认跳过）
-if [[ "${GAMEMESH_EXPERIMENTAL_DYNAMIC_SCALE:-0}" == "1" ]]; then
+if [[ "${LUNASERVER_EXPERIMENTAL_DYNAMIC_SCALE:-0}" == "1" ]]; then
   run_sc 7 "dynamic logic scale / DRAINING" bash "$ROOT/scripts/test_dynamic_logic_scale.sh"
 else
-  echo "==== skip scenario 7 (experimental; set GAMEMESH_EXPERIMENTAL_DYNAMIC_SCALE=1) ===="
+  echo "==== skip scenario 7 (experimental; set LUNASERVER_EXPERIMENTAL_DYNAMIC_SCALE=1) ===="
 fi
 
 # 场景 10：短混沌（完整 2h 见 soak_test.sh）；默认 SCENARIOS 不含 10
 run_sc 10 "chaos short dual-gw burst" bash -c '
   set -euo pipefail
-  source "${GAMEMESH_RUN_DIR}/E2E_PORTS.env" 2>/dev/null || true
+  source "${LUNASERVER_RUN_DIR}/E2E_PORTS.env" 2>/dev/null || true
   H="${E2E_HOST:-127.0.0.1}"
   G0="${E2E_GW0_GAME:-8081}"
   G1="${E2E_GW1_GAME:-8083}"

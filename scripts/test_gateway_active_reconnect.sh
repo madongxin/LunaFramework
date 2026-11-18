@@ -9,10 +9,10 @@ source "$ROOT/scripts/e2e_inventory.sh"
 CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
 [[ -x "$CLIENT" ]] || { echo "ERROR: build game_tcp_e2e_client"; exit 1; }
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME}"

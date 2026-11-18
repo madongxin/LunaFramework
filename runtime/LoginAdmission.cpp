@@ -36,8 +36,8 @@ LoginAdmission &LoginAdmission::Instance() {
 }
 
 LoginAdmission::LoginAdmission() {
-    max_inflight_ = EnvInt("GAMEMESH_LOGIN_INFLIGHT_MAX", 256);
-    reconnect_reserve_ = EnvInt("GAMEMESH_LOGIN_RECONNECT_RESERVE", 32);
+    max_inflight_ = EnvInt("LUNASERVER_LOGIN_INFLIGHT_MAX", 256);
+    reconnect_reserve_ = EnvInt("LUNASERVER_LOGIN_RECONNECT_RESERVE", 32);
     if (reconnect_reserve_ < 0)
         reconnect_reserve_ = 0;
     if (max_inflight_ < 0)
@@ -45,10 +45,10 @@ LoginAdmission::LoginAdmission() {
     if (reconnect_reserve_ > max_inflight_)
         reconnect_reserve_ = max_inflight_;
     const int base = max_inflight_ > 0 ? max_inflight_ : 256;
-    stage_max_[0] = ClampCap(EnvInt("GAMEMESH_LOGIN_AUTH_INFLIGHT", base));
-    stage_max_[1] = ClampCap(EnvInt("GAMEMESH_LOGIN_SESSION_INFLIGHT", stage_max_[0]));
-    stage_max_[2] = ClampCap(EnvInt("GAMEMESH_LOGIN_BIND_INFLIGHT", stage_max_[0]));
-    stage_max_[3] = ClampCap(EnvInt("GAMEMESH_LOGIN_ENTER_INFLIGHT", stage_max_[0]));
+    stage_max_[0] = ClampCap(EnvInt("LUNASERVER_LOGIN_AUTH_INFLIGHT", base));
+    stage_max_[1] = ClampCap(EnvInt("LUNASERVER_LOGIN_SESSION_INFLIGHT", stage_max_[0]));
+    stage_max_[2] = ClampCap(EnvInt("LUNASERVER_LOGIN_BIND_INFLIGHT", stage_max_[0]));
+    stage_max_[3] = ClampCap(EnvInt("LUNASERVER_LOGIN_ENTER_INFLIGHT", stage_max_[0]));
 }
 
 bool LoginAdmission::TryAcquire(bool reconnect) {

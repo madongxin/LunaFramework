@@ -45,10 +45,10 @@ int EnvInt(const char *k, int def, int lo, int hi) {
     return static_cast<int>(v);
 }
 
-int FriendCap() { return EnvInt("GAMEMESH_FRIEND_MAX_COUNT", 100, 1, 500); }
-int BlockCap() { return EnvInt("GAMEMESH_FRIEND_BLOCK_MAX_COUNT", 100, 1, 500); }
-int PendingCap() { return EnvInt("GAMEMESH_FRIEND_REQUEST_MAX_PENDING", 50, 1, 200); }
-int ExpireDays() { return EnvInt("GAMEMESH_FRIEND_REQUEST_EXPIRE_DAYS", 7, 1, 90); }
+int FriendCap() { return EnvInt("LUNASERVER_FRIEND_MAX_COUNT", 100, 1, 500); }
+int BlockCap() { return EnvInt("LUNASERVER_FRIEND_BLOCK_MAX_COUNT", 100, 1, 500); }
+int PendingCap() { return EnvInt("LUNASERVER_FRIEND_REQUEST_MAX_PENDING", 50, 1, 200); }
+int ExpireDays() { return EnvInt("LUNASERVER_FRIEND_REQUEST_EXPIRE_DAYS", 7, 1, 90); }
 
 void Fail(gdb::FriendOpRsp *rsp, const char *code, const char *msg) {
     if (!rsp)

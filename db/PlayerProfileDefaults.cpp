@@ -1,6 +1,6 @@
 #include "PlayerProfileDefaults.h"
 
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "Logging.h"
 
 #include <atomic>
@@ -25,12 +25,12 @@ std::string Trim(std::string s) {
 }
 
 std::string ConfigPath() {
-    if (const char *e = std::getenv("GAMEMESH_PROFILE_DEFAULTS")) {
+    if (const char *e = std::getenv("LUNASERVER_PROFILE_DEFAULTS")) {
         if (e && *e)
             return e;
     }
     std::string resolved;
-    if (GameMeshPaths::ResolveProjectSubdir("config/player_profile_defaults.conf", &resolved))
+    if (LunaServerPaths::ResolveProjectSubdir("config/player_profile_defaults.conf", &resolved))
         return resolved;
     return "config/player_profile_defaults.conf";
 }

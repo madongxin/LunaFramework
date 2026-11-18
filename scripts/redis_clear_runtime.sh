@@ -3,12 +3,12 @@
 # 保留：friend 缓存、svc 发现、账号相关（非本前缀业务键）。
 # 用法：
 #   ./scripts/redis_clear_runtime.sh
-#   GAMEMESH_REDIS_PREFIX=gamemesh:dev: ./scripts/redis_clear_runtime.sh
+#   LUNASERVER_REDIS_PREFIX=lunaserver:dev: ./scripts/redis_clear_runtime.sh
 # 可选：CLEAR_GW_CLAIM=1 同时删 gw_claim（stop_formal 默认开；start 前也可开）
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-REDIS_CNF="${GAMEMESH_REDIS_CNF:-$ROOT/config/redis.cnf}"
+REDIS_CNF="${LUNASERVER_REDIS_CNF:-$ROOT/config/redis.cnf}"
 
 if ! command -v redis-cli >/dev/null 2>&1; then
   echo "WARN: redis-cli missing, skip runtime clear"
@@ -22,11 +22,11 @@ fi
 REDIS_PASS="$(grep -E '^password=' "$REDIS_CNF" | head -1 | cut -d= -f2- || true)"
 REDIS_HOST="$(grep -E '^ip=' "$REDIS_CNF" | head -1 | cut -d= -f2- || true)"
 REDIS_PORT="$(grep -E '^port=' "$REDIS_CNF" | head -1 | cut -d= -f2- || true)"
-PFX="${GAMEMESH_REDIS_PREFIX:-}"
+PFX="${LUNASERVER_REDIS_PREFIX:-}"
 if [[ -z "$PFX" ]]; then
   PFX="$(grep -E '^key_prefix=' "$REDIS_CNF" | head -1 | cut -d= -f2- || true)"
 fi
-PFX="${PFX:-gamemesh:dev}"
+PFX="${PFX:-lunaserver:dev}"
 [[ "$PFX" == *: ]] || PFX="${PFX}:"
 
 CLI=(redis-cli -h "${REDIS_HOST:-127.0.0.1}" -p "${REDIS_PORT:-6379}")

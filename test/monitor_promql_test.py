@@ -31,17 +31,17 @@ def extract_quoted_queries():
             built = []
             for m in re.finditer(r"'([^']*)'|jobSel\(\)", expr):
                 if m.group(1) is None:
-                    built.append('job="gamemesh"')
+                    built.append('job="lunaserver"')
                 else:
                     built.append(m.group(1))
             q = "".join(built)
         else:
             found = re.search(r"'([^']*)'", expr)
             q = found.group(1) if found else ""
-        q = q.replace("JOB", "gamemesh").strip().rstrip(",")
+        q = q.replace("JOB", "lunaserver").strip().rstrip(",")
         if not q or q.startswith("()"):
             continue
-        if not any(tok in q for tok in ("gamemesh_", "process_", "rate(", "increase(", "up{", "{__name__")):
+        if not any(tok in q for tok in ("lunaserver_", "process_", "rate(", "increase(", "up{", "{__name__")):
             continue
         queries.append(q)
     return queries
@@ -51,7 +51,7 @@ def gap_queries():
     def gap(kind, left, right):
         def one(stage):
             return (
-                'sum by (instance_id) (rate(gamemesh_reply_stage_total{job="gamemesh",role="gateway",kind="%s",stage="%s"}[1m]))'
+                'sum by (instance_id) (rate(lunaserver_reply_stage_total{job="lunaserver",role="gateway",kind="%s",stage="%s"}[1m]))'
                 % (kind, stage)
             )
         return one(left) + " - " + one(right)
@@ -130,15 +130,15 @@ def main():
         "cpu", "rss", "threads",
     ]
     sample_queries = {
-        "reply_stages": 'gamemesh_reply_stage_total{job="gamemesh"}',
-        "latency": '{__name__=~"gamemesh_reply_latency_p(50|95|99)_ms",job="gamemesh"}',
-        "control_outbox": '{__name__=~"gamemesh_control_outbox_(current_frames|current_bytes|peak_frames|peak_bytes|held_connections|oldest_held_ms|overflow_total)",job="gamemesh"}',
-        "eventloop": '{__name__=~"gamemesh_eventloop_(todo_last|batch_ms_last|tick_p99_ms|tick_max_ms)",job="gamemesh"}',
-        "aoi": '{__name__=~"gamemesh_(mailbox_pending|aoi_push_backlog|aoi_worker_inflight|aoi_batch_oldest_age_ms|latest_move_hold_ms)",job="gamemesh"}',
-        "tcp": '{__name__=~"process_socket_send_queue_bytes|gamemesh_tcp_eagain_total|gamemesh_host_tcp_retrans_segs_total",job="gamemesh"}',
-        "cpu": 'process_cpu_seconds_total{job="gamemesh"}',
-        "rss": 'process_resident_memory_bytes{job="gamemesh"}',
-        "threads": 'process_threads{job="gamemesh"}',
+        "reply_stages": 'lunaserver_reply_stage_total{job="lunaserver"}',
+        "latency": '{__name__=~"lunaserver_reply_latency_p(50|95|99)_ms",job="lunaserver"}',
+        "control_outbox": '{__name__=~"lunaserver_control_outbox_(current_frames|current_bytes|peak_frames|peak_bytes|held_connections|oldest_held_ms|overflow_total)",job="lunaserver"}',
+        "eventloop": '{__name__=~"lunaserver_eventloop_(todo_last|batch_ms_last|tick_p99_ms|tick_max_ms)",job="lunaserver"}',
+        "aoi": '{__name__=~"lunaserver_(mailbox_pending|aoi_push_backlog|aoi_worker_inflight|aoi_batch_oldest_age_ms|latest_move_hold_ms)",job="lunaserver"}',
+        "tcp": '{__name__=~"process_socket_send_queue_bytes|lunaserver_tcp_eagain_total|lunaserver_host_tcp_retrans_segs_total",job="lunaserver"}',
+        "cpu": 'process_cpu_seconds_total{job="lunaserver"}',
+        "rss": 'process_resident_memory_bytes{job="lunaserver"}',
+        "threads": 'process_threads{job="lunaserver"}',
     }
     for name in export_names:
         rows = prom_query(sample_queries[name])
@@ -162,9 +162,9 @@ def main():
             })
         groups[name] = {"missing": False, "series": series, "series_n": len(rows)}
     doc = {
-        "schema": "gamemesh.server-movement-diagnostics.v1",
+        "schema": "lunaserver.server-movement-diagnostics.v1",
         "formal_version": {"git_sha": "da700a44f147101569829e4a570bb517002013c8"},
-        "prometheus_job": "gamemesh",
+        "prometheus_job": "lunaserver",
         "range": {
             "start": datetime.utcfromtimestamp(end - 3600).isoformat() + "Z",
             "end": datetime.utcfromtimestamp(end).isoformat() + "Z",

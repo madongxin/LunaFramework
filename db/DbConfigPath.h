@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 
 #include <string>
 
@@ -12,7 +12,7 @@ inline const std::string &MysqlCnf() {
     if (!once) {
         once = true;
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/mysql.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/mysql.cnf", &resolved))
             path = std::move(resolved);
     }
     return path;

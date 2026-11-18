@@ -51,7 +51,7 @@ GatewayPushServer env.send   ← 旧：凡 aoi.delta.v1 → send_frame_urgent
 1. `runtime/AoiPushSendRoute.h`：`AoiDeltaUsesCoalescePath(message_type, coalescable)`  
 2. `GatewayPushServer.cpp`：`coalescable` 的 `aoi.delta.v1` → `bind.send_frame`；否则仍 urgent。  
 3. `egress_enforce_test` 增用例 h。  
-4. **默认仍不打开** `GAMEMESH_EGRESS_ENFORCE`（需单独复压验收）。
+4. **默认仍不打开** `LUNASERVER_EGRESS_ENFORCE`（需单独复压验收）。
 
 ---
 

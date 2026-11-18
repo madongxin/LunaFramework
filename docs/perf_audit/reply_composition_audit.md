@@ -13,7 +13,7 @@
 
 本轮把 `"move"` 回包改记为 `frame="move_reply"`（只改指标，不改协议）。`reply` 留给登录/其它控制回包。
 
-网关心跳在 `GameTcpGateway` 本连接 EventLoop 直接 `SubmitControlOnLoop(..., "heartbeat")`，成功时同样走 Heartbeat 计数；另增 `gamemesh_heartbeat_requests_total` 统计请求次数。
+网关心跳在 `GameTcpGateway` 本连接 EventLoop 直接 `SubmitControlOnLoop(..., "heartbeat")`，成功时同样走 Heartbeat 计数；另增 `lunaserver_heartbeat_requests_total` 统计请求次数。
 
 ## 2. 725 帧/秒里各占多少（19:20）
 
@@ -44,7 +44,7 @@
 ## 4. 重复 client_seq / 同目标（只统计，等确认）
 
 - `client_seq <= last` → 已有 `ERR_STALE_SEQ` / `stale_seq` 计数。
-- 与权威点水平距离 &lt; 5cm 仍接受的请求 → 新计数 `duplicate_target`（及 `gamemesh_move_requests_total{result="duplicate_target"}`）。**本轮不改 AOI/状态推进**，只看重复率。
+- 与权威点水平距离 &lt; 5cm 仍接受的请求 → 新计数 `duplicate_target`（及 `lunaserver_move_requests_total{result="duplicate_target"}`）。**本轮不改 AOI/状态推进**，只看重复率。
 - 机器人 2 秒超时重发若带新 seq、同目标，会走 `ok`+`duplicate_target`，不会走 `stale_seq`。
 
 建议：看 `duplicate_target / ok` 比例后再决定是否短路写 AOI。

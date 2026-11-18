@@ -166,7 +166,7 @@ void TestHysteresisBand() {
 }
 
 void TestBudgetKeepsFarBehind() {
-    ::setenv("GAMEMESH_AOI_V2_LAYERS", "1", 1);
+    ::setenv("LUNASERVER_AOI_V2_LAYERS", "1", 1);
     AoiMoveCoalesceLedger ledger;
     ledger.SetEnforceByteBudget(true);
     const int64_t t0 = 10000;
@@ -205,11 +205,11 @@ void TestBudgetKeepsFarBehind() {
     Expect(far_n < 30, "far layer is not flushed every second");
     Expect(bytes <= 331 * 5, "charged bytes stay inside the per-connection budget");
     Expect(near_n > 0, "near layer still gets slots");
-    ::unsetenv("GAMEMESH_AOI_V2_LAYERS");
+    ::unsetenv("LUNASERVER_AOI_V2_LAYERS");
 }
 
 void TestLeaveStaysUntilWrite() {
-    ::setenv("GAMEMESH_AOI_V2_VISIBLE_SET", "1", 1);
+    ::setenv("LUNASERVER_AOI_V2_VISIBLE_SET", "1", 1);
     auto data = MakeOpen();
     if (!data) {
         ++g_fail;
@@ -253,7 +253,7 @@ void TestLeaveStaysUntilWrite() {
     std::vector<AoiPushBatch> done;
     rt.AdvancePresented(&done);
     Expect(CountOp(done, 1, 3) == 0, "delivered LEAVE is not repeated");
-    ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
+    ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
     rt.ClearForTest();
 }
 
@@ -308,13 +308,13 @@ void Pump(MapRuntime &rt, int n, uint64_t viewer, int *enters, int *leaves) {
 }
 
 void TestHysteresisOnMap() {
-    ::setenv("GAMEMESH_AOI_V2_VISIBLE_SET", "1", 1);
-    ::setenv("GAMEMESH_AOI_V2_HYSTERESIS", "1", 1);
+    ::setenv("LUNASERVER_AOI_V2_VISIBLE_SET", "1", 1);
+    ::setenv("LUNASERVER_AOI_V2_HYSTERESIS", "1", 1);
     auto data = MakeOpen();
     if (!data) {
         ++g_fail;
-        ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
-        ::unsetenv("GAMEMESH_AOI_V2_HYSTERESIS");
+        ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
+        ::unsetenv("LUNASERVER_AOI_V2_HYSTERESIS");
         return;
     }
     auto &rt = MapRuntime::Instance();
@@ -356,19 +356,19 @@ void TestHysteresisOnMap() {
     leaves += CountOp(std::vector<AoiPushBatch>{pushes}, 11, 3);
     Pump(rt, 20, 11, &enters, &leaves);
     Expect(leaves >= 1, "leaving the outer radius emits LEAVE");
-    ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
-    ::unsetenv("GAMEMESH_AOI_V2_HYSTERESIS");
+    ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
+    ::unsetenv("LUNASERVER_AOI_V2_HYSTERESIS");
     rt.ClearForTest();
 }
 
 void TestCrowdCap() {
-    ::setenv("GAMEMESH_AOI_V2_VISIBLE_SET", "1", 1);
-    ::setenv("GAMEMESH_AOI_V2_CAP_SLACK", "0", 1);
+    ::setenv("LUNASERVER_AOI_V2_VISIBLE_SET", "1", 1);
+    ::setenv("LUNASERVER_AOI_V2_CAP_SLACK", "0", 1);
     auto data = MakeOpen();
     if (!data) {
         ++g_fail;
-        ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
-        ::unsetenv("GAMEMESH_AOI_V2_CAP_SLACK");
+        ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
+        ::unsetenv("LUNASERVER_AOI_V2_CAP_SLACK");
         return;
     }
     auto &rt = MapRuntime::Instance();
@@ -409,17 +409,17 @@ void TestCrowdCap() {
     Expect(static_cast<int>(seen.size()) <= 4, "visible set stays within the cap");
     Expect(static_cast<int>(seen.size()) == 4, "visible set fills the cap");
     rt.SetMaxVisible(200);
-    ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
-    ::unsetenv("GAMEMESH_AOI_V2_CAP_SLACK");
+    ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
+    ::unsetenv("LUNASERVER_AOI_V2_CAP_SLACK");
     rt.ClearForTest();
 }
 
 void TestRadiusFrozenAtEnter() {
-    ::setenv("GAMEMESH_AOI_V2_RADIUS_CELLS", "1", 1);
+    ::setenv("LUNASERVER_AOI_V2_RADIUS_CELLS", "1", 1);
     auto data = MakeOpen();
     if (!data) {
         ++g_fail;
-        ::unsetenv("GAMEMESH_AOI_V2_RADIUS_CELLS");
+        ::unsetenv("LUNASERVER_AOI_V2_RADIUS_CELLS");
         return;
     }
     auto &rt = MapRuntime::Instance();
@@ -433,7 +433,7 @@ void TestRadiusFrozenAtEnter() {
     MapRuntime::FullView view;
     Expect(rt.CollectFullView(40, &view), "radius view");
     Expect(view.radius_cells == 1, "env radius is copied onto the new instance");
-    ::unsetenv("GAMEMESH_AOI_V2_RADIUS_CELLS");
+    ::unsetenv("LUNASERVER_AOI_V2_RADIUS_CELLS");
     Expect(rt.Enter(9104, data, Ent(41, 2, 1), &self, &snap, &pushes, &err), "second enter");
     Expect(rt.CollectFullView(41, &view), "second view");
     Expect(view.radius_cells == 1, "clearing the env leaves the existing instance radius");
@@ -444,7 +444,7 @@ void TestRadiusFrozenAtEnter() {
 }
 
 void TestLeaveRetriesPastTheOldCap() {
-    ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
+    ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
     auto data = MakeOpen();
     if (!data) {
         ++g_fail;

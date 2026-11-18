@@ -11,16 +11,16 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-BUILD_TYPE="${1:-${GAMEMESH_BUILD_TYPE:-${MMO_BUILD_TYPE:-Debug}}}"
+BUILD_TYPE="${1:-${LUNASERVER_BUILD_TYPE:-${MMO_BUILD_TYPE:-Debug}}}"
 # Release 默认独立目录，避免覆盖 Debug 的 build/test 业务二进制
-if [[ -n "${GAMEMESH_BUILD_DIR:-${MMO_BUILD_DIR:-}}" ]]; then
-  BUILD_DIR="${GAMEMESH_BUILD_DIR:-${MMO_BUILD_DIR}}"
+if [[ -n "${LUNASERVER_BUILD_DIR:-${MMO_BUILD_DIR:-}}" ]]; then
+  BUILD_DIR="${LUNASERVER_BUILD_DIR:-${MMO_BUILD_DIR}}"
 elif [[ "$BUILD_TYPE" == "Release" ]]; then
   BUILD_DIR="$ROOT/build-release"
 else
   BUILD_DIR="$ROOT/build"
 fi
-JOBS="${GAMEMESH_JOBS:-${MMO_JOBS:-$(nproc 2>/dev/null || echo 4)}}"
+JOBS="${LUNASERVER_JOBS:-${MMO_JOBS:-$(nproc 2>/dev/null || echo 4)}}"
 TARGET=""
 LOWLEVEL=0
 
@@ -60,10 +60,10 @@ else
   : "${ENABLE_BRPC:=ON}"
 fi
 : "${ENABLE_ROCKSDB:=OFF}"
-if [[ "${GAMEMESH_WERROR:-}" == "1" || "${GAMEMESH_WERROR:-}" == "ON" ]]; then
-  GAMEMESH_WERROR=ON
+if [[ "${LUNASERVER_WERROR:-}" == "1" || "${LUNASERVER_WERROR:-}" == "ON" ]]; then
+  LUNASERVER_WERROR=ON
 else
-  GAMEMESH_WERROR=OFF
+  LUNASERVER_WERROR=OFF
 fi
 : "${ENABLE_ASAN:=OFF}"
 : "${ENABLE_UBSAN:=OFF}"
@@ -75,7 +75,7 @@ if [[ "${ENABLE_ASAN}" == "ON" && "${ENABLE_TSAN}" == "ON" ]]; then
 fi
 
 if [[ "${ENABLE_BRPC}" == "ON" ]]; then
-  DEPS_PREFIX="${GAMEMESH_DEPS_PREFIX:-$HOME/.local/gamemesh-deps}"
+  DEPS_PREFIX="${LUNASERVER_DEPS_PREFIX:-$HOME/.local/lunaserver-deps}"
   if [[ ! -f /usr/local/include/brpc/server.h && ! -f /usr/include/brpc/server.h && \
         ! -f "$DEPS_PREFIX/include/brpc/server.h" ]]; then
     echo "ERROR: ENABLE_BRPC=ON but brpc headers not found." >&2
@@ -116,7 +116,7 @@ cmake -S "$ROOT" -B "$BUILD_DIR" \
   -DENABLE_ASAN="$ENABLE_ASAN" \
   -DENABLE_UBSAN="$ENABLE_UBSAN" \
   -DENABLE_TSAN="$ENABLE_TSAN" \
-  -DGAMEMESH_WERROR="$GAMEMESH_WERROR"
+  -DLUNASERVER_WERROR="$LUNASERVER_WERROR"
 
 echo "== build: jobs=$JOBS target=${TARGET:-all} =="
 if [[ -n "$TARGET" ]]; then

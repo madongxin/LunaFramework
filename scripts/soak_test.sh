@@ -36,9 +36,9 @@ fi
 
 CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
 [[ -x "$CLIENT" ]] || { echo "ERROR: build client"; exit 1; }
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
 [[ -f "$RUN_DIR/pids" ]] || { echo "ERROR: start cluster"; exit 1; }
-export GAMEMESH_RUN_DIR="$RUN_DIR"
+export LUNASERVER_RUN_DIR="$RUN_DIR"
 # shellcheck disable=SC1090
 [[ -f "$RUN_DIR/E2E_PORTS.env" ]] && source "$RUN_DIR/E2E_PORTS.env"
 

@@ -5,7 +5,7 @@
 #include "Logging.h"
 #include "OpsMetrics.h"
 #include "BrpcSslUtil.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 
 #include <brpc/server.h>
 #include <bthread/bthread.h>
@@ -57,7 +57,7 @@ const std::string &GameDbCnf() {
     if (!once) {
         once = true;
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/gamedb.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/gamedb.cnf", &resolved))
             path = std::move(resolved);
     }
     return path;

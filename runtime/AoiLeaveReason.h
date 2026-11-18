@@ -1,6 +1,6 @@
 #pragma once
 
-/** LEAVE 的原因。指标名 gamemesh_aoi_leave_total{reason=...}。 */
+/** LEAVE 的原因。指标名 lunaserver_aoi_leave_total{reason=...}。 */
 enum class AoiLeaveReason {
     OutOfWindow = 0,
     CapEvict,

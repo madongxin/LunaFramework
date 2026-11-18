@@ -30,6 +30,6 @@ public:
 private:
     RedisServiceRegistry() = default;
     std::string InstanceKey(const std::string &service, const std::string &instance_id) const;
-    std::string key_prefix_ = "gamemesh:dev:";
+    std::string key_prefix_ = "lunaserver:dev:";
     std::atomic<bool> ready_{false};
 };

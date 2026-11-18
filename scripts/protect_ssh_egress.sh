@@ -1,13 +1,13 @@
 #!/bin/bash
 # 这台机器的云厂商公网出口是 3 Mbps。脚本不探测链路，3 Mbps 来自 2026-11-13 的实测说明。
 # 8081 和 8083 共用类 1:10。rate / ceil 用环境变量，默认 2200 / 2600 kbit。
-# 8094 用类 1:30：rate 仍是 400 kbit，ceil 用 GAMEMESH_TC_DB_CEIL_KBIT，默认 500。
+# 8094 用类 1:30：rate 仍是 400 kbit，ceil 用 LUNASERVER_TC_DB_CEIL_KBIT，默认 500。
 # 其余流量走类 1:20，给 SSH 留余量。监控队列不跟游戏包挤在一起。
 set -euo pipefail
-DEV="${GAMEMESH_EGRESS_DEV:-eth0}"
-GAME_RATE="${GAMEMESH_TC_GAME_RATE_KBIT:-2200}"
-GAME_CEIL="${GAMEMESH_TC_GAME_CEIL_KBIT:-2600}"
-DB_CEIL="${GAMEMESH_TC_DB_CEIL_KBIT:-500}"
+DEV="${LUNASERVER_EGRESS_DEV:-eth0}"
+GAME_RATE="${LUNASERVER_TC_GAME_RATE_KBIT:-2200}"
+GAME_CEIL="${LUNASERVER_TC_GAME_CEIL_KBIT:-2600}"
+DB_CEIL="${LUNASERVER_TC_DB_CEIL_KBIT:-500}"
 tc qdisc del dev "$DEV" root 2>/dev/null || true
 tc qdisc add dev "$DEV" root handle 1: htb default 20
 tc class add dev "$DEV" parent 1: classid 1:1 htb rate 1000mbit ceil 1000mbit

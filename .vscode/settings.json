@@ -31,22 +31,22 @@
   },
 
   "C_Cpp.default.compileCommands": "${workspaceFolder}/compile_commands.json",
-  "C_Cpp.default.cppStandard": "c++14",
+  "C_Cpp.default.cppStandard": "c++17",
   "C_Cpp.intelliSenseEngine": "disabled",
   "C_Cpp.autocomplete": "disabled",
   "C_Cpp.errorSquiggles": "disabled",
 
   "clangd.enable": true,
-  "clangd.path": "clangd",
+  "clangd.path": "/root/.local/bin/clangd",
   "clangd.arguments": [
     "--compile-commands-dir=${workspaceFolder}",
-    "--background-index",
-    "--header-insertion=never",
-    "--clang-tidy=false",
-    "--log=error"
+    "-log=error"
   ],
 
   "editor.gotoLocation.multipleDefinitions": "goto",
   "editor.gotoLocation.multipleImplementations": "goto",
-  "editor.gotoLocation.multipleDeclarations": "goto"
+  "editor.gotoLocation.multipleDeclarations": "goto",
+
+  "accessibility.signalOptions.volume": 0,
+  "editor.accessibilitySupport": "off"
 }

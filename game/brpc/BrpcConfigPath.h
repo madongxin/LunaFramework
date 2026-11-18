@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 
 #include <string>
 
@@ -12,7 +12,7 @@ inline const std::string &Cnf() {
     if (!once) {
         once = true;
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/brpc.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/brpc.cnf", &resolved))
             path = std::move(resolved);
     }
     return path;

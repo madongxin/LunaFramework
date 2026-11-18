@@ -56,10 +56,10 @@ aoi_visible_cap_expected: 200
 
 监控页 `http://127.0.0.1:8094/monitor`（内网）。按实例看，不要加总成一个 max。
 
-- 计划发送 vs Gateway `rate(gamemesh_gateway_rx_frames_total)`：入站含心跳，大于纯 Move。
-- 别人是否还在收到位置：`rate(gamemesh_move_flush_total)`。
-- 是否在等内核排空：`rate(gamemesh_move_hold_total)` 与 `gamemesh_send_pending_max_bytes`。
-- 是否暂时不再入队：`rate(gamemesh_move_drop_total)`。
-- 在线：Session 的 `gamemesh_session_online_players`，Gateway 的 `gamemesh_gateway_tcp_connections`。分线占位可能高于在线，看 `gamemesh_ghost_occupancy`。
+- 计划发送 vs Gateway `rate(lunaserver_gateway_rx_frames_total)`：入站含心跳，大于纯 Move。
+- 别人是否还在收到位置：`rate(lunaserver_move_flush_total)`。
+- 是否在等内核排空：`rate(lunaserver_move_hold_total)` 与 `lunaserver_send_pending_max_bytes`。
+- 是否暂时不再入队：`rate(lunaserver_move_drop_total)`。
+- 在线：Session 的 `lunaserver_session_online_players`，Gateway 的 `lunaserver_gateway_tcp_connections`。分线占位可能高于在线，看 `lunaserver_ghost_occupancy`。
 
 没有 Move 受理次数 counter，也没有 P95/P99。不要把 ACK 次数写成 AOI 完成次数。正式集群在重启之前，这些新计数不在正在跑的进程里。

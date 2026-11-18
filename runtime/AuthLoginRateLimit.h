@@ -15,7 +15,7 @@ public:
 
 private:
     AuthLoginRateLimit() = default;
-    std::string key_prefix_ = "gamemesh:dev:";
+    std::string key_prefix_ = "lunaserver:dev:";
     int window_sec_ = 60;
     int max_fails_ = 10;
 };

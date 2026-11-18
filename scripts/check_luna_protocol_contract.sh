@@ -3,17 +3,17 @@
 # 用法：
 #   LUNA_REPO=/path/to/luna ./scripts/check_luna_protocol_contract.sh
 #   ./scripts/check_luna_protocol_contract.sh /path/to/luna
-#   GAMEMESH_REQUIRE_LUNA_CONTRACT=1 ./scripts/check_luna_protocol_contract.sh
+#   LUNASERVER_REQUIRE_LUNA_CONTRACT=1 ./scripts/check_luna_protocol_contract.sh
 #
 # 行为：
 # - LUNA_REPO 或参数给出仓库时：必须运行 Unity 检查脚本，hash 不一致则失败。
-# - GAMEMESH_REQUIRE_LUNA_CONTRACT=1 且未给出仓库：失败（client_ready / 发布门禁）。
+# - LUNASERVER_REQUIRE_LUNA_CONTRACT=1 且未给出仓库：失败（client_ready / 发布门禁）。
 # - 未要求且未给出仓库：打印 NOT RUN，退出 0（普通单元测试）。
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-REQUIRE="${GAMEMESH_REQUIRE_LUNA_CONTRACT:-0}"
+REQUIRE="${LUNASERVER_REQUIRE_LUNA_CONTRACT:-0}"
 LUNA="${LUNA_REPO:-}"
 if [[ "${1:-}" != "" && "${1}" != --* ]]; then
   LUNA="$1"
@@ -74,8 +74,8 @@ fi
 SERVER_PROTO="$ROOT/proto/game.proto"
 CLIENT_PROTO=""
 for cand in \
-  "$LUNA/Assets/GameMesh/Protocol/Schema/game.proto" \
-  "$LUNA/Assets/GameMesh/Protocol/game.proto" \
+  "$LUNA/Assets/LunaServer/Protocol/Schema/game.proto" \
+  "$LUNA/Assets/LunaServer/Protocol/game.proto" \
   "$LUNA/proto/game.proto"; do
   if [[ -f "$cand" ]]; then
     CLIENT_PROTO="$cand"
@@ -84,7 +84,7 @@ for cand in \
 done
 CLIENT_MANIFEST=""
 for cand in \
-  "$LUNA/Assets/GameMesh/Protocol/protocol_manifest.json" \
+  "$LUNA/Assets/LunaServer/Protocol/protocol_manifest.json" \
   "$LUNA/protocol_manifest.json"; do
   if [[ -f "$cand" ]]; then
     CLIENT_MANIFEST="$cand"
@@ -114,7 +114,7 @@ echo "server_schema_sha256=$SERVER_SCHEMA_SHA"
 echo "client_schema_sha256=$CLIENT_SCHEMA_SHA"
 echo "client_manifest_schema_sha256=$CLIENT_MANIFEST_SHA"
 
-CHECK="$LUNA/Tools/GameMesh/check_protocol_contract.sh"
+CHECK="$LUNA/Tools/LunaServer/check_protocol_contract.sh"
 if [[ ! -f "$CHECK" ]]; then
   die "missing Unity checker $CHECK (luna_commit=$LUNA_COMMIT)"
 fi

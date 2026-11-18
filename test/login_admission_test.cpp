@@ -4,8 +4,8 @@
 #include <cstdlib>
 
 int main() {
-    if (setenv("GAMEMESH_LOGIN_INFLIGHT_MAX", "4", 1) != 0 ||
-        setenv("GAMEMESH_LOGIN_RECONNECT_RESERVE", "1", 1) != 0) {
+    if (setenv("LUNASERVER_LOGIN_INFLIGHT_MAX", "4", 1) != 0 ||
+        setenv("LUNASERVER_LOGIN_RECONNECT_RESERVE", "1", 1) != 0) {
         std::printf("FAIL setenv\n");
         return 1;
     }

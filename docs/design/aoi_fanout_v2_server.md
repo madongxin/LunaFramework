@@ -4,7 +4,7 @@
 
 目标：带宽不高于现有 2.4 Mbps 预算的前提下，降低 AOI 扇出，并让 LEAVE 在写进连接之前一直留在服务端状态里。
 
-范围：GameMesh 服务端。不改客户端工程。客户端接口只约定，不在本文实现。
+范围：LunaServer 服务端。不改客户端工程。客户端接口只约定，不在本文实现。
 
 ## 0. 现有行为核对
 
@@ -29,7 +29,7 @@
 
 ## 1. 预算算式（估算，不是实测）
 
-默认 `GAMEMESH_EGRESS_BUDGET_MBPS=2.4`，`GAMEMESH_GATEWAY_INSTANCES=2`。
+默认 `LUNASERVER_EGRESS_BUDGET_MBPS=2.4`，`LUNASERVER_GATEWAY_INSTANCES=2`。
 
 ```
 每网关字节/秒 = 2.4e6 / 8 / 2 = 150000
@@ -59,11 +59,11 @@
 
 | 开关 | 默认 | 作用 |
 | --- | --- | --- |
-| `GAMEMESH_AOI_V2_RADIUS_CELLS` | 未设置 | 设置后覆盖该进程的视野半径。实验值 `1`。不改 `map_manifest` 和 `gamelogic.cnf` 里的 2。 |
-| `GAMEMESH_AOI_V2_LAYERS` | 未设置或 `0` | `1` 才启用近远分层，并关掉「due≥200ms 就把人数抬过字节预算」的提额。 |
-| `GAMEMESH_AOI_V2_VISIBLE_SET` | 未设置或 `0` | `1` 才用「已通知集合」差集产生 ENTER/LEAVE，并取消 8 次补发上限。 |
-| `GAMEMESH_AOI_V2_HYSTERESIS` | 未设置或 `0` | `1` 才把进入半径和离开半径分开。 |
-| `GAMEMESH_AOI_V2_RECONCILE` | 不实现 | 对账消息。本文只写接口。确认前不加字段、不发消息。 |
+| `LUNASERVER_AOI_V2_RADIUS_CELLS` | 未设置 | 设置后覆盖该进程的视野半径。实验值 `1`。不改 `map_manifest` 和 `gamelogic.cnf` 里的 2。 |
+| `LUNASERVER_AOI_V2_LAYERS` | 未设置或 `0` | `1` 才启用近远分层，并关掉「due≥200ms 就把人数抬过字节预算」的提额。 |
+| `LUNASERVER_AOI_V2_VISIBLE_SET` | 未设置或 `0` | `1` 才用「已通知集合」差集产生 ENTER/LEAVE，并取消 8 次补发上限。 |
+| `LUNASERVER_AOI_V2_HYSTERESIS` | 未设置或 `0` | `1` 才把进入半径和离开半径分开。 |
+| `LUNASERVER_AOI_V2_RECONCILE` | 不实现 | 对账消息。本文只写接口。确认前不加字段、不发消息。 |
 
 回滚：去掉对应环境变量并重启。四个已实现开关互不依赖，可以只关其中一个。关 `VISIBLE_SET` 时，未确认的 LEAVE 差集会在重启时消失，客户端可能留下旧模型，直到重进图的全量快照。这是回滚代价，写在第 8 节。
 
@@ -84,10 +84,10 @@
 
 ### 3.2 近远层和账本
 
-仅 `GAMEMESH_AOI_V2_LAYERS=1`。
+仅 `LUNASERVER_AOI_V2_LAYERS=1`。
 
-- 近层：落在观察者 3×3 格内，且呈现距离 `<= GAMEMESH_AOI_V2_NEAR_METERS`。建议默认 **32 米**（一格）。代码里已有 `kNearM=16`，但非外推路径把 `far` 丢弃了，`MoveLayer` 又恒为 1，所以 16 米今天不参与调度。不用 16 米做默认，避免和这个死常量绑在一起。
-- 远层：在视野窗口内、但不满足近层。逻辑侧产生间隔 `GAMEMESH_AOI_V2_FAR_INTERVAL_MS`，建议默认 **1000**，允许配置 600–1000。标注待压测校准。
+- 近层：落在观察者 3×3 格内，且呈现距离 `<= LUNASERVER_AOI_V2_NEAR_METERS`。建议默认 **32 米**（一格）。代码里已有 `kNearM=16`，但非外推路径把 `far` 丢弃了，`MoveLayer` 又恒为 1，所以 16 米今天不参与调度。不用 16 米做默认，避免和这个死常量绑在一起。
+- 远层：在视野窗口内、但不满足近层。逻辑侧产生间隔 `LUNASERVER_AOI_V2_FAR_INTERVAL_MS`，建议默认 **1000**，允许配置 600–1000。标注待压测校准。
 - 近层逻辑侧间隔保持现有 180ms。
 
 和账本的衔接（`AoiMoveCoalesceLedger`，`GameTcpGateway.cpp` 的 `MoveLayer` / `FlushMoveSlot`）：
@@ -105,7 +105,7 @@
 1. 远层本帧名额降到 0。远层实体留在槽里，不另开队列。
 2. 近层在剩余字节里按静默从长到短取，人数不超过 `(剩余字节 - 66) / 52`。
 3. 近层静默硬上限到期时，只在**本秒还剩的字节**里优先发这些近层实体，不把 `limit` 抬过字节余额。发不完的继续留在槽里，年龄记入静默分位数。
-4. 总记账字节（帧负载 + 每帧 66）不超过该连接本秒配额。不提高 `GAMEMESH_EGRESS_BUDGET_MBPS`。
+4. 总记账字节（帧负载 + 每帧 66）不超过该连接本秒配额。不提高 `LUNASERVER_EGRESS_BUDGET_MBPS`。
 
 近层保底额度：本帧至少尝试为近层保留 `max(1, limit × 近层名额百分比 / 100)` 个名额，但这个保留**不能**使本秒记账超过配额。配额连 1 个事件都放不下时，本帧一个都不发，包括到期的近层。静默会超过 3000。这种情况打指标，不偷偷加字节。
 
@@ -121,7 +121,7 @@
 
 ## 4. B. 可见集合
 
-仅 `GAMEMESH_AOI_V2_VISIBLE_SET=1`。关闭时仍走今天的 `watchers` / `visible_targets` / `leave_again`。
+仅 `LUNASERVER_AOI_V2_VISIBLE_SET=1`。关闭时仍走今天的 `watchers` / `visible_targets` / `leave_again`。
 
 ### 4.1 状态
 
@@ -150,20 +150,20 @@
 
 ### 4.3 上限和滞回
 
-`GAMEMESH_AOI_V2_VISIBLE_CAP` 默认 200，与 `max_visible_` 相同。仅本开关打开时，它才是推送集合的硬上限。`RefreshViewers` 里「仍在格子里就塞回」的分支在此开关下不执行。
+`LUNASERVER_AOI_V2_VISIBLE_CAP` 默认 200，与 `max_visible_` 相同。仅本开关打开时，它才是推送集合的硬上限。`RefreshViewers` 里「仍在格子里就塞回」的分支在此开关下不执行。
 
 排序：呈现距离，距离相同则 id 较小者优先。与 `VisibleIds` / `CollectFullView` 现有次序一致。
 
 挤出：当前集合按距离取前 N。已通知且仍在窗口内、但落到 N 名之外的人，进入 LEAVE 差集。为避免第 N 与第 N+1 名对调：
 
-- 已在集合里的人，只有当他的名次 `> N + GAMEMESH_AOI_V2_CAP_SLACK` 才被挤出。建议默认 slack **8**。
+- 已在集合里的人，只有当他的名次 `> N + LUNASERVER_AOI_V2_CAP_SLACK` 才被挤出。建议默认 slack **8**。
 - 不在集合里的人，只有当名次 `<= N - slack` 才允许 ENTER 进来占坑。slack 用尽（集合不足 `N - slack`）时，按名次补到 N。
 
 被挤出的人走和走出窗口相同的 LEAVE：留在差集里直到网关接受。
 
 ### 4.4 低频对账（只设计，不实现）
 
-开关名预留 `GAMEMESH_AOI_V2_RECONCILE`。确认前：不加 proto 字段，不发消息，不写实现。
+开关名预留 `LUNASERVER_AOI_V2_RECONCILE`。确认前：不加 proto 字段，不发消息，不写实现。
 
 建议消息，字段号取 `GameResponse` 里当前未占用的新号（实现时再对 `game.proto` 扫一遍，不改已有字段号）：
 
@@ -176,7 +176,7 @@
 
 客户端约定（本文不实现）：收到摘要后，删除本地有、列表里没有的模型。这是 LEAVE 丢失后的兜底，不是主路径。主路径仍是 op=3。
 
-周期 `GAMEMESH_AOI_V2_RECONCILE_SEC`，建议默认 20，允许 10–30。每个观察者错开，避免同一秒打满。摘要字节计入同一 2.4 Mbps 预算，排在 MOVE 之后、LEAVE 之前：LEAVE 仍优先于摘要。
+周期 `LUNASERVER_AOI_V2_RECONCILE_SEC`，建议默认 20，允许 10–30。每个观察者错开，避免同一秒打满。摘要字节计入同一 2.4 Mbps 预算，排在 MOVE 之后、LEAVE 之前：LEAVE 仍优先于摘要。
 
 ### 4.5 清槽后的 needs_resync
 
@@ -205,10 +205,10 @@
 
 ## 5. C. 边界滞回
 
-仅 `GAMEMESH_AOI_V2_HYSTERESIS=1`。
+仅 `LUNASERVER_AOI_V2_HYSTERESIS=1`。
 
-- 进入半径：`GAMEMESH_AOI_V2_RADIUS_CELLS`，未设置则 2。
-- 离开半径：进入半径 + `GAMEMESH_AOI_V2_LEAVE_EXTRA_CELLS`，建议默认 **1**。离开判定用更大的窗口。人必须走出外圈才 LEAVE，走进内圈才 ENTER。停在两圈之间的人维持原状态。
+- 进入半径：`LUNASERVER_AOI_V2_RADIUS_CELLS`，未设置则 2。
+- 离开半径：进入半径 + `LUNASERVER_AOI_V2_LEAVE_EXTRA_CELLS`，建议默认 **1**。离开判定用更大的窗口。人必须走出外圈才 LEAVE，走进内圈才 ENTER。停在两圈之间的人维持原状态。
 
 现有代码没有距离滞回。`InterestKeepMeters` 已删除。`RefreshViewers` 把「还在同一视野窗口里」的人留住，只是为了不让 200 人裁剪把窗口内的人 LEAVE 掉，进和出用的是同一个半径。v2 的差异只是：进出用两个半径；上限挤出用名次 slack，而不是再加一圈距离。
 
@@ -216,21 +216,21 @@
 
 ## 6. D. 指标
 
-前缀 `gamemesh_`。每个序列在**没有任何样本**时不输出该时间序列。监控上显示无数据，不把缺测写成 0。已有序列保持现状，避免把旧图全部改成「时有时无」。
+前缀 `lunaserver_`。每个序列在**没有任何样本**时不输出该时间序列。监控上显示无数据，不把缺测写成 0。已有序列保持现状，避免把旧图全部改成「时有时无」。
 
 | 名字 | 类型 | 单位 | HELP 要点 |
 | --- | --- | --- | --- |
-| `gamemesh_aoi_visible_count` | 分位数 p50/p95/p99/max | 人 | 每个观察者当前已通知且非 leave-pending 的人数。 |
-| `gamemesh_aoi_sub_enter_per_sec` | gauge，由现有计数的区间增量得到；若本进程还没有过 ENTER，不输出 | 次/秒 | ENTER 速率。现有 `gamemesh_aoi_sub_enter_total` 保留。 |
-| `gamemesh_aoi_sub_leave_per_sec` | 同上 | 次/秒 | LEAVE 速率。现有 total 保留。 |
-| `gamemesh_aoi_edge_flap_10s` | gauge | 次 | 同一观察者与同一实体在 10 秒内 ENTER 之后又 LEAVE（或相反）的来回次数。无来回则不输出。 |
-| `gamemesh_aoi_move_silence_near_p50_ms` 及 p95/p99/max | gauge | 毫秒 | 已有近层静默。分层关闭时人人是近层，序列含义不变。无待发实体时不输出。 |
-| `gamemesh_aoi_move_silence_far_p50_ms` 及 p95/p99/max | gauge | 毫秒 | 已有远层静默。分层关闭时没有 layer 0，今天就不会有远层样本。 |
-| `gamemesh_aoi_leave_pending` | gauge | 个 | 所有观察者 `op_pending=leave` 的条目数。开关关闭时不输出。 |
-| `gamemesh_aoi_leave_pending_age_ms` | p50/p95/p99/max | 毫秒 | 这些条目自进入差集起的年龄。无条目时不输出。 |
-| `gamemesh_aoi_reconcile_total` | counter | 次 | 对账消息发出次数。未实现前不注册。 |
-| `gamemesh_aoi_reconcile_removed_total` | counter | 个 | 对账导致客户端应删除的 id 数（服务端统计的是摘要里故意不含、且当时仍在旧 notified 里的人数）。未实现前不注册。 |
-| `gamemesh_aoi_cap_evict_total` | counter | 次 | 被上限挤出并进入 LEAVE 差集的次数。开关关闭时不注册。 |
+| `lunaserver_aoi_visible_count` | 分位数 p50/p95/p99/max | 人 | 每个观察者当前已通知且非 leave-pending 的人数。 |
+| `lunaserver_aoi_sub_enter_per_sec` | gauge，由现有计数的区间增量得到；若本进程还没有过 ENTER，不输出 | 次/秒 | ENTER 速率。现有 `lunaserver_aoi_sub_enter_total` 保留。 |
+| `lunaserver_aoi_sub_leave_per_sec` | 同上 | 次/秒 | LEAVE 速率。现有 total 保留。 |
+| `lunaserver_aoi_edge_flap_10s` | gauge | 次 | 同一观察者与同一实体在 10 秒内 ENTER 之后又 LEAVE（或相反）的来回次数。无来回则不输出。 |
+| `lunaserver_aoi_move_silence_near_p50_ms` 及 p95/p99/max | gauge | 毫秒 | 已有近层静默。分层关闭时人人是近层，序列含义不变。无待发实体时不输出。 |
+| `lunaserver_aoi_move_silence_far_p50_ms` 及 p95/p99/max | gauge | 毫秒 | 已有远层静默。分层关闭时没有 layer 0，今天就不会有远层样本。 |
+| `lunaserver_aoi_leave_pending` | gauge | 个 | 所有观察者 `op_pending=leave` 的条目数。开关关闭时不输出。 |
+| `lunaserver_aoi_leave_pending_age_ms` | p50/p95/p99/max | 毫秒 | 这些条目自进入差集起的年龄。无条目时不输出。 |
+| `lunaserver_aoi_reconcile_total` | counter | 次 | 对账消息发出次数。未实现前不注册。 |
+| `lunaserver_aoi_reconcile_removed_total` | counter | 个 | 对账导致客户端应删除的 id 数（服务端统计的是摘要里故意不含、且当时仍在旧 notified 里的人数）。未实现前不注册。 |
+| `lunaserver_aoi_cap_evict_total` | counter | 次 | 被上限挤出并进入 LEAVE 差集的次数。开关关闭时不注册。 |
 
 ## 7. E. 测试方案
 
@@ -246,9 +246,9 @@
 
 压测时每次只开一类开关，顺序固定：
 
-1. 只设 `GAMEMESH_AOI_V2_RADIUS_CELLS=1`，再开 `GAMEMESH_AOI_V2_LAYERS=1`。
-2. 在上一步之上开 `GAMEMESH_AOI_V2_VISIBLE_SET=1`。
-3. 在上一步之上开 `GAMEMESH_AOI_V2_HYSTERESIS=1`。
+1. 只设 `LUNASERVER_AOI_V2_RADIUS_CELLS=1`，再开 `LUNASERVER_AOI_V2_LAYERS=1`。
+2. 在上一步之上开 `LUNASERVER_AOI_V2_VISIBLE_SET=1`。
+3. 在上一步之上开 `LUNASERVER_AOI_V2_HYSTERESIS=1`。
 
 对账开关不在这轮打开。
 
@@ -256,7 +256,7 @@
 
 - 每观察者可见数（p50/p99）
 - AOI 事件/秒（ENTER、LEAVE、MOVE 分开）
-- 出口 Mbps（现有 `rate(gamemesh_gateway_tx_bytes_total)*8/1e6`）
+- 出口 Mbps（现有 `rate(lunaserver_gateway_tx_bytes_total)*8/1e6`）
 - 近远层静默 p99 与 max
 - 心跳 p99（现有心跳延迟序列；没有样本则写无数据）
 - 自己的移动回包 p99（现有 move 回包延迟；没有样本则写无数据）

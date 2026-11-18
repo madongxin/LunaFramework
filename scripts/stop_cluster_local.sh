@@ -7,14 +7,14 @@ cd "$ROOT"
 MODE="${1:-auto}"
 
 stop_pids() {
-  local run_dir="${GAMEMESH_RUN_DIR:-$ROOT/run/cluster}"
+  local run_dir="${LUNASERVER_RUN_DIR:-$ROOT/run/cluster}"
   if [[ -f "$run_dir/pids" ]]; then
-    GAMEMESH_RUN_DIR="$run_dir" "$ROOT/scripts/stop_cluster.sh"
+    LUNASERVER_RUN_DIR="$run_dir" "$ROOT/scripts/stop_cluster.sh"
     return 0
   fi
   run_dir="$ROOT/run/formal"
   if [[ -f "$run_dir/pids" ]]; then
-    GAMEMESH_RUN_DIR="$run_dir" "$ROOT/scripts/stop_cluster.sh"
+    LUNASERVER_RUN_DIR="$run_dir" "$ROOT/scripts/stop_cluster.sh"
     return 0
   fi
   echo "no local pids under run/cluster or run/formal"

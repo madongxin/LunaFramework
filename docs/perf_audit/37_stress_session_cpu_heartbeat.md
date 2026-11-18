@@ -24,7 +24,7 @@
 3. **Session**：去掉 `MapLineSync::Install`（分线推送仅 GameLogic）；`OnlinePlayerCount` 改 SCARD + 2s 缓存 + 抽样对账。
 4. **occ 对账**：每 ~15s 跑一次，降低与 MarkDisconnected 抢 Redis。
 5. **AOI**：Move 合并间隔 100ms→**200ms**；`MapLineSync` 默认 5s→**8s**。
-6. **指标**：`gamemesh_heartbeat_soft_drop_total`、`reply_soft_drop_total`、`line_occupancy_total`、`ghost_occupancy`、`aoi_push_backlog`。
+6. **指标**：`lunaserver_heartbeat_soft_drop_total`、`reply_soft_drop_total`、`line_occupancy_total`、`ghost_occupancy`、`aoi_push_backlog`。
 
 ## 客户端建议对照
 

@@ -34,8 +34,8 @@
 - `process_cpu_seconds_total`
 - `process_resident_memory_bytes`
 - `process_open_fds` / `process_threads`
-- `gamemesh_eventloop_tick_seconds` / `_peak_seconds`
-- `gamemesh_logic_handle_seconds` / `_peak_seconds`
+- `lunaserver_eventloop_tick_seconds` / `_peak_seconds`
+- `lunaserver_logic_handle_seconds` / `_peak_seconds`
 
 ## 缺口（本阶段不强制有数）
 

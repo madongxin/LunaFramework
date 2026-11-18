@@ -1,6 +1,6 @@
 #include "MapCatalog.h"
 
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "Logging.h"
 
 #include <json/json.h>
@@ -216,7 +216,7 @@ bool MapCatalog::EnsureDefault(std::string *err) {
     std::string dir = map_data_dir_;
     if (dir.empty()) {
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/maps", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/maps", &resolved))
             dir = resolved;
         else
             dir = "config/maps";

@@ -9,14 +9,14 @@ SEED="${ROOT}/build/test/placement_seed_tool"
 [[ -x "$CLIENT" ]] || { echo "ERROR: build game_tcp_e2e_client first"; exit 1; }
 
 # 端口：优先 E2E 集群，其次 formal 默认
-if [[ -f "${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}/E2E_PORTS.env" ]]; then
+if [[ -f "${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}/E2E_PORTS.env" ]]; then
   # shellcheck disable=SC1090
-  source "${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}/E2E_PORTS.env"
+  source "${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}/E2E_PORTS.env"
 fi
 GW0_HOST="${E2E_GW0_HOST:-127.0.0.1}"
 GW1_HOST="${E2E_GW1_HOST:-127.0.0.1}"
-GW0_GAME="${E2E_GW0_GAME:-${GAMEMESH_GAME_G0:-8081}}"
-GW1_GAME="${E2E_GW1_GAME:-${GAMEMESH_GAME_G1:-8083}}"
+GW0_GAME="${E2E_GW0_GAME:-${LUNASERVER_GAME_G0:-8081}}"
+GW1_GAME="${E2E_GW1_GAME:-${LUNASERVER_GAME_G1:-8083}}"
 
 # 默认不预置地图（由 EnterMap 新建）；TRANSFER=1 时预置 gl-1 测跨 Logic
 MAP_TPL="${E2E_MAP_TPL:-$((910000 + RANDOM % 10000))}"

@@ -43,7 +43,7 @@
 
 ## 备选 A：保持 generation 加一，另加 Redis 纪元
 
-登录仍用现在的 `gen = old_gen + 1` 和 token。另外在 Redis 里放一个 `run_id`（Redis 自己的 `INFO server` 里有）对应的 `gamemesh:epoch`。Session 进程启动时读 run_id。和上次写入的不一样，就把 epoch 加一写回去，并拒绝 Acquire/Bind，直到管理员或启动脚本确认「这是一次空库，epoch 已提升」。
+登录仍用现在的 `gen = old_gen + 1` 和 token。另外在 Redis 里放一个 `run_id`（Redis 自己的 `INFO server` 里有）对应的 `lunaserver:epoch`。Session 进程启动时读 run_id。和上次写入的不一样，就把 epoch 加一写回去，并拒绝 Acquire/Bind，直到管理员或启动脚本确认「这是一次空库，epoch 已提升」。
 
 玩家键里多一个 `epoch` 字段。校验时 epoch 和 token、generation 一起比。旧连接的 epoch 较小，迟到回调被拒绝。新会话的 generation 仍可以从 1 开始，但 epoch 更大，所以整体序号不会和旧世界撞上。
 

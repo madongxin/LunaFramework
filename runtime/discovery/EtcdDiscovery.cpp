@@ -60,7 +60,7 @@ bool DoRawHttp(const std::string &host, int port, const std::string &method,
 }
 
 bool LegacyEtcdV2Enabled() {
-    const char *en = std::getenv("GAMEMESH_ENABLE_ETCD_V2");
+    const char *en = std::getenv("LUNASERVER_ENABLE_ETCD_V2");
     return en && std::strcmp(en, "1") == 0;
 }
 
@@ -72,15 +72,15 @@ EtcdDiscovery &EtcdDiscovery::Instance() {
 }
 
 void EtcdDiscovery::Configure(std::string endpoints, std::string prefix) {
-    prefix_ = prefix.empty() ? "gamemesh" : prefix;
+    prefix_ = prefix.empty() ? "lunaserver" : prefix;
     enabled_ = false;
     if (endpoints.empty())
         return;
-    // 生产路径禁止 etcd v2；仅显式 GAMEMESH_ENABLE_ETCD_V2=1 开启（已废弃）
+    // 生产路径禁止 etcd v2；仅显式 LUNASERVER_ENABLE_ETCD_V2=1 开启（已废弃）
     if (!LegacyEtcdV2Enabled()) {
         LOG_WARN << "etcd_endpoints set but etcd v2 disabled for production; "
                     "use static *_addrs / brpc list:// naming "
-                    "(legacy only: GAMEMESH_ENABLE_ETCD_V2=1)";
+                    "(legacy only: LUNASERVER_ENABLE_ETCD_V2=1)";
         return;
     }
     LOG_WARN << "EtcdDiscovery: DEPRECATED etcd v2 HTTP path enabled (do not use in production)";

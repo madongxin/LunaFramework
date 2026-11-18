@@ -121,9 +121,9 @@ std::string GatewayConnGuard::CheckConnectRate(int fd) {
         b.connects = 0;
     }
     ++b.connects;
-    // 2s 窗口默认 80：允许容量测试 51 连。压测设 GAMEMESH_CONNECT_RATE_MAX。
+    // 2s 窗口默认 80：允许容量测试 51 连。压测设 LUNASERVER_CONNECT_RATE_MAX。
     uint32_t max_connects = 80;
-    if (const char *e = std::getenv("GAMEMESH_CONNECT_RATE_MAX")) {
+    if (const char *e = std::getenv("LUNASERVER_CONNECT_RATE_MAX")) {
         const int v = std::atoi(e);
         if (v > 0 && v <= 100000)
             max_connects = static_cast<uint32_t>(v);

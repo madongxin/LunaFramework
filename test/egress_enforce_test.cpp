@@ -23,23 +23,23 @@ void Expect(bool c, const char *m) {
 }
 
 void ClearEnv() {
-    unsetenv("GAMEMESH_AOI_V2_LAYERS");
-    unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
-    unsetenv("GAMEMESH_AOI_V2_HYSTERESIS");
-    unsetenv("GAMEMESH_EGRESS_ENFORCE");
-    unsetenv("GAMEMESH_EGRESS_SHARED_CLASS_KBIT");
-    unsetenv("GAMEMESH_EGRESS_HEADROOM_PERCENT");
-    unsetenv("GAMEMESH_EGRESS_MOVE_FLOOR_PERCENT");
-    unsetenv("GAMEMESH_EGRESS_RETRANS_RESERVE_PERCENT");
-    unsetenv("GAMEMESH_EGRESS_BUDGET_MBPS");
-    unsetenv("GAMEMESH_GATEWAY_INSTANCES");
+    unsetenv("LUNASERVER_AOI_V2_LAYERS");
+    unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
+    unsetenv("LUNASERVER_AOI_V2_HYSTERESIS");
+    unsetenv("LUNASERVER_EGRESS_ENFORCE");
+    unsetenv("LUNASERVER_EGRESS_SHARED_CLASS_KBIT");
+    unsetenv("LUNASERVER_EGRESS_HEADROOM_PERCENT");
+    unsetenv("LUNASERVER_EGRESS_MOVE_FLOOR_PERCENT");
+    unsetenv("LUNASERVER_EGRESS_RETRANS_RESERVE_PERCENT");
+    unsetenv("LUNASERVER_EGRESS_BUDGET_MBPS");
+    unsetenv("LUNASERVER_GATEWAY_INSTANCES");
     AoiMoveCoalesceLedger::ResetEgressBudgetCacheForTest();
 }
 
 // a: 200 entities, 60s, enforce on → wire <= B*60*1.05
 void TestA_BudgetCap() {
     ClearEnv();
-    setenv("GAMEMESH_EGRESS_ENFORCE", "1", 1);
+    setenv("LUNASERVER_EGRESS_ENFORCE", "1", 1);
     AoiMoveCoalesceLedger ledger;
     // Mirror gateway: enforce only via EGRESS_ENFORCE / AOI_V2_LAYERS, not a bare setter.
     ledger.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
@@ -69,8 +69,8 @@ void TestA_BudgetCap() {
 // b: control bytes shrink move quota; control not blocked; floor 20%
 void TestB_ControlFloor() {
     ClearEnv();
-    setenv("GAMEMESH_EGRESS_ENFORCE", "1", 1);
-    setenv("GAMEMESH_EGRESS_MOVE_FLOOR_PERCENT", "20", 1);
+    setenv("LUNASERVER_EGRESS_ENFORCE", "1", 1);
+    setenv("LUNASERVER_EGRESS_MOVE_FLOOR_PERCENT", "20", 1);
     AoiMoveCoalesceLedger ledger;
     ledger.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
     const int B = 1000;
@@ -89,7 +89,7 @@ void TestB_ControlFloor() {
 // c: oldest silent rotates under budget; hard silence does not break budget
 void TestC_RotateNoBreak() {
     ClearEnv();
-    setenv("GAMEMESH_EGRESS_ENFORCE", "1", 1);
+    setenv("LUNASERVER_EGRESS_ENFORCE", "1", 1);
     AoiMoveCoalesceLedger ledger;
     ledger.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
     // Budget fits roughly one event+header per second after 5% retrans reserve.
@@ -121,11 +121,11 @@ void TestC_RotateNoBreak() {
 // d: no due-raise past budget when enforce on
 void TestD_NoDueRaise() {
     ClearEnv();
-    setenv("GAMEMESH_EGRESS_ENFORCE", "1", 1);
+    setenv("LUNASERVER_EGRESS_ENFORCE", "1", 1);
     AoiMoveCoalesceLedger with_enforce;
     with_enforce.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
     ClearEnv();
-    setenv("GAMEMESH_EGRESS_ENFORCE", "0", 1);  // due-raise path: enforce 显式关
+    setenv("LUNASERVER_EGRESS_ENFORCE", "0", 1);  // due-raise path: enforce 显式关
     AoiMoveCoalesceLedger without;
     without.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
     const int B = kOnWireHeaderBytes + kAoiMoveEventBytes;  // one entity
@@ -144,7 +144,7 @@ void TestD_NoDueRaise() {
 // e: two ledgers do not share remaining budget
 void TestE_IndependentShares() {
     ClearEnv();
-    setenv("GAMEMESH_EGRESS_ENFORCE", "1", 1);
+    setenv("LUNASERVER_EGRESS_ENFORCE", "1", 1);
     AoiMoveCoalesceLedger stalled;
     AoiMoveCoalesceLedger live;
     stalled.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
@@ -174,8 +174,8 @@ void TestE_IndependentShares() {
 // f: retrans reserve shrinks usable move budget
 void TestF_RetransReserve() {
     ClearEnv();
-    setenv("GAMEMESH_EGRESS_ENFORCE", "1", 1);
-    setenv("GAMEMESH_EGRESS_RETRANS_RESERVE_PERCENT", "50", 1);
+    setenv("LUNASERVER_EGRESS_ENFORCE", "1", 1);
+    setenv("LUNASERVER_EGRESS_RETRANS_RESERVE_PERCENT", "50", 1);
     AoiMoveCoalesceLedger ledger;
     ledger.SetEnforceByteBudget(EgressEnforce() || AoiV2Layers());
     const int B = 2 * (kAoiMoveEventBytes + kOnWireHeaderBytes);
@@ -197,11 +197,11 @@ void TestF_RetransReserve() {
  */
 void TestG_ScaleInterval() {
     ClearEnv();
-    setenv("GAMEMESH_EGRESS_ENFORCE", "1", 1);
-    setenv("GAMEMESH_EGRESS_SHARED_CLASS_KBIT", "2600", 1);
-    setenv("GAMEMESH_EGRESS_HEADROOM_PERCENT", "85", 1);
-    setenv("GAMEMESH_EGRESS_RETRANS_RESERVE_PERCENT", "5", 1);
-    setenv("GAMEMESH_GATEWAY_INSTANCES", "2", 1);
+    setenv("LUNASERVER_EGRESS_ENFORCE", "1", 1);
+    setenv("LUNASERVER_EGRESS_SHARED_CLASS_KBIT", "2600", 1);
+    setenv("LUNASERVER_EGRESS_HEADROOM_PERCENT", "85", 1);
+    setenv("LUNASERVER_EGRESS_RETRANS_RESERVE_PERCENT", "5", 1);
+    setenv("LUNASERVER_GATEWAY_INSTANCES", "2", 1);
     AoiMoveCoalesceLedger::ResetEgressBudgetCacheForTest();
     const int gw = AoiMoveCoalesceLedger::EgressBudgetBytesPerSec();
     Expect(gw == 138125, "g: per-gateway share is 138125 B/s");

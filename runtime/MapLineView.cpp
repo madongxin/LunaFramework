@@ -97,15 +97,15 @@ std::string PrometheusText(const std::string &owner_only) {
             if (!owner_only.empty() && r.owner_logic_server_id != owner_only)
                 continue;
             if (!any_line) {
-                os << "# HELP gamemesh_map_line_occupancy Players reserved on a LINE instance.\n"
-                      "# TYPE gamemesh_map_line_occupancy gauge\n";
-                count_os << "# HELP gamemesh_map_line_count Ready LINE instances per owner/template.\n"
-                            "# TYPE gamemesh_map_line_count gauge\n";
+                os << "# HELP lunaserver_map_line_occupancy Players reserved on a LINE instance.\n"
+                      "# TYPE lunaserver_map_line_occupancy gauge\n";
+                count_os << "# HELP lunaserver_map_line_count Ready LINE instances per owner/template.\n"
+                            "# TYPE lunaserver_map_line_count gauge\n";
                 any_line = true;
             }
             const std::string owner =
                 r.owner_logic_server_id.empty() ? "unknown" : r.owner_logic_server_id;
-            os << "gamemesh_map_line_occupancy{map_template_id=\"" << e.map_template_id
+            os << "lunaserver_map_line_occupancy{map_template_id=\"" << e.map_template_id
                << "\",line_no=\"" << r.line_no << "\",owner=\"" << PromEscape(owner)
                << "\",kind=\"LINE\",state=\"" << PromEscape(r.state) << "\"} " << r.occupancy
                << "\n";
@@ -119,7 +119,7 @@ std::string PrometheusText(const std::string &owner_only) {
             const auto tab = kv.first.find('\t');
             const std::string owner = kv.first.substr(0, tab);
             const std::string tpl = tab == std::string::npos ? "0" : kv.first.substr(tab + 1);
-            count_os << "gamemesh_map_line_count{map_template_id=\"" << tpl << "\",owner=\""
+            count_os << "lunaserver_map_line_count{map_template_id=\"" << tpl << "\",owner=\""
                      << PromEscape(owner) << "\",kind=\"LINE\"} " << kv.second << "\n";
         }
         count_os << "\n";
@@ -143,22 +143,22 @@ std::string PrometheusText(const std::string &owner_only) {
             if (r.state == "CLOSED")
                 continue;
             if (!any_dungeon) {
-                d_os << "# HELP gamemesh_map_dungeon_occupancy Players reserved on a DUNGEON instance.\n"
-                        "# TYPE gamemesh_map_dungeon_occupancy gauge\n";
-                d_mem << "# HELP gamemesh_map_dungeon_members Allowed members on a DUNGEON instance.\n"
-                         "# TYPE gamemesh_map_dungeon_members gauge\n";
-                d_cnt << "# HELP gamemesh_map_dungeon_count Live DUNGEON instances per owner/template.\n"
-                         "# TYPE gamemesh_map_dungeon_count gauge\n";
+                d_os << "# HELP lunaserver_map_dungeon_occupancy Players reserved on a DUNGEON instance.\n"
+                        "# TYPE lunaserver_map_dungeon_occupancy gauge\n";
+                d_mem << "# HELP lunaserver_map_dungeon_members Allowed members on a DUNGEON instance.\n"
+                         "# TYPE lunaserver_map_dungeon_members gauge\n";
+                d_cnt << "# HELP lunaserver_map_dungeon_count Live DUNGEON instances per owner/template.\n"
+                         "# TYPE lunaserver_map_dungeon_count gauge\n";
                 any_dungeon = true;
             }
             const std::string owner =
                 r.owner_logic_server_id.empty() ? "unknown" : r.owner_logic_server_id;
-            d_os << "gamemesh_map_dungeon_occupancy{map_template_id=\"" << e.map_template_id
+            d_os << "lunaserver_map_dungeon_occupancy{map_template_id=\"" << e.map_template_id
                  << "\",map_instance_id=\"" << r.map_instance_id << "\",owner=\""
                  << PromEscape(owner) << "\",kind=\"DUNGEON\",state=\"" << PromEscape(r.state)
                  << "\",soft_cap=\"" << r.soft_cap << "\",hard_cap=\"" << r.hard_cap << "\"} "
                  << r.occupancy << "\n";
-            d_mem << "gamemesh_map_dungeon_members{map_template_id=\"" << e.map_template_id
+            d_mem << "lunaserver_map_dungeon_members{map_template_id=\"" << e.map_template_id
                   << "\",map_instance_id=\"" << r.map_instance_id << "\",owner=\""
                   << PromEscape(owner) << "\",kind=\"DUNGEON\",state=\"" << PromEscape(r.state)
                   << "\"} " << r.members_n << "\n";
@@ -172,7 +172,7 @@ std::string PrometheusText(const std::string &owner_only) {
             const auto tab = kv.first.find('\t');
             const std::string owner = kv.first.substr(0, tab);
             const std::string tpl = tab == std::string::npos ? "0" : kv.first.substr(tab + 1);
-            d_cnt << "gamemesh_map_dungeon_count{map_template_id=\"" << tpl << "\",owner=\""
+            d_cnt << "lunaserver_map_dungeon_count{map_template_id=\"" << tpl << "\",owner=\""
                   << PromEscape(owner) << "\",kind=\"DUNGEON\"} " << kv.second << "\n";
         }
         d_cnt << "\n";

@@ -38,7 +38,7 @@ WORLD=29301
 SESSION=29401
 GAMEDB=29501
 
-WORKDIR=/tmp/gamemesh-midterm
+WORKDIR=/tmp/lunaserver-midterm
 mkdir -p "$WORKDIR"
 GW_CNF="$ROOT/config/gateway.cnf"
 WORLD_CNF="$ROOT/config/globalservice.cnf"

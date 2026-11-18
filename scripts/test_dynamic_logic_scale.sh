@@ -13,20 +13,20 @@ LOGIC_BIN="${ROOT}/build/test/gamelogic"
   echo "ERROR: missing client/seed/gamelogic (build Debug)"; exit 1
 }
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME}"
 GW1="${E2E_GW1_GAME}"
-HTTP_L2="${GAMEMESH_HTTP_L2:-19097}"
-LOGIC2="${GAMEMESH_LOGIC2:-19203}"
-L0="${GAMEMESH_LOGIC0:-19201}"
-L1="${GAMEMESH_LOGIC1:-19202}"
-GL2_LOG="$GAMEMESH_RUN_DIR/logs/logic2.log"
-PREFIX="${GAMEMESH_REDIS_PREFIX:-gamemesh:dev:}"
+HTTP_L2="${LUNASERVER_HTTP_L2:-19097}"
+LOGIC2="${LUNASERVER_LOGIC2:-19203}"
+L0="${LUNASERVER_LOGIC0:-19201}"
+L1="${LUNASERVER_LOGIC1:-19202}"
+GL2_LOG="$LUNASERVER_RUN_DIR/logs/logic2.log"
+PREFIX="${LUNASERVER_REDIS_PREFIX:-lunaserver:dev:}"
 REDIS_PASS=""
 [[ -f "$ROOT/config/redis.cnf" ]] && REDIS_PASS="$(awk -F= '/^password=/{print $2; exit}' "$ROOT/config/redis.cnf")"
 RCLI=(redis-cli)
@@ -43,9 +43,9 @@ cleanup_gl2() {
 trap cleanup_gl2 EXIT
 
 echo "== start gl-2 http=$HTTP_L2 rpc=$LOGIC2 =="
-GAMEMESH_INSTANCE_ID=gl-2 nohup "$LOGIC_BIN" "$HTTP_L2" "$LOGIC2" >"$GL2_LOG" 2>&1 &
+LUNASERVER_INSTANCE_ID=gl-2 nohup "$LOGIC_BIN" "$HTTP_L2" "$LOGIC2" >"$GL2_LOG" 2>&1 &
 GL2_PID=$!
-echo "$GL2_PID" >>"$GAMEMESH_RUN_DIR/pids"
+echo "$GL2_PID" >>"$LUNASERVER_RUN_DIR/pids"
 e2e_inv_append gamelogic gl-2 "$GL2_PID" "127.0.0.1:${LOGIC2}" "$HTTP_L2" -
 
 ready=0

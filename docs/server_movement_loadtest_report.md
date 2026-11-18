@@ -6,7 +6,7 @@
 
 | 命令 | 结果 |
 | --- | --- |
-| `GAMEMESH_JOBS=2 ./scripts/build.sh Debug gateway` | 退出码 0。随后又编了带停放计数的 `gateway` 与 `reactor_integration_test` |
+| `LUNASERVER_JOBS=2 ./scripts/build.sh Debug gateway` | 退出码 0。随后又编了带停放计数的 `gateway` 与 `reactor_integration_test` |
 | `./build/test/reactor_integration_test` | 退出码 0。内核忙时最新移动帧留在应用缓冲且不写进内核；回包留在该帧前面；内核空闲时帧会写到对端 |
 
 未跑：`test_two_player_aoi.sh`、`aoi200_subscription_test`、1 真人 + 1 Bot、10/50/100/200/201/250/400、600×5 Hz、3000/10000、5% 断线注入。这些档位记 **NOT_RUN**。
@@ -21,11 +21,11 @@
 | --- | --- | --- |
 | Bot 计划 Move/s | 600 × 90% × 5 Hz = 2700 | NOT_RUN |
 | 客户端已发送 Move/s | — | NOT_RUN |
-| Gateway 收到的帧/s | `rate(gamemesh_gateway_rx_frames_total)`，含心跳 | NOT_RUN |
+| Gateway 收到的帧/s | `rate(lunaserver_gateway_rx_frames_total)`，含心跳 | NOT_RUN |
 | GameLogic 成功 Move/s | NOT_COLLECTED，没有受理 counter | NOT_RUN |
-| AOI MOVE | `rate(gamemesh_aoi_move_events_total)` | NOT_RUN |
-| 写进内核的移动帧 | `rate(gamemesh_move_flush_total)` | NOT_RUN |
-| 停放 | `rate(gamemesh_move_hold_total)` | NOT_RUN |
+| AOI MOVE | `rate(lunaserver_aoi_move_events_total)` | NOT_RUN |
+| 写进内核的移动帧 | `rate(lunaserver_move_flush_total)` | NOT_RUN |
+| 停放 | `rate(lunaserver_move_hold_total)` | NOT_RUN |
 | P95/P99 | NOT_COLLECTED | 不能填 |
 
 ## 先前现象（旧二进制，不是本报告的通过证据）

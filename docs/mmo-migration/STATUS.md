@@ -1,17 +1,17 @@
-# STATUS — GameMesh 迁移进度
+# STATUS — LunaServer 迁移进度
 
 > 进程名已从 `world` 改为 `globalservice`。下面若还出现旧二进制名，只作历史记录，启动请用 `./build/test/globalservice`。
 
 > 更新：2026-09-06
 > 正式基线：`docs/mmo-distributed-architecture.md`
-> 全阶段路线图：`docs/GameMesh_Cursor_All_Phases.md`
+> 全阶段路线图：`docs/LunaServer_Cursor_All_Phases.md`
 > 场景施工：`docs/mmo-migration/scene-management-construction.md`（P0 + P1 LINE 已落地）
-> 工程名：**GameMesh**（原 CppWebServer）
+> 工程名：**LunaServer**（原 CppWebServer）
 
 ## 当前阶段
 
-**`GameMesh_Cursor_All_Phases` 阶段 3 — 鉴权 / 所有权 / 安全 / 运维：本轮已落地（见 `PHASE3_STATUS.md`）。**
-阶段 0–2 见对应 `PHASE*_STATUS.md`。正式模式请设 `GAMEMESH_FORMAL=1`。
+**`LunaServer_Cursor_All_Phases` 阶段 3 — 鉴权 / 所有权 / 安全 / 运维：本轮已落地（见 `PHASE3_STATUS.md`）。**
+阶段 0–2 见对应 `PHASE*_STATUS.md`。正式模式请设 `LUNASERVER_FORMAL=1`。
 
 ## 阶段 0–6
 
@@ -22,7 +22,7 @@
 - [x] `apps/ServerBootstrap` + `gateway|gamelogic|world|session|gamedb`；`server role=*` 复用同一 Bootstrap
 - [x] `session.proto` + `SessionBrpcServer`；配置 `session_addrs` 时走 Session RPC
 - [x] `gamedb.proto` + `GameDbBrpcServer` + `BrpcGameDbRepository`
-- [x] 可选 etcd（prefix=`gamemesh`）/ NATS / `ssl_enable`
+- [x] 可选 etcd（prefix=`lunaserver`）/ NATS / `ssl_enable`
 - [x] runbook + `scripts/run_midterm_local.sh`
 
 ## 验证

@@ -66,7 +66,7 @@ int main() {
     }
     // 唯一前缀与 leader id，避免与上次残留互相扫描/抢 leader 干扰
     const std::string prefix =
-        "gamemesh:dev:placerecovertest:" + std::to_string(static_cast<long long>(::getpid())) + ":";
+        "lunaserver:dev:placerecovertest:" + std::to_string(static_cast<long long>(::getpid())) + ":";
     if (!PlacementStore::Instance().InitFromSessionPrefix(prefix, 2))
         return Fail("init");
     PlacementStore::Instance().SetLogicOwners({"gl-0", "gl-1"});

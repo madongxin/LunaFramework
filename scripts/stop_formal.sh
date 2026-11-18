@@ -3,14 +3,14 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/formal}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/formal}"
 
 if [[ ! -f "$RUN_DIR/pids" ]]; then
   echo "没有运行中的正式实例（缺少 $RUN_DIR/pids）"
   exit 0
 fi
 
-echo "== GameMesh formal stop =="
+echo "== LunaServer formal stop =="
 while read -r pid; do
   [[ -z "$pid" ]] && continue
   if kill -0 "$pid" 2>/dev/null; then
@@ -37,9 +37,9 @@ if [[ -x "$ROOT/scripts/redis_clear_runtime.sh" ]]; then
 elif command -v redis-cli >/dev/null 2>&1 && [[ -f "$ROOT/config/redis.cnf" ]]; then
   REDIS_PASS="$(grep -E '^password=' "$ROOT/config/redis.cnf" | head -1 | cut -d= -f2- || true)"
   if [[ -n "$REDIS_PASS" ]]; then
-    redis-cli -a "$REDIS_PASS" DEL 'gamemesh:dev:gw_claim:gw-0' 'gamemesh:dev:gw_claim:gw-1' >/dev/null 2>&1 || true
+    redis-cli -a "$REDIS_PASS" DEL 'lunaserver:dev:gw_claim:gw-0' 'lunaserver:dev:gw_claim:gw-1' >/dev/null 2>&1 || true
   else
-    redis-cli DEL 'gamemesh:dev:gw_claim:gw-0' 'gamemesh:dev:gw_claim:gw-1' >/dev/null 2>&1 || true
+    redis-cli DEL 'lunaserver:dev:gw_claim:gw-0' 'lunaserver:dev:gw_claim:gw-1' >/dev/null 2>&1 || true
   fi
 fi
 

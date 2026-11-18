@@ -1,7 +1,7 @@
 # Urgent Minimum Stable Fix — 阶段一进度与验收
 
 基线：`857d963`
-文档：`docs/GameMesh_Cursor_Urgent_Minimum_Stable_Fix_857d963.md`
+文档：`docs/LunaServer_Cursor_Urgent_Minimum_Stable_Fix_857d963.md`
 状态：**阶段一验收通过；按文档停止，不进入阶段二**
 
 ## 修改文件列表

@@ -111,7 +111,7 @@ brpc_header = ""
 for p in [
     "/usr/local/include/brpc/server.h",
     "/usr/include/brpc/server.h",
-    os.path.expanduser("~/.local/gamemesh-deps/include/brpc/server.h"),
+    os.path.expanduser("~/.local/lunaserver-deps/include/brpc/server.h"),
 ]:
     if os.path.isfile(p):
         brpc_header = p
@@ -128,8 +128,8 @@ manifest = {
         "cmake": sh("cmake --version | head -1"),
         "protoc": sh("protoc --version"),
         "brpc_header": brpc_header,
-        "brpc_version_pin": os.environ.get("GAMEMESH_BRPC_VERSION", "1.9.0"),
-        "deps_prefix": os.environ.get("GAMEMESH_DEPS_PREFIX", ""),
+        "brpc_version_pin": os.environ.get("LUNASERVER_BRPC_VERSION", "1.9.0"),
+        "deps_prefix": os.environ.get("LUNASERVER_DEPS_PREFIX", ""),
         "uname": sh("uname -a"),
         "nproc": sh("nproc"),
         "mem_kb": sh("awk '/MemTotal/{print $2}' /proc/meminfo"),

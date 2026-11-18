@@ -226,7 +226,7 @@ bool PlayerProfileStore::EnsureTable() {
     if (!ProfileTableExists(conn.get())) {
         available_ = false;
         LOG_ERROR << "PlayerProfileStore: player_profile missing; run ./scripts/migrate_db.sh "
-                     "(or GAMEMESH_BOOTSTRAP_DDL=1 for local bootstrap)";
+                     "(or LUNASERVER_BOOTSTRAP_DDL=1 for local bootstrap)";
         return false;
     }
     if (!ProfileColumnsOk(conn.get())) {

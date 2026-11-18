@@ -11,7 +11,7 @@ namespace gameproto {
 bool AllowUnsafeDebugCommands() {
     if (FormalModeEnabled())
         return false;
-    const char *v = std::getenv("GAMEMESH_ALLOW_UNSAFE_DEBUG_COMMANDS");
+    const char *v = std::getenv("LUNASERVER_ALLOW_UNSAFE_DEBUG_COMMANDS");
     if (!v || !*v)
         return false;
     return std::strcmp(v, "1") == 0 || std::strcmp(v, "true") == 0 ||

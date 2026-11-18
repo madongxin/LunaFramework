@@ -1,11 +1,11 @@
 
 cmake_minimum_required(VERSION 3.10)
-project(GameMesh)
+project(LunaServer)
 
 # 供 Cursor/VS Code（Microsoft C++、clangd）跳转定义/实现
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Export compile_commands.json for IDE" FORCE)
 
-set(GAMEMESH_BASE_INCLUDES
+set(LUNASERVER_BASE_INCLUDES
     ${CMAKE_SOURCE_DIR}/base
     ${CMAKE_SOURCE_DIR}/tcp
     ${CMAKE_SOURCE_DIR}/log
@@ -25,31 +25,31 @@ option(ENABLE_REDIS "Game session store (hiredis)" ON)
 option(ENABLE_ROCKSDB "Local RocksDB KV store (protobuf values)" OFF)
 option(ENABLE_BRPC "baidu brpc mail dual-stack (MailBrpcService)" OFF)
 
-file(SHA256 "${CMAKE_SOURCE_DIR}/proto/game.proto" GAMEMESH_SCHEMA_SHA256)
+file(SHA256 "${CMAKE_SOURCE_DIR}/proto/game.proto" LUNASERVER_SCHEMA_SHA256)
 execute_process(
   COMMAND git rev-parse HEAD
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-  OUTPUT_VARIABLE GAMEMESH_GIT_SHA
+  OUTPUT_VARIABLE LUNASERVER_GIT_SHA
   OUTPUT_STRIP_TRAILING_WHITESPACE
   ERROR_QUIET)
-if(NOT GAMEMESH_GIT_SHA)
-  set(GAMEMESH_GIT_SHA "unknown")
+if(NOT LUNASERVER_GIT_SHA)
+  set(LUNASERVER_GIT_SHA "unknown")
 endif()
 add_compile_definitions(
-  GAMEMESH_SCHEMA_SHA256="${GAMEMESH_SCHEMA_SHA256}"
-  GAMEMESH_GIT_SHA="${GAMEMESH_GIT_SHA}")
-message(STATUS "protocol schema_sha256=${GAMEMESH_SCHEMA_SHA256}")
-message(STATUS "git sha=${GAMEMESH_GIT_SHA}")
+  LUNASERVER_SCHEMA_SHA256="${LUNASERVER_SCHEMA_SHA256}"
+  LUNASERVER_GIT_SHA="${LUNASERVER_GIT_SHA}")
+message(STATUS "protocol schema_sha256=${LUNASERVER_SCHEMA_SHA256}")
+message(STATUS "git sha=${LUNASERVER_GIT_SHA}")
 
 set(CMAKE_CXX_COMPILER "g++")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-# 不覆盖 CMake 的 Release 优化选项。-Werror 只在 GAMEMESH_WERROR=ON 时打开。
-option(GAMEMESH_WERROR "Treat compiler warnings as errors" OFF)
-if(DEFINED ENV{GAMEMESH_WERROR})
-  if("$ENV{GAMEMESH_WERROR}" STREQUAL "1" OR "$ENV{GAMEMESH_WERROR}" STREQUAL "ON")
-    set(GAMEMESH_WERROR ON)
+# 不覆盖 CMake 的 Release 优化选项。-Werror 只在 LUNASERVER_WERROR=ON 时打开。
+option(LUNASERVER_WERROR "Treat compiler warnings as errors" OFF)
+if(DEFINED ENV{LUNASERVER_WERROR})
+  if("$ENV{LUNASERVER_WERROR}" STREQUAL "1" OR "$ENV{LUNASERVER_WERROR}" STREQUAL "ON")
+    set(LUNASERVER_WERROR ON)
   endif()
 endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
@@ -286,14 +286,26 @@ if(ENABLE_BRPC)
   message(STATUS "brpc: include=${BRPC_INCLUDE_DIR} lib=${BRPC_LIB}")
 endif()
 
-set(SRC_BOOTSTRAP apps/ServerBootstrap.cpp runtime/ServiceHealth.cpp runtime/PasswordHash.cpp
+set(SRC_BOOTSTRAP apps/ServerBootstrap.cpp
+    apps/bootstrap/AdminHttpUtil.cpp
+    apps/bootstrap/ClusterMonitor.cpp
+    apps/bootstrap/GmAdmin.cpp
+    apps/bootstrap/AdminHttpRouter.cpp
+    apps/bootstrap/LocalRegistry.cpp
+    apps/bootstrap/ConfigKv.cpp
+    apps/bootstrap/StartDeps.cpp
+    apps/bootstrap/StartRoles.cpp
+    apps/bootstrap/PeriodicTasks.cpp
+    apps/bootstrap/GameTcpStart.cpp
+    apps/bootstrap/GracefulShutdown.cpp
+    runtime/ServiceHealth.cpp runtime/PasswordHash.cpp
     runtime/GatewayIdentity.cpp runtime/GatewayAuthFlow.cpp runtime/OpsMetrics.cpp
     runtime/HealthDeps.cpp runtime/HealthProbe.cpp runtime/RpcOffloadPool.cpp)
-set(GAMEMESH_COMMON_SRCS
+set(LUNASERVER_COMMON_SRCS
   ${SRC_LIST1} ${SRC_LIST2} ${SRC_LIST3} ${SRC_LIST4} ${SRC_LIST5}
   ${SRC_DB} ${SRC_GAME} ${SRC_REDIS} ${SRC_ROCKSDB} ${SRC_BRPC} ${SRC_BOOTSTRAP})
 
-function(gamemesh_apply_target_options tgt)
+function(lunaserver_apply_target_options tgt)
   target_include_directories(${tgt} PRIVATE ${OPENSSL_INCLUDE_DIR})
   target_link_libraries(${tgt} ${CMAKE_THREAD_LIBS_INIT} ${JSONCPP_LIBRARIES} ${OPENSSL_CRYPTO_LIB})
   if(ENABLE_MYSQL)
@@ -324,12 +336,12 @@ function(gamemesh_apply_target_options tgt)
   endif()
 endfunction()
 
-add_library(gamemesh_core STATIC ${GAMEMESH_COMMON_SRCS})
-gamemesh_apply_target_options(gamemesh_core)
+add_library(lunaserver_core STATIC ${LUNASERVER_COMMON_SRCS})
+lunaserver_apply_target_options(lunaserver_core)
 
 add_executable(server test/http_server.cpp)
-target_link_libraries(server gamemesh_core)
-gamemesh_apply_target_options(server)
+target_link_libraries(server lunaserver_core)
+lunaserver_apply_target_options(server)
 
 if(ENABLE_BRPC)
   add_executable(gateway apps/gateway_main.cpp)
@@ -337,16 +349,16 @@ if(ENABLE_BRPC)
   add_executable(globalservice apps/globalservice_main.cpp)
   add_executable(session apps/session_main.cpp)
   add_executable(gamedb apps/gamedb_main.cpp)
-  target_link_libraries(gateway gamemesh_core)
-  target_link_libraries(gamelogic gamemesh_core)
-  target_link_libraries(globalservice gamemesh_core)
-  target_link_libraries(session gamemesh_core)
-  target_link_libraries(gamedb gamemesh_core)
-  gamemesh_apply_target_options(gateway)
-  gamemesh_apply_target_options(gamelogic)
-  gamemesh_apply_target_options(globalservice)
-  gamemesh_apply_target_options(session)
-  gamemesh_apply_target_options(gamedb)
+  target_link_libraries(gateway lunaserver_core)
+  target_link_libraries(gamelogic lunaserver_core)
+  target_link_libraries(globalservice lunaserver_core)
+  target_link_libraries(session lunaserver_core)
+  target_link_libraries(gamedb lunaserver_core)
+  lunaserver_apply_target_options(gateway)
+  lunaserver_apply_target_options(gamelogic)
+  lunaserver_apply_target_options(globalservice)
+  lunaserver_apply_target_options(session)
+  lunaserver_apply_target_options(gamedb)
 endif()
 
 if(ENABLE_BRPC)
@@ -371,6 +383,10 @@ if(ENABLE_BRPC)
     runtime/brpc/GameDbBrpcServer.cpp runtime/brpc/GameDbServiceImpl.cpp
     db/BrpcGameDbRepository.cpp
     apps/ServerBootstrap.cpp
+    apps/bootstrap/StartRoles.cpp
+    apps/bootstrap/GracefulShutdown.cpp
+    apps/bootstrap/ConfigKv.cpp
+    apps/bootstrap/LocalRegistry.cpp
     PROPERTIES COMPILE_FLAGS "-faligned-new")
 endif()
 
@@ -1881,7 +1897,7 @@ target_include_directories(leave_pending_audit_test PRIVATE
 target_link_libraries(leave_pending_audit_test
   ${CMAKE_THREAD_LIBS_INIT} ${OPENSSL_CRYPTO_LIB} ${JSONCPP_LIBRARIES})
 
-set(_gamemesh_evidence_users
+set(_lunaserver_evidence_users
   player_serial_queue_test
   player_serial_shutdown_test
   map_runtime_aoi_test
@@ -1913,20 +1929,20 @@ set(_gamemesh_evidence_users
   mail_claim_integration_test
   gamedb_mail_claim_test
   player_mail_send_test)
-foreach(_t ${_gamemesh_evidence_users})
+foreach(_t ${_lunaserver_evidence_users})
   if(TARGET ${_t})
     target_sources(${_t} PRIVATE ${CMAKE_SOURCE_DIR}/runtime/AoiEvidence.cpp)
   endif()
 endforeach()
 
 enable_testing()
-get_property(_gamemesh_targets DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY BUILDSYSTEM_TARGETS)
-foreach(_t ${_gamemesh_targets})
+get_property(_lunaserver_targets DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY BUILDSYSTEM_TARGETS)
+foreach(_t ${_lunaserver_targets})
   get_target_property(_typ ${_t} TYPE)
   if(_typ STREQUAL "EXECUTABLE" OR _typ STREQUAL "STATIC_LIBRARY")
-    target_include_directories(${_t} PRIVATE ${GAMEMESH_BASE_INCLUDES})
+    target_include_directories(${_t} PRIVATE ${LUNASERVER_BASE_INCLUDES})
     target_compile_options(${_t} PRIVATE -Wall)
-    if(GAMEMESH_WERROR)
+    if(LUNASERVER_WERROR)
       target_compile_options(${_t} PRIVATE -Werror)
     endif()
   endif()

@@ -7,8 +7,8 @@
 若已经重启到这版，再回到 `86391f0` 的二进制：
 
 1. 用当时留下的 `gateway` / `gamelogic` 覆盖 `build/test/`，或在干净的 `86391f0` 上重新编译这两个目标。
-2. `./scripts/stop_formal.sh` 然后 `GAMEMESH_ADVERTISE_HOST=10.0.0.2 ./scripts/start_formal.sh`。
-3. 重启会清掉 Redis 里 `gamemesh:dev:` 的运行时，客户端必须重新登录。
+2. `./scripts/stop_formal.sh` 然后 `LUNASERVER_ADVERTISE_HOST=10.0.0.2 ./scripts/start_formal.sh`。
+3. 重启会清掉 Redis 里 `lunaserver:dev:` 的运行时，客户端必须重新登录。
 
 源码回退时一起撤掉这些文件里的本次改动：`TcpReplySink.cpp`、`GameTcpGateway.cpp`、`GatewayConnRegistry.h`、`GatewayConnRegistry.cpp`、`GameLogic.cpp`、`MapRuntime.h`、`OpsMetrics.h`、`OpsMetrics.cpp`、`TcpConnection.h`、`TcpConnection.cpp`，以及 `test/reactor_integration_test.cpp`、`test/world_snapshot_test.cpp`、`test/gateway_conn_race_test.cpp`、`test/auth_session_boundary_test.cpp`。
 

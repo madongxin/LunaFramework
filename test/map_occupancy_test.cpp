@@ -65,7 +65,7 @@ bool InitRedis() {
 int main() {
     if (!InitRedis())
         return Fail("redis unavailable");
-    const std::string prefix = "gamemesh:test:map_occ:" +
+    const std::string prefix = "lunaserver:test:map_occ:" +
                                std::to_string(static_cast<unsigned long long>(::getpid())) + ":";
     if (!PlacementStore::Instance().InitFromSessionPrefix(prefix))
         return Fail("PlacementStore init");

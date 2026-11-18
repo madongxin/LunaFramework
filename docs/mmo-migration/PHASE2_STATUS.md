@@ -1,7 +1,7 @@
-# 阶段 2 状态（GameMesh_Cursor_All_Phases）
+# 阶段 2 状态（LunaServer_Cursor_All_Phases）
 
 > 更新：2026-08-08
-> 对照：`docs/GameMesh_Cursor_All_Phases.md` 阶段 2
+> 对照：`docs/LunaServer_Cursor_All_Phases.md` 阶段 2
 
 ## 已落地
 
@@ -25,7 +25,7 @@
 
 ### 2.4 服务发现（路径选择）
 - **决定**：短期不扩展 etcd v2；正式路径规划 **etcd v3 lease/watch**（或 brpc NamingService）
-- 现状：`StaticServiceRegistry` + 配置 `*_addrs`；注册用 `GAMEMESH_ADVERTISE_HOST`（默认 127.0.0.1），禁止把 `0.0.0.0` 当 advertise
+- 现状：`StaticServiceRegistry` + 配置 `*_addrs`；注册用 `LUNASERVER_ADVERTISE_HOST`（默认 127.0.0.1），禁止把 `0.0.0.0` 当 advertise
 - 未知 logic ID 仍 fail-closed
 
 ### 2.5 可靠 Push

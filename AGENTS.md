@@ -1,9 +1,9 @@
-# GameMesh (CppWebServer) Agent Notes
+# LunaServer (LunaFramework) Agent Notes
 
 ## Topology (MVP)
 
 - Client ↔ public **VIP:8081** (L4 LB) → Gateway ×2 (game TCP). HTTP admin and Push brpc ports are **internal only**.
-- bRPC and the HTTP admin port default to **127.0.0.1**. `GAMEMESH_FORMAL=1` refuses `0.0.0.0` and public addresses unless `allow_public_bind=true` or `GAMEMESH_ALLOW_PUBLIC_BIND=1`. The public monitor on gamedb-0 is that explicit exception.
+- bRPC and the HTTP admin port default to **127.0.0.1**. `LUNASERVER_FORMAL=1` refuses `0.0.0.0` and public addresses unless `allow_public_bind=true` or `LUNASERVER_ALLOW_PUBLIC_BIND=1`. The public monitor on gamedb-0 is that explicit exception.
 - Gateway orchestrates login: **AuthService.Login** → **SessionService.AcquireSession** → **GameLogic.BindPlayer**.
 - AuthService and SessionService share the `session` binary but keep separate protos; Auth does **not** create Sessions.
 - Auth: Redis (access tokens) + GameDB/MySQL (accounts). Session: Redis (fence / ONLINE / DISCONNECTED).
@@ -34,5 +34,5 @@ Scene construction (LINE / DUNGEON): `docs/mmo-migration/scene-management-constr
 ./scripts/test.sh integration
 ```
 
-全阶段路线图：`docs/GameMesh_Cursor_All_Phases.md`（阶段 0–3 见 `docs/mmo-migration/PHASE*_STATUS.md`）。
-Session Redis：连接池 + Lua；正式业务 `Dispatch`；Register/Login 经 Auth→GameDB；`GAMEMESH_FORMAL=1` fail-closed。
+全阶段路线图：`docs/LunaServer_Cursor_All_Phases.md`（阶段 0–3 见 `docs/mmo-migration/PHASE*_STATUS.md`）。
+Session Redis：连接池 + Lua；正式业务 `Dispatch`；Register/Login 经 Auth→GameDB；`LUNASERVER_FORMAL=1` fail-closed。

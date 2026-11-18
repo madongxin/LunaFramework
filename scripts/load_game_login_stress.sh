@@ -8,7 +8,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 SCENARIO="login_enter"
-SEED="${GAMEMESH_STRESS_SEED:-1}"
+SEED="${LUNASERVER_STRESS_SEED:-1}"
 USERS=2
 RAMP_SECONDS=0
 TARGET_LOGIN_RPS=0
@@ -112,15 +112,15 @@ if [[ "$EXECUTE" -ne 1 ]]; then
   write_report
   exit 0
 fi
-if [[ "$HOST" != "127.0.0.1" && "$HOST" != "localhost" && "${GAMEMESH_STRESS_ALLOW_REMOTE:-}" != "1" ]]; then
+if [[ "$HOST" != "127.0.0.1" && "$HOST" != "localhost" && "${LUNASERVER_STRESS_ALLOW_REMOTE:-}" != "1" ]]; then
   STATUS="BLOCKED"
   REASON="endpoint is not loopback"
   write_report
   exit 2
 fi
-if [[ "$USERS" -gt 20 && "${GAMEMESH_STRESS_ALLOW_LARGE:-}" != "1" ]]; then
+if [[ "$USERS" -gt 20 && "${LUNASERVER_STRESS_ALLOW_LARGE:-}" != "1" ]]; then
   STATUS="BLOCKED"
-  REASON="users>20 requires GAMEMESH_STRESS_ALLOW_LARGE=1 on an isolated host"
+  REASON="users>20 requires LUNASERVER_STRESS_ALLOW_LARGE=1 on an isolated host"
   write_report
   exit 2
 fi

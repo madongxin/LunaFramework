@@ -19,7 +19,7 @@
 namespace {
 
 bool InternalDeliverTokenOk(const std::string &presented) {
-    const char *expect = std::getenv("GAMEMESH_MAIL_DELIVER_TOKEN");
+    const char *expect = std::getenv("LUNASERVER_MAIL_DELIVER_TOKEN");
     if (!expect || !*expect || presented.empty())
         return false;
     const size_t n = std::strlen(expect);
@@ -294,7 +294,7 @@ void MailBrpcServiceImpl::MailDeliver(::google::protobuf::RpcController *control
     (void)controller;
     if (!request || !response)
         return;
-    // 玩家会话不能投系统奖励。这里只认 GAMEMESH_MAIL_DELIVER_TOKEN，不看收件人是否在线。
+    // 玩家会话不能投系统奖励。这里只认 LUNASERVER_MAIL_DELIVER_TOKEN，不看收件人是否在线。
     if (!InternalDeliverTokenOk(request->session_token())) {
         response->set_ok(false);
         response->set_error_code("ERR_COMMAND_FORBIDDEN");

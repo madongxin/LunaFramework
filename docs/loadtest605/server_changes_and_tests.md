@@ -14,7 +14,7 @@
 | `game/GameTcpGateway.cpp` | 跨线程等待仍是 200ms，等的是入队结果。超时后取消还没执行的回调，避免报失败的同时帧又写进缓冲。 |
 | `runtime/brpc/GameLogicPush.cpp` | 推送前改用当前绑定的 gateway / session / fence / generation，不再沿用进图时的旧 session。按返回的逐条结果计数。日志不再写死 stale session/fence。 |
 | `runtime/AoiRecipientGate` | `no_session` 或 `closed` 后暂停给该收件人组 AOI，`BindPlayer` 成功时清掉。 |
-| `runtime/OpsMetrics.cpp` | `gamemesh_reliable_push_reject_total{reason=...}`。 |
+| `runtime/OpsMetrics.cpp` | `lunaserver_reliable_push_reject_total{reason=...}`。 |
 
 没改：Move 速度、坐标校验、分线容量、AOI 可见上限、AOI 发布线程、快照上限 200、1KB 移动预算、200ms 停车重试、回复软丢重试。没有第二层异步 Push，也没有把 `QueueOneFunc` 成功说成 TCP 已写完。
 

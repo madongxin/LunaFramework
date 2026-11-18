@@ -6,8 +6,8 @@ V7 验收编号和旧文档里的 MAIL 编号不是同一套含义。下面矩�
 
 | 问题 | 修改 |
 | --- | --- |
-| Redis 不可用时邮件接口放行 | 默认拒绝。只有非正式环境的 `GAMEMESH_MAIL_DEV_SKIP_SESSION=1` 可以跳过。正式环境忽略该开关 |
-| 邮件 brpc 的 `MailDeliver` 用收件人会话鉴权 | 改为只校验 `GAMEMESH_MAIL_DELIVER_TOKEN`，并限制 `SYSTEM`/`ACTIVITY`。玩家 token 不能发奖。离线收件不依赖会话 |
+| Redis 不可用时邮件接口放行 | 默认拒绝。只有非正式环境的 `LUNASERVER_MAIL_DEV_SKIP_SESSION=1` 可以跳过。正式环境忽略该开关 |
+| 邮件 brpc 的 `MailDeliver` 用收件人会话鉴权 | 改为只校验 `LUNASERVER_MAIL_DELIVER_TOKEN`，并限制 `SYSTEM`/`ACTIVITY`。玩家 token 不能发奖。离线收件不依赖会话 |
 | 已读/领取/收藏/批量删除的幂等键未绑定操作意图 | 同一 key 换角色、邮件或操作类型返回 `IDEMPOTENCY_CONFLICT`。投递重复键会比对附件、发送人和到期时间。查询失败返回 `INTERNAL_ERROR`，不会当成未命中再执行 |
 | 领取事务把未领附件标成过期 | `DoClaimMail` 对 `UNCLAIMED`/`CLAIMING` 不再写成 `EXPIRED`，仍可领取 |
 | 过期扫描把未领附件标成 `EXPIRED`，随后领取被拒绝 | `MarkExpiredBatch` 与 `TouchExpireIfNeeded` 跳过 `UNCLAIMED` / `CLAIMING`。`mail::PreserveAttachmentOnExpire` |
@@ -40,7 +40,7 @@ V7 验收编号和旧文档里的 MAIL 编号不是同一套含义。下面矩�
 | MAIL-14 GameDB 超时 | 未执行 | |
 | MAIL-15 过期与领取 | 未执行 | 未领不标 `EXPIRED` 已在代码中，扫描并发未跑 |
 | MAIL-16 Redis 故障 | 未执行 | 正式环境默认拒绝，未停 Redis |
-| MAIL-17 无令牌不能投递 | 未执行 | brpc 只认 `GAMEMESH_MAIL_DELIVER_TOKEN`，未跑负例 |
+| MAIL-17 无令牌不能投递 | 未执行 | brpc 只认 `LUNASERVER_MAIL_DELIVER_TOKEN`，未跑负例 |
 | MAIL-18 多实例版本 | 未执行 | `mailbox_version` 仍是进程内存，客户端必须全量拉列表 |
 | MAIL-19 重连恢复 | 未执行 | 合同要求重连拉摘要和列表 |
 | MAIL-20 双角色隔离 | 未执行 | |

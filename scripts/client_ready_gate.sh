@@ -7,16 +7,16 @@ cd "$ROOT"
 # shellcheck disable=SC1090
 source "$ROOT/scripts/e2e_inventory.sh"
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/unity-e2e}"
-export GAMEMESH_MAP_SHA256_FILE="${GAMEMESH_MAP_SHA256_FILE:-$ROOT/config/maps/map_1001.json.sha256}"
-export GAMEMESH_MAP_DATA_VERSION="${GAMEMESH_MAP_DATA_VERSION:-1}"
-export GAMEMESH_SKIP_CLUSTER_STOP=1
-# 完整 CLIENT READY 必须核对 Unity；CI 无 luna 时用 GAMEMESH_CI_TCP_ONLY=1，只宣称 CLIENT TCP PASS。
-CI_TCP_ONLY="${GAMEMESH_CI_TCP_ONLY:-0}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/unity-e2e}"
+export LUNASERVER_MAP_SHA256_FILE="${LUNASERVER_MAP_SHA256_FILE:-$ROOT/config/maps/map_1001.json.sha256}"
+export LUNASERVER_MAP_DATA_VERSION="${LUNASERVER_MAP_DATA_VERSION:-1}"
+export LUNASERVER_SKIP_CLUSTER_STOP=1
+# 完整 CLIENT READY 必须核对 Unity；CI 无 luna 时用 LUNASERVER_CI_TCP_ONLY=1，只宣称 CLIENT TCP PASS。
+CI_TCP_ONLY="${LUNASERVER_CI_TCP_ONLY:-0}"
 if [[ "$CI_TCP_ONLY" == "1" ]]; then
-  export GAMEMESH_REQUIRE_LUNA_CONTRACT=0
+  export LUNASERVER_REQUIRE_LUNA_CONTRACT=0
 else
-  export GAMEMESH_REQUIRE_LUNA_CONTRACT=1
+  export LUNASERVER_REQUIRE_LUNA_CONTRACT=1
 fi
 
 CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
@@ -46,7 +46,7 @@ write_summary() {
   "gate": "client_ready",
   "start_time": "${GATE_START}",
   "end_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "run_dir": "${GAMEMESH_RUN_DIR}",
+  "run_dir": "${LUNASERVER_RUN_DIR}",
   "exit_code": ${rc},
   "blocked_reason": $(printf '%s' "$reason" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))' 2>/dev/null || echo "\"$reason\""),
   "steps": [${csv}]
@@ -61,7 +61,7 @@ run_tcp() {
   echo "== client_ready: $name =="
   e2e_ensure_cluster "$ROOT" || die "$name cluster unhealthy"
   # shellcheck disable=SC1090
-  [[ -f "$GAMEMESH_RUN_DIR/E2E_PORTS.env" ]] && source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+  [[ -f "$LUNASERVER_RUN_DIR/E2E_PORTS.env" ]] && source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
   local log rc
   log="${SUMMARY_DIR}/${name}.log"
   set +e
@@ -84,9 +84,9 @@ STEPS+=("{\"name\":\"luna_protocol_contract\",\"exit_code\":${luna_rc}}")
 if [[ "$CI_TCP_ONLY" == "1" ]]; then
   # TCP-only job must not require Luna; mismatch/missing is not CLIENT READY, not a TCP fail.
   if echo "$luna_out" | grep -q "luna_protocol_contract=PASS"; then
-    echo "INFO: luna contract PASS (GAMEMESH_CI_TCP_ONLY=1 still not CLIENT READY)"
+    echo "INFO: luna contract PASS (LUNASERVER_CI_TCP_ONLY=1 still not CLIENT READY)"
   else
-    echo "INFO: luna contract not PASS (GAMEMESH_CI_TCP_ONLY=1); not CLIENT READY"
+    echo "INFO: luna contract not PASS (LUNASERVER_CI_TCP_ONLY=1); not CLIENT READY"
   fi
 else
   [[ "$luna_rc" -eq 0 ]] || die "luna protocol contract failed rc=$luna_rc"

@@ -6,27 +6,27 @@
 # start_formal.sh 会以后台方式启动 --watch。停止集群时一起停。
 #
 # 环境变量（可选）:
-#   GAMEMESH_GAME_PORTS        默认 "8081 8083"
-#   GAMEMESH_PARK_SENDQ        默认 16384
-#   GAMEMESH_PARK_HOLD_S       默认 5
-#   GAMEMESH_PARK_DUMP_GAP_S   默认 120（全机冷却）
-#   GAMEMESH_PARK_MAX_DUMPS    默认 20（每组 3 个文件，超出删最旧）
-#   GAMEMESH_PARK_SUMMARY_TOP  默认 64（摘要最多写多少条热点）
+#   LUNASERVER_GAME_PORTS        默认 "8081 8083"
+#   LUNASERVER_PARK_SENDQ        默认 16384
+#   LUNASERVER_PARK_HOLD_S       默认 5
+#   LUNASERVER_PARK_DUMP_GAP_S   默认 120（全机冷却）
+#   LUNASERVER_PARK_MAX_DUMPS    默认 20（每组 3 个文件，超出删最旧）
+#   LUNASERVER_PARK_SUMMARY_TOP  默认 64（摘要最多写多少条热点）
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MODE="${1:-}"
 if [[ "$MODE" == "--watch" ]]; then
-  OUT="${2:-${GAMEMESH_PARKED_SS_DIR:-$ROOT/run/formal/parked-ss}}"
+  OUT="${2:-${LUNASERVER_PARKED_SS_DIR:-$ROOT/run/formal/parked-ss}}"
   exec python3 - "$OUT" <<'PY'
 import os, subprocess, time, sys, glob
 out = sys.argv[1]
-ports = set(os.environ.get("GAMEMESH_GAME_PORTS", "8081 8083").split())
-thresh = int(os.environ.get("GAMEMESH_PARK_SENDQ", "16384"))
-hold_s = float(os.environ.get("GAMEMESH_PARK_HOLD_S", "5"))
-gap_s = float(os.environ.get("GAMEMESH_PARK_DUMP_GAP_S", "120"))
-max_dumps = int(os.environ.get("GAMEMESH_PARK_MAX_DUMPS", "20"))
-summary_top = int(os.environ.get("GAMEMESH_PARK_SUMMARY_TOP", "64"))
-poll_s = float(os.environ.get("GAMEMESH_PARK_POLL_S", "2"))
+ports = set(os.environ.get("LUNASERVER_GAME_PORTS", "8081 8083").split())
+thresh = int(os.environ.get("LUNASERVER_PARK_SENDQ", "16384"))
+hold_s = float(os.environ.get("LUNASERVER_PARK_HOLD_S", "5"))
+gap_s = float(os.environ.get("LUNASERVER_PARK_DUMP_GAP_S", "120"))
+max_dumps = int(os.environ.get("LUNASERVER_PARK_MAX_DUMPS", "20"))
+summary_top = int(os.environ.get("LUNASERVER_PARK_SUMMARY_TOP", "64"))
+poll_s = float(os.environ.get("LUNASERVER_PARK_POLL_S", "2"))
 os.makedirs(out, exist_ok=True)
 episode_start = None
 last_dump = 0.0

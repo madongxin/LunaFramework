@@ -123,7 +123,7 @@ std::string BuildPrometheusMetricsText() {
             int at = 0;
             while (vs >> val) {
                 if (at == retrans_idx) {
-                    EmitCounter(os, "gamemesh_host_tcp_retrans_segs_total",
+                    EmitCounter(os, "lunaserver_host_tcp_retrans_segs_total",
                                 "Host-wide TcpRetransSegs from /proc/net/snmp. Same value on every process; do not sum.",
                                 std::strtod(val.c_str(), nullptr));
                     break;
@@ -135,18 +135,18 @@ std::string BuildPrometheusMetricsText() {
     }
 
     // 兼容旧名（监控页不再使用）
-    EmitGauge(os, "gamemesh_eventloop_tick_seconds", "Last event loop iteration duration.",
+    EmitGauge(os, "lunaserver_eventloop_tick_seconds", "Last event loop iteration duration.",
               m.eventloop_tick_sec);
-    EmitGauge(os, "gamemesh_eventloop_tick_peak_seconds", "Peak event loop iteration duration.",
+    EmitGauge(os, "lunaserver_eventloop_tick_peak_seconds", "Peak event loop iteration duration.",
               m.eventloop_tick_peak_sec);
-    EmitGauge(os, "gamemesh_logic_handle_seconds", "Last GameLogic::Handle duration.",
+    EmitGauge(os, "lunaserver_logic_handle_seconds", "Last GameLogic::Handle duration.",
               m.logic_handle_sec);
-    EmitGauge(os, "gamemesh_logic_handle_peak_seconds", "Peak GameLogic::Handle duration.",
+    EmitGauge(os, "lunaserver_logic_handle_peak_seconds", "Peak GameLogic::Handle duration.",
               m.logic_handle_peak_sec);
 
     if (!m.thread_states_json.empty() && m.thread_states_json != "{}") {
-        os << "# HELP gamemesh_os_threads Threads by /proc state letter.\n"
-              "# TYPE gamemesh_os_threads gauge\n";
+        os << "# HELP lunaserver_os_threads Threads by /proc state letter.\n"
+              "# TYPE lunaserver_os_threads gauge\n";
         for (std::size_t i = 0; i < m.thread_states_json.size(); ++i) {
             if (m.thread_states_json[i] == '"') {
                 const char state = m.thread_states_json[i + 1];
@@ -154,7 +154,7 @@ std::string BuildPrometheusMetricsText() {
                 std::size_t end = m.thread_states_json.find_first_of(",}", colon);
                 if (colon != std::string::npos && end != std::string::npos) {
                     const int cnt = std::atoi(m.thread_states_json.c_str() + colon + 1);
-                    os << "gamemesh_os_threads{state=\"" << state << "\"} " << cnt << "\n";
+                    os << "lunaserver_os_threads{state=\"" << state << "\"} " << cnt << "\n";
                 }
             }
         }
@@ -166,7 +166,7 @@ std::string BuildPrometheusMetricsText() {
 #if defined(WEBSERVER_ENABLE_REDIS) && defined(WEBSERVER_ENABLE_GAME_PROTOBUF)
     {
         std::string owner_only;
-        if (const char *id = std::getenv("GAMEMESH_INSTANCE_ID")) {
+        if (const char *id = std::getenv("LUNASERVER_INSTANCE_ID")) {
             if (std::strncmp(id, "gl-", 3) == 0)
                 owner_only = id;
         }

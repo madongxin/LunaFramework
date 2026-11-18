@@ -1,6 +1,6 @@
 # P1 外推：客户端配合清单（2026-11-14）
 
-服务端外推 + egress enforce：P1g@905 验收后 **默认开**（`GAMEMESH_AOI_EXTRAPOLATE` / `GAMEMESH_EGRESS_ENFORCE`；显式 `=0` 关闭）。  
+服务端外推 + egress enforce：P1g@905 验收后 **默认开**（`LUNASERVER_AOI_EXTRAPOLATE` / `LUNASERVER_EGRESS_ENFORCE`；显式 `=0` 关闭）。  
 灰度打开前，客户端需具备下列能力；否则不要开开关。
 
 ---
@@ -63,5 +63,5 @@
 ## 6. 服务端现状（给客户端同学）
 
 - P0 enforce + P1 外推为正式默认；P1g@905 timeout **1.68%**。  
-- 误差用**呈现坐标**；远关键帧默认 10s（`GAMEMESH_AOI_FAR_KEYFRAME_MS`）。  
+- 误差用**呈现坐标**；远关键帧默认 10s（`LUNASERVER_AOI_FAR_KEYFRAME_MS`）。  
 - ENTER/MOVE 在外推开启时由 `FillEntitySnapshot` / `FillMoveSnapshot` 写入 `vx/vz/move_start_ms`。  

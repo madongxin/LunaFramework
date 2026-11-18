@@ -210,8 +210,8 @@ void TestNotifyQueuesOnLoop() {
 }
 
 void TestGatewayIdentityEnv() {
-    setenv("GAMEMESH_INSTANCE_ID", "gw-race-test", 1);
-    unsetenv("GAMEMESH_FORMAL");
+    setenv("LUNASERVER_INSTANCE_ID", "gw-race-test", 1);
+    unsetenv("LUNASERVER_FORMAL");
     GatewayIdentity::Instance().Set("");  // 清空后重新 Resolve
     std::string err;
     Expect(GatewayIdentity::Instance().Resolve(&err), "resolve from env");

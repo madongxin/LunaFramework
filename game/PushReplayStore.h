@@ -74,7 +74,7 @@ private:
     std::string MetaKey(uint64_t player_id, const std::string &session_id) const;
 
     bool available_ = false;
-    std::string key_prefix_ = "gamemesh:dev:";
+    std::string key_prefix_ = "lunaserver:dev:";
     size_t cap_ = 1024;
     int ttl_sec_ = 7200;
 };

@@ -16,7 +16,7 @@ if [[ -z "$SESSION_BIN" ]]; then
   exit 1
 fi
 
-RUN="${TMPDIR:-/tmp}/gamemesh_netpart_$$"
+RUN="${TMPDIR:-/tmp}/lunaserver_netpart_$$"
 mkdir -p "$RUN"
 cleanup() {
   if [[ -f "$RUN/pid" ]]; then
@@ -33,16 +33,16 @@ port=1
 password=
 EOF
 
-HTTP_PORT="${GAMEMESH_NETPART_HTTP:-18193}"
-BRPC_PORT="${GAMEMESH_NETPART_BRPC:-18493}"
+HTTP_PORT="${LUNASERVER_NETPART_HTTP:-18193}"
+BRPC_PORT="${LUNASERVER_NETPART_BRPC:-18493}"
 
-# 通过工作目录让 ../config/redis.cnf 解析到我们的假配置：把 RUN 当作 gamemesh 父布局
+# 通过工作目录让 ../config/redis.cnf 解析到我们的假配置：把 RUN 当作 lunaserver 父布局
 mkdir -p "$RUN/opt/config" "$RUN/opt/bin"
 cp "$RUN/redis.cnf" "$RUN/opt/config/redis.cnf"
-# 也覆盖项目 config 路径：使用 GAMEMESH_FORCE_NOT_READY 作为可靠断言，
+# 也覆盖项目 config 路径：使用 LUNASERVER_FORCE_NOT_READY 作为可靠断言，
 # 同时验证「强制 not-ready」门禁；再加一轮真实坏 Redis（若进程能起来）。
 
-GAMEMESH_FORCE_NOT_READY=1 GAMEMESH_INSTANCE_ID=netpart-force \
+LUNASERVER_FORCE_NOT_READY=1 LUNASERVER_INSTANCE_ID=netpart-force \
   nohup "$SESSION_BIN" "$HTTP_PORT" "$BRPC_PORT" >"$RUN/force.log" 2>&1 &
 echo $! >"$RUN/pid"
 sleep 2
@@ -55,7 +55,7 @@ if [[ "$code" != "503" ]]; then
   exit 1
 fi
 grep -q '"ready":false' "$RUN/body"
-grep -q 'GAMEMESH_FORCE_NOT_READY' "$RUN/body" || grep -q '"deps_ok":false' "$RUN/body"
+grep -q 'LUNASERVER_FORCE_NOT_READY' "$RUN/body" || grep -q '"deps_ok":false' "$RUN/body"
 kill "$(cat "$RUN/pid")" 2>/dev/null || true
 wait "$(cat "$RUN/pid")" 2>/dev/null || true
 rm -f "$RUN/pid"

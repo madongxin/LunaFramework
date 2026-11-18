@@ -16,10 +16,10 @@
 
 ## 服务端能对上的数
 
-- 心跳写出：`gamemesh_heartbeat_ok_total`。没写出：`gamemesh_heartbeat_soft_drop_total`。
-- 应答没进发送缓冲：`gamemesh_reply_soft_drop_total`。
-- 移动在业务前被拒绝：`gamemesh_move_overloaded_total`。这个计数在新二进制里，21:30 的进程还没有。
-- 内核未发送超过 8KB 时停住的 AOI 移动：`gamemesh_move_hold_total`。交给 write 的是 `gamemesh_move_flush_total`。
+- 心跳写出：`lunaserver_heartbeat_ok_total`。没写出：`lunaserver_heartbeat_soft_drop_total`。
+- 应答没进发送缓冲：`lunaserver_reply_soft_drop_total`。
+- 移动在业务前被拒绝：`lunaserver_move_overloaded_total`。这个计数在新二进制里，21:30 的进程还没有。
+- 内核未发送超过 8KB 时停住的 AOI 移动：`lunaserver_move_hold_total`。交给 write 的是 `lunaserver_move_flush_total`。
 
 `tx_frames` 和 `PushBatch` 成功都不能当成客户端 pending 已匹配。
 

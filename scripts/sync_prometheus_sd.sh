@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# 从 inventory.tsv 生成 Prometheus file_sd（job=gamemesh，按 role/instance_id 打标）。
+# 从 inventory.tsv 生成 Prometheus file_sd（job=lunaserver，按 role/instance_id 打标）。
 # 用法:
-#   GAMEMESH_RUN_DIR=run/formal ./scripts/sync_prometheus_sd.sh
-#   ./scripts/sync_prometheus_sd.sh /etc/prometheus/file_sd/gamemesh.json
+#   LUNASERVER_RUN_DIR=run/formal ./scripts/sync_prometheus_sd.sh
+#   ./scripts/sync_prometheus_sd.sh /etc/prometheus/file_sd/lunaserver.json
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-INV="${GAMEMESH_RUN_DIR:-$ROOT/run/formal}/inventory.tsv"
-OUT_DEFAULT="/etc/prometheus/file_sd/gamemesh.json"
+INV="${LUNASERVER_RUN_DIR:-$ROOT/run/formal}/inventory.tsv"
+OUT_DEFAULT="/etc/prometheus/file_sd/lunaserver.json"
 OUT="${1:-}"
 if [[ -z "$OUT" ]]; then
   if [[ -d /etc/prometheus ]]; then
     OUT="$OUT_DEFAULT"
   else
-    OUT="${GAMEMESH_RUN_DIR:-$ROOT/run/formal}/prometheus_file_sd.json"
+    OUT="${LUNASERVER_RUN_DIR:-$ROOT/run/formal}/prometheus_file_sd.json"
   fi
 fi
 

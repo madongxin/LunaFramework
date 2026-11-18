@@ -30,7 +30,7 @@ int main() {
     const auto ok = EvaluateHttpAdminAccess(true, "124.222.244.169", "secret", "secret");
     Expect(ok.allow, "matching token allows a public peer");
     Expect(HttpQueryParam("/monitor?access_token=abc&x=1", "access_token") == "abc", "query token");
-    Expect(HttpCookieValue("a=b; gamemesh_token=abc", "gamemesh_token") == "abc", "cookie token");
+    Expect(HttpCookieValue("a=b; lunaserver_token=abc", "lunaserver_token") == "abc", "cookie token");
 
     if (fails) {
         std::printf("http_admin_access_test FAIL %d\n", fails);

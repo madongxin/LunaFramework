@@ -9,14 +9,14 @@ source "$ROOT/scripts/e2e_inventory.sh"
 CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
 [[ -x "$CLIENT" ]] || { echo "ERROR: missing $CLIENT" >&2; exit 1; }
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/unity-e2e}"
-export GAMEMESH_MAP_SHA256_FILE="${GAMEMESH_MAP_SHA256_FILE:-$ROOT/config/maps/map_1001.json.sha256}"
-export GAMEMESH_MAP_DATA_VERSION="${GAMEMESH_MAP_DATA_VERSION:-1}"
-export GAMEMESH_SAFE_POS_FLUSH_MS="${GAMEMESH_SAFE_POS_FLUSH_MS:-0}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/unity-e2e}"
+export LUNASERVER_MAP_SHA256_FILE="${LUNASERVER_MAP_SHA256_FILE:-$ROOT/config/maps/map_1001.json.sha256}"
+export LUNASERVER_MAP_DATA_VERSION="${LUNASERVER_MAP_DATA_VERSION:-1}"
+export LUNASERVER_SAFE_POS_FLUSH_MS="${LUNASERVER_SAFE_POS_FLUSH_MS:-0}"
 
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME:?}"
 GW1="${E2E_GW1_GAME:?}"
@@ -80,16 +80,16 @@ if kill -0 "$PID_L0" 2>/dev/null; then
   kill -9 "$PID_L0" 2>/dev/null || true
   sleep 1
 fi
-mkdir -p "$GAMEMESH_RUN_DIR/logs"
+mkdir -p "$LUNASERVER_RUN_DIR/logs"
 if [[ "$(basename "$LOGIC_BIN")" == "server" ]]; then
-  GAMEMESH_FORMAL=1 GAMEMESH_INSTANCE_ID=gl-0 nohup "$LOGIC_BIN" gamelogic "$HTTP_L0" "$LOGIC_PORT" \
-    >>"$GAMEMESH_RUN_DIR/logs/logic0.log" 2>&1 &
+  LUNASERVER_FORMAL=1 LUNASERVER_INSTANCE_ID=gl-0 nohup "$LOGIC_BIN" gamelogic "$HTTP_L0" "$LOGIC_PORT" \
+    >>"$LUNASERVER_RUN_DIR/logs/logic0.log" 2>&1 &
 else
-  GAMEMESH_FORMAL=1 GAMEMESH_INSTANCE_ID=gl-0 nohup "$LOGIC_BIN" "$HTTP_L0" "$LOGIC_PORT" \
-    >>"$GAMEMESH_RUN_DIR/logs/logic0.log" 2>&1 &
+  LUNASERVER_FORMAL=1 LUNASERVER_INSTANCE_ID=gl-0 nohup "$LOGIC_BIN" "$HTTP_L0" "$LOGIC_PORT" \
+    >>"$LUNASERVER_RUN_DIR/logs/logic0.log" 2>&1 &
 fi
 newpid=$!
-echo "$newpid" >>"$GAMEMESH_RUN_DIR/pids"
+echo "$newpid" >>"$LUNASERVER_RUN_DIR/pids"
 e2e_inv_replace gamelogic gl-0 "$newpid" "$RPC_L0" "$HTTP_L0" -
 ready=0
 for _ in $(seq 1 50); do

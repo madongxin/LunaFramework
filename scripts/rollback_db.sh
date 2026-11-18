@@ -3,7 +3,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-CNF="${GAMEMESH_MYSQL_CNF:-$ROOT/config/mysql.cnf}"
+CNF="${LUNASERVER_MYSQL_CNF:-$ROOT/config/mysql.cnf}"
 [[ -f "$CNF" ]] || { echo "ERROR: missing $CNF" >&2; exit 1; }
 
 python3 - "$ROOT" "$CNF" <<'PY'
@@ -17,11 +17,11 @@ for line in open(cnf):
         continue
     k, v = line.split("=", 1)
     kv[k.strip()] = v.strip()
-host = os.environ.get("GAMEMESH_MYSQL_HOST", kv.get("ip", "127.0.0.1"))
-port = os.environ.get("GAMEMESH_MYSQL_PORT", kv.get("port", "3306"))
-user = os.environ.get("GAMEMESH_MYSQL_USER", kv.get("username", kv.get("user", "root")))
-pw = os.environ.get("GAMEMESH_MYSQL_PASSWORD", kv.get("password", ""))
-db = os.environ.get("GAMEMESH_MYSQL_DB", kv.get("dbname", "metrics"))
+host = os.environ.get("LUNASERVER_MYSQL_HOST", kv.get("ip", "127.0.0.1"))
+port = os.environ.get("LUNASERVER_MYSQL_PORT", kv.get("port", "3306"))
+user = os.environ.get("LUNASERVER_MYSQL_USER", kv.get("username", kv.get("user", "root")))
+pw = os.environ.get("LUNASERVER_MYSQL_PASSWORD", kv.get("password", ""))
+db = os.environ.get("LUNASERVER_MYSQL_DB", kv.get("dbname", "metrics"))
 
 def mysql(sql):
     cmd = ["mysql", "-h", host, "-P", str(port), "-u", user, "--batch", "--raw", "-N", "-D", db]

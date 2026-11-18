@@ -7,7 +7,7 @@
 | 项 | 值 |
 | --- | --- |
 | 本批 | Unity 联调切片 S3 |
-| 协议 | `proto/game.proto`，`package game`，C# `GameMesh.Protocol` |
+| 协议 | `proto/game.proto`，`package game`，C# `LunaServer.Protocol` |
 | 帧 | `uint32` 大端长度 + protobuf，最大 4 MiB |
 | 地图模板 | `1001` / `config/maps/map_1001.json` |
 | 容量 | 公共实例 50 人；第 51 人新实例 |
@@ -26,7 +26,7 @@
 1. MySQL、Redis 已按 `scripts/bootstrap_local_config.sh` 配置。
 2. `./scripts/check_deps.sh` 与 `./scripts/build.sh Debug`。
 3. `./scripts/run_unity_integration_server.sh`  
-   默认 `GAMEMESH_RUN_DIR=$ROOT/run/unity-e2e`，拓扑与 `run_e2e_cluster.sh` 相同：Gateway×2、Session/Auth×2、GameLogic×2、World、GameDB×2。`GAMEMESH_FORMAL=1`。
+   默认 `LUNASERVER_RUN_DIR=$ROOT/run/unity-e2e`，拓扑与 `run_e2e_cluster.sh` 相同：Gateway×2、Session/Auth×2、GameLogic×2、World、GameDB×2。`LUNASERVER_FORMAL=1`。
 4. 客户端连 **Game TCP**：`E2E_GW0_GAME`（默认 19081）与 `E2E_GW1_GAME`（19083）。HTTP / Push 仅内网。
 5. 停止：`./scripts/stop_unity_integration_server.sh`（只杀 PID 文件中的进程）。
 

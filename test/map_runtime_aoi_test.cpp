@@ -78,7 +78,7 @@ int CountOp(const AoiPushBatch &b, uint64_t recipient, int op) {
 }  // namespace
 
 int main() {
-    ::setenv("GAMEMESH_AOI_EXTRAPOLATE", "0", 1);
+    ::setenv("LUNASERVER_AOI_EXTRAPOLATE", "0", 1);
     const auto lock_samples_before = ServerStats::aoi_lock_samples.load();
     const auto lock_hold_before = ServerStats::aoi_lock_hold_us_sum.load();
     auto data = MakeOpen();
@@ -419,7 +419,7 @@ int main() {
     }
     Expect(seen == 80, "every one of 80 movers gets a send slot");
     Expect(max_gap > 0 && max_gap <= 2, "no mover waits more than two frames");
-    ::setenv("GAMEMESH_AOI_EXTRAPOLATE", "1", 1);
+    ::setenv("LUNASERVER_AOI_EXTRAPOLATE", "1", 1);
     rt.ClearForTest();
     pushes = {};
     Expect(rt.Enter(40, data, Ent(1, 1, 1), &self, &snap, &pushes, &err, 3), "extrap enter watcher");
@@ -450,7 +450,7 @@ int main() {
     Expect(rt.Move(41, 2, 11.f, 0, 30, 0, 2, 1500, &conf, &pushes, &err, true) == MapMoveReject::Ok,
            "extrap far 2");
     Expect(CountOp(pushes, 1, 2) == 0, "far same velocity has no periodic keyframe");
-    ::setenv("GAMEMESH_AOI_EXTRAPOLATE", "0", 1);
+    ::setenv("LUNASERVER_AOI_EXTRAPOLATE", "0", 1);
 
     // 没订阅过的人不能收到 LEAVE。走出视野的人仍然要收到一次。
     rt.ClearForTest();

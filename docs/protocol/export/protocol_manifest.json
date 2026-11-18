@@ -1,5 +1,5 @@
 {
-  "protocol_name": "gamemesh.game",
+  "protocol_name": "lunaserver.game",
   "protocol_version": 1,
   "min_supported_protocol_version": 1,
   "server_commit": "774052f6d288d05705d6b2b96730d07cde1bad2d",
@@ -20,7 +20,7 @@
   "max_frame_bytes": 4194304,
   "protoc_version": "3.12.4",
   "package": "game",
-  "csharp_namespace": "GameMesh.Protocol",
+  "csharp_namespace": "LunaServer.Protocol",
   "generated_at_utc": "2026-11-05T09:15:27Z",
   "required_types": [
     "ClientHelloReq",

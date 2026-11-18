@@ -119,8 +119,8 @@ int Connect(const char *host, int port) {
     return fd;
 }
 
-#ifndef GAMEMESH_SCHEMA_SHA256
-#define GAMEMESH_SCHEMA_SHA256 ""
+#ifndef LUNASERVER_SCHEMA_SHA256
+#define LUNASERVER_SCHEMA_SHA256 ""
 #endif
 
 bool Exchange(int fd, const game::GameRequest &req, game::GameResponse *rsp, int timeout_ms = 8000);
@@ -131,7 +131,7 @@ bool DoClientHello(int fd, const char *schema_override = nullptr, uint32_t proto
     req.set_seq(0);
     auto *h = req.mutable_client_hello();
     h->set_protocol_version(proto_ver);
-    h->set_schema_sha256(schema_override ? schema_override : GAMEMESH_SCHEMA_SHA256);
+    h->set_schema_sha256(schema_override ? schema_override : LUNASERVER_SCHEMA_SHA256);
     h->set_client_version("e2e-1.0.0");
     h->set_platform("cpp-e2e");
     h->set_build_channel("test");
@@ -292,12 +292,12 @@ std::string NormalizeHex(std::string s) {
 
 std::string LoadMapSha256(uint64_t map_tpl = 1001) {
     if (map_tpl == 1001) {
-        if (const char *e = std::getenv("GAMEMESH_MAP_SHA256")) {
+        if (const char *e = std::getenv("LUNASERVER_MAP_SHA256")) {
             const std::string v = NormalizeHex(e);
             if (!v.empty())
                 return v;
         }
-        if (const char *path = std::getenv("GAMEMESH_MAP_SHA256_FILE")) {
+        if (const char *path = std::getenv("LUNASERVER_MAP_SHA256_FILE")) {
             if (path && *path) {
                 std::ifstream in(path);
                 if (in) {
@@ -324,7 +324,7 @@ std::string LoadMapSha256(uint64_t map_tpl = 1001) {
 }
 
 uint64_t LoadMapDataVersion() {
-    if (const char *e = std::getenv("GAMEMESH_MAP_DATA_VERSION"))
+    if (const char *e = std::getenv("LUNASERVER_MAP_DATA_VERSION"))
         return std::strtoull(e, nullptr, 10);
     return 1;
 }
@@ -1675,7 +1675,7 @@ int CmdUnityHeartbeatMove(int argc, char **argv) {
     hello.set_seq(1);
     auto *h = hello.mutable_client_hello();
     h->set_protocol_version(1);
-    h->set_schema_sha256(GAMEMESH_SCHEMA_SHA256);
+    h->set_schema_sha256(LUNASERVER_SCHEMA_SHA256);
     h->set_client_version("luna-e2e");
     h->set_platform("unity");
     h->set_build_channel("e2e");
@@ -1849,7 +1849,7 @@ int CmdUnityContractCheck(int argc, char **argv) {
         ::close(c.fd);
         return 18;
     }
-    PrintKv("csharp_namespace", std::string("GameMesh.Protocol"));
+    PrintKv("csharp_namespace", std::string("LunaServer.Protocol"));
     PrintKv("enter_map_req_sha256_field", 6);
     PrintKv("aoi_delta_field", 62);
     PrintKv("mailbox_changed_field", 64);

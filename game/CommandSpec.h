@@ -11,7 +11,7 @@ struct CommandSpec {
     bool mail;                 // 邮件帧，Formal 下可转 GameDB
     bool preauth_allow;        // 未登录连接可以发
     bool authenticated_allow;  // 已登录连接可以发
-    bool dangerous;            // 已登录也要 GAMEMESH_ALLOW_UNSAFE_DEBUG_COMMANDS
+    bool dangerous;            // 已登录也要 LUNASERVER_ALLOW_UNSAFE_DEBUG_COMMANDS
     bool needs_session_token;  // GameLogic::Handle 入口要校验 token
 };
 

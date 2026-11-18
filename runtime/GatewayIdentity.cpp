@@ -46,7 +46,7 @@ std::string ReadGatewayCnfInstanceId() {
 }
 
 std::string ReadRedisKeyPrefix() {
-    if (const char *env = std::getenv("GAMEMESH_REDIS_PREFIX")) {
+    if (const char *env = std::getenv("LUNASERVER_REDIS_PREFIX")) {
         if (*env) {
             std::string p = env;
             if (!p.empty() && p.back() != ':')
@@ -74,7 +74,7 @@ std::string ReadRedisKeyPrefix() {
             return p;
         }
     }
-    return "gamemesh:dev:";
+    return "lunaserver:dev:";
 }
 
 bool LooksLikeListenDerived(const std::string &id) {
@@ -99,7 +99,7 @@ bool GatewayIdentity::Resolve(std::string *err) {
     if (!id_.empty())
         return true;
 
-    if (const char *env = std::getenv("GAMEMESH_INSTANCE_ID")) {
+    if (const char *env = std::getenv("LUNASERVER_INSTANCE_ID")) {
         if (*env)
             id_ = env;
     }
@@ -109,11 +109,11 @@ bool GatewayIdentity::Resolve(std::string *err) {
     if (id_.empty()) {
         if (FormalModeEnabled()) {
             if (err)
-                *err = "gateway_instance_id empty (set GAMEMESH_INSTANCE_ID or gateway.cnf)";
+                *err = "gateway_instance_id empty (set LUNASERVER_INSTANCE_ID or gateway.cnf)";
             return false;
         }
         id_ = "gw-0";
-        LOG_WARN << "GatewayIdentity: defaulting to gw-0 (non-FORMAL); set GAMEMESH_INSTANCE_ID";
+        LOG_WARN << "GatewayIdentity: defaulting to gw-0 (non-FORMAL); set LUNASERVER_INSTANCE_ID";
     }
 
     if (LooksLikeListenDerived(id_)) {

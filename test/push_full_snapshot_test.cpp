@@ -67,7 +67,7 @@ int main() {
         return 1;
     }
     const std::string prefix =
-        "gamemesh:dev:pushsnap:" + std::to_string(static_cast<long long>(::getpid())) + ":";
+        "lunaserver:dev:pushsnap:" + std::to_string(static_cast<long long>(::getpid())) + ":";
     if (!PushReplayStore::Instance().InitFromSessionPrefix(prefix, 64, 600))
         return Fail("init");
 

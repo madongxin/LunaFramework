@@ -168,55 +168,55 @@ void ReplyStage::NoteWritten(uint64_t conn_id, uint64_t seq, const char *kind) {
 
 std::string ReplyStage::Prometheus() {
     std::ostringstream os;
-    os << "# HELP gamemesh_reply_stage_total RPC reply pipeline counters.\n"
-          "# TYPE gamemesh_reply_stage_total counter\n";
+    os << "# HELP lunaserver_reply_stage_total RPC reply pipeline counters.\n"
+          "# TYPE lunaserver_reply_stage_total counter\n";
     for (int k = 0; k < kKindCount; ++k) {
         for (int s = 0; s < StageCount; ++s) {
-            os << "gamemesh_reply_stage_total{kind=\"" << kKinds[k] << "\",stage=\"" << kStages[s]
+            os << "lunaserver_reply_stage_total{kind=\"" << kKinds[k] << "\",stage=\"" << kStages[s]
                << "\"} " << g_stage[k][s].load(std::memory_order_relaxed) << "\n";
         }
     }
-    os << "\n# HELP gamemesh_response_soft_drop_total Replies dropped while the TCP connection stayed up.\n"
-          "# TYPE gamemesh_response_soft_drop_total counter\n";
+    os << "\n# HELP lunaserver_response_soft_drop_total Replies dropped while the TCP connection stayed up.\n"
+          "# TYPE lunaserver_response_soft_drop_total counter\n";
     uint64_t soft = 0;
     for (int k = 0; k < kKindCount; ++k)
         soft += g_stage[k][ResponseSoftDrop].load(std::memory_order_relaxed);
-    os << "gamemesh_response_soft_drop_total " << soft << "\n\n";
+    os << "lunaserver_response_soft_drop_total " << soft << "\n\n";
 
-    os << "# HELP gamemesh_reply_latency_ms_bucket Request receive to socket-buffer accept.\n"
-          "# TYPE gamemesh_reply_latency_ms_bucket histogram\n";
-    os << "# HELP gamemesh_reply_latency_ms_sum Sum of request-to-socket-accept milliseconds.\n"
-          "# TYPE gamemesh_reply_latency_ms_sum counter\n";
-    os << "# HELP gamemesh_reply_latency_ms_count Replies with a request timestamp.\n"
-          "# TYPE gamemesh_reply_latency_ms_count counter\n";
-    os << "# HELP gamemesh_reply_latency_p50_ms Lifetime cumulative bucket upper edge for the 50th percentile since process start. Not a sliding window. Do not average across instances; use gamemesh_reply_latency_ms_bucket.\n"
-          "# TYPE gamemesh_reply_latency_p50_ms gauge\n";
-    os << "# HELP gamemesh_reply_latency_p95_ms Lifetime cumulative bucket upper edge for the 95th percentile since process start. Not a sliding window. Do not average across instances; use gamemesh_reply_latency_ms_bucket.\n"
-          "# TYPE gamemesh_reply_latency_p95_ms gauge\n";
-    os << "# HELP gamemesh_reply_latency_p99_ms Lifetime cumulative bucket upper edge for the 99th percentile since process start. Not a sliding window. Do not average across instances; use gamemesh_reply_latency_ms_bucket.\n"
-          "# TYPE gamemesh_reply_latency_p99_ms gauge\n";
+    os << "# HELP lunaserver_reply_latency_ms_bucket Request receive to socket-buffer accept.\n"
+          "# TYPE lunaserver_reply_latency_ms_bucket histogram\n";
+    os << "# HELP lunaserver_reply_latency_ms_sum Sum of request-to-socket-accept milliseconds.\n"
+          "# TYPE lunaserver_reply_latency_ms_sum counter\n";
+    os << "# HELP lunaserver_reply_latency_ms_count Replies with a request timestamp.\n"
+          "# TYPE lunaserver_reply_latency_ms_count counter\n";
+    os << "# HELP lunaserver_reply_latency_p50_ms Lifetime cumulative bucket upper edge for the 50th percentile since process start. Not a sliding window. Do not average across instances; use lunaserver_reply_latency_ms_bucket.\n"
+          "# TYPE lunaserver_reply_latency_p50_ms gauge\n";
+    os << "# HELP lunaserver_reply_latency_p95_ms Lifetime cumulative bucket upper edge for the 95th percentile since process start. Not a sliding window. Do not average across instances; use lunaserver_reply_latency_ms_bucket.\n"
+          "# TYPE lunaserver_reply_latency_p95_ms gauge\n";
+    os << "# HELP lunaserver_reply_latency_p99_ms Lifetime cumulative bucket upper edge for the 99th percentile since process start. Not a sliding window. Do not average across instances; use lunaserver_reply_latency_ms_bucket.\n"
+          "# TYPE lunaserver_reply_latency_p99_ms gauge\n";
     for (int k = 0; k < kKindCount; ++k) {
         uint64_t cum = 0;
         for (int b = 0; b < kBucketCount; ++b) {
             cum += g_bucket[k][b].load(std::memory_order_relaxed);
             const char *le = b == kBucketCount - 1 ? "+Inf" : nullptr;
             if (le) {
-                os << "gamemesh_reply_latency_ms_bucket{kind=\"" << kKinds[k] << "\",le=\"+Inf\"} "
+                os << "lunaserver_reply_latency_ms_bucket{kind=\"" << kKinds[k] << "\",le=\"+Inf\"} "
                    << cum << "\n";
             } else {
-                os << "gamemesh_reply_latency_ms_bucket{kind=\"" << kKinds[k] << "\",le=\""
+                os << "lunaserver_reply_latency_ms_bucket{kind=\"" << kKinds[k] << "\",le=\""
                    << kBucketMs[b] << "\"} " << cum << "\n";
             }
         }
-        os << "gamemesh_reply_latency_ms_sum{kind=\"" << kKinds[k] << "\"} "
+        os << "lunaserver_reply_latency_ms_sum{kind=\"" << kKinds[k] << "\"} "
            << g_latency_sum[k].load(std::memory_order_relaxed) << "\n";
-        os << "gamemesh_reply_latency_ms_count{kind=\"" << kKinds[k] << "\"} "
+        os << "lunaserver_reply_latency_ms_count{kind=\"" << kKinds[k] << "\"} "
            << g_latency_count[k].load(std::memory_order_relaxed) << "\n";
-        os << "gamemesh_reply_latency_p50_ms{kind=\"" << kKinds[k] << "\"} " << QuantileMs(k, 50)
+        os << "lunaserver_reply_latency_p50_ms{kind=\"" << kKinds[k] << "\"} " << QuantileMs(k, 50)
            << "\n";
-        os << "gamemesh_reply_latency_p95_ms{kind=\"" << kKinds[k] << "\"} " << QuantileMs(k, 95)
+        os << "lunaserver_reply_latency_p95_ms{kind=\"" << kKinds[k] << "\"} " << QuantileMs(k, 95)
            << "\n";
-        os << "gamemesh_reply_latency_p99_ms{kind=\"" << kKinds[k] << "\"} " << QuantileMs(k, 99)
+        os << "lunaserver_reply_latency_p99_ms{kind=\"" << kKinds[k] << "\"} " << QuantileMs(k, 99)
            << "\n";
     }
     uint64_t received_n = 0, completed_n = 0, closed_n = 0, soft_n = 0;
@@ -238,19 +238,19 @@ std::string ReplyStage::Prometheus() {
         if (since > 0 && now >= since)
             idle_ms = now - since;
     }
-    os << "\n# HELP gamemesh_reply_inflight Requests not yet write_complete, closed, or soft-dropped.\n"
-          "# TYPE gamemesh_reply_inflight gauge\n"
-          "gamemesh_reply_inflight "
+    os << "\n# HELP lunaserver_reply_inflight Requests not yet write_complete, closed, or soft-dropped.\n"
+          "# TYPE lunaserver_reply_inflight gauge\n"
+          "lunaserver_reply_inflight "
        << inflight
-       << "\n# HELP gamemesh_reply_conservation_residual request_received minus write_complete, "
+       << "\n# HELP lunaserver_reply_conservation_residual request_received minus write_complete, "
           "connection_closed_before_reply, response_soft_drop, and inflight.\n"
-          "# TYPE gamemesh_reply_conservation_residual gauge\n"
-          "gamemesh_reply_conservation_residual "
+          "# TYPE lunaserver_reply_conservation_residual gauge\n"
+          "lunaserver_reply_conservation_residual "
        << residual
-       << "\n# HELP gamemesh_reply_write_complete_idle_ms Milliseconds since the last write_complete "
+       << "\n# HELP lunaserver_reply_write_complete_idle_ms Milliseconds since the last write_complete "
           "while a reply is still in flight. Zero when nothing is in flight.\n"
-          "# TYPE gamemesh_reply_write_complete_idle_ms gauge\n"
-          "gamemesh_reply_write_complete_idle_ms "
+          "# TYPE lunaserver_reply_write_complete_idle_ms gauge\n"
+          "lunaserver_reply_write_complete_idle_ms "
        << idle_ms << "\n\n";
     return os.str();
 }

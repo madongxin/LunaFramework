@@ -1,7 +1,7 @@
-# 阶段 0 状态（GameMesh_Cursor_All_Phases）
+# 阶段 0 状态（LunaServer_Cursor_All_Phases）
 
 > 更新：2026-08-08
-> 对照：`docs/GameMesh_Cursor_All_Phases.md` 阶段 0
+> 对照：`docs/LunaServer_Cursor_All_Phases.md` 阶段 0
 
 ## 已落地
 

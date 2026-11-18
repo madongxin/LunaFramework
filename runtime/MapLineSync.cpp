@@ -43,7 +43,7 @@ uint64_t Key(uint32_t realm, uint64_t tpl) {
 }
 
 int MinIntervalMs() {
-    if (const char *env = std::getenv("GAMEMESH_MAP_LINE_SYNC_MS")) {
+    if (const char *env = std::getenv("LUNASERVER_MAP_LINE_SYNC_MS")) {
         const int v = std::atoi(env);
         if (v >= 500)
             return v;

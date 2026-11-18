@@ -68,7 +68,7 @@ int main() {
     }
     // 隔离前缀，避免与 E2E/正式拓扑共享 map:tpl 键导致并发唯一性假失败
     const std::string prefix =
-        "gamemesh:test:placement_store:" + std::to_string(static_cast<unsigned long long>(::getpid())) +
+        "lunaserver:test:placement_store:" + std::to_string(static_cast<unsigned long long>(::getpid())) +
         ":";
     if (!PlacementStore::Instance().InitFromSessionPrefix(prefix))
         return Fail("PlacementStore init");

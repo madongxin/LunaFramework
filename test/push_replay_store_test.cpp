@@ -62,7 +62,7 @@ int main() {
         std::printf("FAIL push_replay_store_test (Redis unavailable)\n");
         return 1;
     }
-    const std::string prefix = "gamemesh:dev:pushreplaytest:";
+    const std::string prefix = "lunaserver:dev:pushreplaytest:";
     if (!PushReplayStore::Instance().InitFromSessionPrefix(prefix, 8, 600))
         return Fail("init");
 

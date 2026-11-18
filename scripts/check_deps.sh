@@ -26,7 +26,7 @@ ok() { printf '[OK] %s\n' "$*"; }
 bad() { printf '[MISSING] %s\n' "$*"; fail=1; }
 warn() { printf '[WARN] %s\n' "$*"; }
 
-echo "== GameMesh dependency check (root=$ROOT mode=$MODE) =="
+echo "== LunaServer dependency check (root=$ROOT mode=$MODE) =="
 
 command -v g++ >/dev/null && ok "g++ $(g++ --version | head -1)" || bad "g++"
 command -v cmake >/dev/null && ok "cmake $(cmake --version | head -1)" || bad "cmake"
@@ -58,7 +58,7 @@ if [[ "$MODE" != "lowlevel" ]]; then
 fi
 
 has_brpc=0
-DEPS_PREFIX="${GAMEMESH_DEPS_PREFIX:-$HOME/.local/gamemesh-deps}"
+DEPS_PREFIX="${LUNASERVER_DEPS_PREFIX:-$HOME/.local/lunaserver-deps}"
 brpc_hint=""
 if [[ -f /usr/local/include/brpc/server.h ]]; then
   has_brpc=1

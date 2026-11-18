@@ -1,5 +1,5 @@
 {
-  "protocol_name": "gamemesh.game",
+  "protocol_name": "lunaserver.game",
   "protocol_version": 1,
   "min_supported_protocol_version": 1,
   "server_git_sha": "145a64753aacd0d9e1dc7916edee81d15f183148",
@@ -16,7 +16,7 @@
   "frame": "uint32_be_length_prefixed",
   "max_frame_bytes": 4194304,
   "package": "game",
-  "csharp_namespace": "GameMesh.Protocol",
+  "csharp_namespace": "LunaServer.Protocol",
   "generated_at_utc": "2026-08-15T08:29:02Z",
   "push_message_types": ["aoi.delta.v1", "mailbox.changed.v1", "player.state.v1"]
 }

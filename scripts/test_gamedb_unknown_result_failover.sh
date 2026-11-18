@@ -15,10 +15,10 @@ TOOL="${ROOT}/build/test/gamedb_rpc_tool"
 [[ -x "$ROOT/build/test/gamedb_mutation_idempotency_test" ]] && \
   "$ROOT/build/test/gamedb_mutation_idempotency_test"
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 
 [[ -x "$TOOL" ]] || { echo "ERROR: build gamedb_rpc_tool"; exit 1; }
 
@@ -63,27 +63,27 @@ kill -9 "$PID_DB0" 2>/dev/null || true
 sleep 1
 http_port="$HTTP_DB0"
 rpc_port="${RPC_DB0##*:}"
-: >"$GAMEMESH_RUN_DIR/logs/gamedb0_fp.log"
-GAMEMESH_INSTANCE_ID=gamedb-0 \
-  GAMEMESH_FAILPOINT_DELAY_MS=2500 \
-  GAMEMESH_FAILPOINT_ABORT_AFTER_COMMIT=1 \
-  nohup "$GAMEDB_BIN" "$http_port" "$rpc_port" >"$GAMEMESH_RUN_DIR/logs/gamedb0_fp.log" 2>&1 &
+: >"$LUNASERVER_RUN_DIR/logs/gamedb0_fp.log"
+LUNASERVER_INSTANCE_ID=gamedb-0 \
+  LUNASERVER_FAILPOINT_DELAY_MS=2500 \
+  LUNASERVER_FAILPOINT_ABORT_AFTER_COMMIT=1 \
+  nohup "$GAMEDB_BIN" "$http_port" "$rpc_port" >"$LUNASERVER_RUN_DIR/logs/gamedb0_fp.log" 2>&1 &
 FP_PID=$!
-echo "$FP_PID" >>"$GAMEMESH_RUN_DIR/pids"
+echo "$FP_PID" >>"$LUNASERVER_RUN_DIR/pids"
 e2e_inv_replace gamedb gamedb-0 "$FP_PID" "$RPC_DB0" "$HTTP_DB0" -
 ready_fp=0
 for _ in $(seq 1 60); do
-  if grep -qE 'GameDbBrpcServer listening|role=gamedb' "$GAMEMESH_RUN_DIR/logs/gamedb0_fp.log" 2>/dev/null; then
+  if grep -qE 'GameDbBrpcServer listening|role=gamedb' "$LUNASERVER_RUN_DIR/logs/gamedb0_fp.log" 2>/dev/null; then
     ready_fp=1
     break
   fi
   if ! kill -0 "$FP_PID" 2>/dev/null; then
-    echo "ERROR: gamedb-0 failpoint process exited early"; tail -40 "$GAMEMESH_RUN_DIR/logs/gamedb0_fp.log" || true; exit 1
+    echo "ERROR: gamedb-0 failpoint process exited early"; tail -40 "$LUNASERVER_RUN_DIR/logs/gamedb0_fp.log" || true; exit 1
   fi
   sleep 0.25
 done
 [[ "$ready_fp" -eq 1 ]] || {
-  echo "ERROR: gamedb-0 failpoint not listening"; tail -40 "$GAMEMESH_RUN_DIR/logs/gamedb0_fp.log" || true; exit 1
+  echo "ERROR: gamedb-0 failpoint not listening"; tail -40 "$LUNASERVER_RUN_DIR/logs/gamedb0_fp.log" || true; exit 1
 }
 live=0
 for _ in $(seq 1 40); do
@@ -94,7 +94,7 @@ for _ in $(seq 1 40); do
   sleep 0.25
 done
 [[ "$live" -eq 1 ]] || {
-  echo "ERROR: gamedb-0 failpoint health/live refused"; tail -40 "$GAMEMESH_RUN_DIR/logs/gamedb0_fp.log" || true; exit 1
+  echo "ERROR: gamedb-0 failpoint health/live refused"; tail -40 "$LUNASERVER_RUN_DIR/logs/gamedb0_fp.log" || true; exit 1
 }
 
 player="$((940000000 + RANDOM % 100000))"

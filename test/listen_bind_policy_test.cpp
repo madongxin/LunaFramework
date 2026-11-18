@@ -31,7 +31,7 @@ int main() {
     Expect(EvaluateListenBind("0.0.0.0:8181", true, true).ok, "explicit allow_public_bind");
     Expect(EvaluateListenBind("1.2.3.4:8201", false, false).ok, "dev mode may bind public");
     Expect(!EvaluateListenBind("", true, true).ok, "empty address refused");
-    Expect(!AllowPublicBindFromEnv() || std::getenv("GAMEMESH_ALLOW_PUBLIC_BIND") != nullptr,
+    Expect(!AllowPublicBindFromEnv() || std::getenv("LUNASERVER_ALLOW_PUBLIC_BIND") != nullptr,
            "env switch is opt-in");
     if (g_fails) {
         std::printf("%d failures\n", g_fails);

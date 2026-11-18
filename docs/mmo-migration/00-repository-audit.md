@@ -119,11 +119,11 @@ curl -s http://127.0.0.1:8080/metrics
 | `process_resident_memory_bytes` | `/proc` | 有 |
 | `process_open_fds` | `/proc` | 有 |
 | `process_threads` | `/proc` | 有 |
-| `gamemesh_os_threads{state=}` | `/proc` | 有 |
-| `gamemesh_eventloop_tick_seconds` | EventLoopMetrics | last |
-| `gamemesh_eventloop_tick_peak_seconds` | EventLoopMetrics | peak |
-| `gamemesh_logic_handle_seconds` | LogicMetrics | last |
-| `gamemesh_logic_handle_peak_seconds` | LogicMetrics | peak |
+| `lunaserver_os_threads{state=}` | `/proc` | 有 |
+| `lunaserver_eventloop_tick_seconds` | EventLoopMetrics | last |
+| `lunaserver_eventloop_tick_peak_seconds` | EventLoopMetrics | peak |
+| `lunaserver_logic_handle_seconds` | LogicMetrics | last |
+| `lunaserver_logic_handle_peak_seconds` | LogicMetrics | peak |
 | `tcp_send/recv_queue_bytes` | ProcSelfStats | **在 snapshot，未进 /metrics** |
 
 ### 阶段 0 缺口（记录，本阶段不改行为强补）

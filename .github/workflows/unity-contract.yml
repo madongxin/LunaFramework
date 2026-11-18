@@ -38,7 +38,7 @@ jobs:
       - name: protocol contract
         env:
           LUNA_REPO: ${{ github.workspace }}/luna
-          GAMEMESH_REQUIRE_LUNA_CONTRACT: "1"
+          LUNASERVER_REQUIRE_LUNA_CONTRACT: "1"
         run: ./scripts/check_luna_protocol_contract.sh
       - name: download unity client artifact
         if: ${{ github.event.inputs.unity_client_artifact != '' }}
@@ -56,7 +56,7 @@ jobs:
             echo "Do not assume a Unity binary exists in a source-only job."
             exit 1
           fi
-          BIN="$(find unity-client -type f \( -name 'GameMeshClient' -o -name 'GameMeshClient.exe' -o -perm -u+x \) | head -1 || true)"
+          BIN="$(find unity-client -type f \( -name 'LunaServerClient' -o -name 'LunaServerClient.exe' -o -perm -u+x \) | head -1 || true)"
           if [[ -z "$BIN" || ! -e "$BIN" ]]; then
             echo "UNITY TWO CLIENTS BLOCKED: artifact '${ARTIFACT_NAME}' downloaded but no client binary found"
             echo "Artifact must come from the same workflow run; this job does not invent a binary."

@@ -2,7 +2,7 @@
 
 #include "BrpcSslUtil.h"
 #include "GameDbRepository.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "GatewayConfigPath.h"
 #include "IGameDbRepository.h"
 #include "Logging.h"
@@ -65,7 +65,7 @@ bool BrpcGameDbRepository::ApplySnapshot(const std::vector<std::string> &addrs) 
     if (!ssl.enable) {
         std::string gamedb_cnf = "../config/gamedb.cnf";
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/gamedb.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/gamedb.cnf", &resolved))
             gamedb_cnf = resolved;
         BrpcSslUtil::LoadFromCnf(gamedb_cnf, &ssl);
     }

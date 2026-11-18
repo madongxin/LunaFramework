@@ -2417,9 +2417,9 @@ bool LocalFriendApplyQuota(uint64_t player_id) {
         const int v = std::atoi(e);
         return v > 0 ? v : def;
     };
-    const int per_min = env("GAMEMESH_FRIEND_RATE_PER_MINUTE", 10);
-    const int per_hour = env("GAMEMESH_FRIEND_RATE_PER_HOUR", 50);
-    const int per_day = env("GAMEMESH_FRIEND_RATE_PER_DAY", 200);
+    const int per_min = env("LUNASERVER_FRIEND_RATE_PER_MINUTE", 10);
+    const int per_hour = env("LUNASERVER_FRIEND_RATE_PER_HOUR", 50);
+    const int per_day = env("LUNASERVER_FRIEND_RATE_PER_DAY", 200);
     static std::mutex mu;
     static std::unordered_map<uint64_t, std::vector<int64_t>> stamps;
     const int64_t now = NowUnixSec();
@@ -2456,9 +2456,9 @@ bool SessionStore::ConsumeFriendApplyQuota(uint64_t player_id) {
         const int v = std::atoi(e);
         return v > 0 ? v : def;
     };
-    const int per_min = env("GAMEMESH_FRIEND_RATE_PER_MINUTE", 10);
-    const int per_hour = env("GAMEMESH_FRIEND_RATE_PER_HOUR", 50);
-    const int per_day = env("GAMEMESH_FRIEND_RATE_PER_DAY", 200);
+    const int per_min = env("LUNASERVER_FRIEND_RATE_PER_MINUTE", 10);
+    const int per_hour = env("LUNASERVER_FRIEND_RATE_PER_HOUR", 50);
+    const int per_day = env("LUNASERVER_FRIEND_RATE_PER_DAY", 200);
     const std::string base = key_prefix_ + "friend:rate:" + std::to_string(player_id);
     if (!ConsumeKeyedQuota(base + ":m", per_min, 60))
         return false;

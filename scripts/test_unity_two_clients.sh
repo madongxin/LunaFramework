@@ -24,45 +24,45 @@ fi
 LUNA="$(cd "$LUNA" && pwd)"
 if [[ -z "$BIN" ]]; then
   for cand in \
-    "$LUNA/Builds/GameMeshClient/GameMeshClient.x86_64" \
-    "$LUNA/Builds/GameMeshClient/GameMeshClient" \
-    "$LUNA/Builds/GameMeshClient/GameMeshClient.exe"; do
+    "$LUNA/Builds/LunaServerClient/LunaServerClient.x86_64" \
+    "$LUNA/Builds/LunaServerClient/LunaServerClient" \
+    "$LUNA/Builds/LunaServerClient/LunaServerClient.exe"; do
     if [[ -x "$cand" || -f "$cand" ]]; then
       BIN="$cand"
       break
     fi
   done
 fi
-[[ -n "$BIN" ]] || die "UNITY_CLIENT_BIN unset and no Luna Builds/GameMeshClient binary"
+[[ -n "$BIN" ]] || die "UNITY_CLIENT_BIN unset and no Luna Builds/LunaServerClient binary"
 [[ -x "$BIN" || -f "$BIN" ]] || die "UNITY_CLIENT_BIN missing: $BIN"
 export LUNA_REPO="$LUNA"
-export GAMEMESH_REQUIRE_LUNA_CONTRACT=1
+export LUNASERVER_REQUIRE_LUNA_CONTRACT=1
 
 "$ROOT/scripts/check_luna_protocol_contract.sh" "$LUNA" \
   || die "protocol contract failed"
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/unity-e2e}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/unity-e2e}"
 # shellcheck disable=SC1090
 source "$ROOT/scripts/e2e_inventory.sh"
 e2e_ensure_cluster "$ROOT" || die "cluster unhealthy"
 # shellcheck disable=SC1090
-[[ -f "$GAMEMESH_RUN_DIR/E2E_PORTS.env" ]] && source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+[[ -f "$LUNASERVER_RUN_DIR/E2E_PORTS.env" ]] && source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME:?}"
 GW1="${E2E_GW1_GAME:?}"
 
 UNITY_SCRIPT=""
 for cand in \
-  "$LUNA/Tools/GameMesh/run_two_clients_e2e.sh" \
-  "$LUNA/Tools/GameMesh/run_two_clients.sh" \
-  "$LUNA/Tools/GameMesh/test_two_clients.sh" \
-  "$LUNA/Tools/GameMesh/e2e_two_clients.sh"; do
+  "$LUNA/Tools/LunaServer/run_two_clients_e2e.sh" \
+  "$LUNA/Tools/LunaServer/run_two_clients.sh" \
+  "$LUNA/Tools/LunaServer/test_two_clients.sh" \
+  "$LUNA/Tools/LunaServer/e2e_two_clients.sh"; do
   if [[ -f "$cand" ]]; then
     UNITY_SCRIPT="$cand"
     break
   fi
 done
-[[ -n "$UNITY_SCRIPT" ]] || die "missing Luna two-client script under Tools/GameMesh/"
+[[ -n "$UNITY_SCRIPT" ]] || die "missing Luna two-client script under Tools/LunaServer/"
 
 STAMP="$(date +%s)"
 OUT_DIR="${ROOT}/run/unity_two_clients/${STAMP}"
@@ -77,10 +77,10 @@ mkdir -p "$OUT_DIR"
 chmod +x "$UNITY_SCRIPT" 2>/dev/null || true
 set +e
 if [[ "$(basename "$UNITY_SCRIPT")" == "run_two_clients_e2e.sh" ]]; then
-  export GAMEMESH_E2E_GATEWAY=1
-  export GAMEMESH_HOST="$HOST"
-  export GAMEMESH_PORT="$GW0"
-  export GAMEMESH_E2E_SCENARIO="${GAMEMESH_E2E_SCENARIO:-presence-move-logout}"
+  export LUNASERVER_E2E_GATEWAY=1
+  export LUNASERVER_HOST="$HOST"
+  export LUNASERVER_PORT="$GW0"
+  export LUNASERVER_E2E_SCENARIO="${LUNASERVER_E2E_SCENARIO:-presence-move-logout}"
   "$UNITY_SCRIPT" "$BIN" >"$OUT_DIR/unity_runner.log" 2>&1
   rc=$?
   # Luna writes Logs/e2e-*/{a,b}/result.json under the client repo.

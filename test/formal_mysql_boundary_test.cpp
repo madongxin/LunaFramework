@@ -20,14 +20,14 @@ int main() {
     if (ConnectionPool::getconnectionPool()->isInitialized())
         return Fail("pool must not init after ForbidInit");
 
-    ::setenv("GAMEMESH_FORMAL", "1", 1);
+    ::setenv("LUNASERVER_FORMAL", "1", 1);
     if (FormalModeAllowsMysql("gamelogic") || FormalModeAllowsMysql("globalservice") ||
         FormalModeAllowsMysql("gateway") || FormalModeAllowsMysql("session"))
         return Fail("non-gamedb roles must be denied under FORMAL");
     if (!FormalModeAllowsMysql("gamedb") || !FormalModeAllowsMysql("all"))
         return Fail("gamedb/all must allow under FORMAL");
 
-    ::unsetenv("GAMEMESH_FORMAL");
+    ::unsetenv("LUNASERVER_FORMAL");
     if (!FormalModeAllowsMysql("gamelogic"))
         return Fail("compat mode allows mysql");
 

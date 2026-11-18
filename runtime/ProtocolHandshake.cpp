@@ -7,11 +7,11 @@
 #include <cstring>
 #include <string>
 
-#ifndef GAMEMESH_SCHEMA_SHA256
-#define GAMEMESH_SCHEMA_SHA256 ""
+#ifndef LUNASERVER_SCHEMA_SHA256
+#define LUNASERVER_SCHEMA_SHA256 ""
 #endif
-#ifndef GAMEMESH_GIT_SHA
-#define GAMEMESH_GIT_SHA "unknown"
+#ifndef LUNASERVER_GIT_SHA
+#define LUNASERVER_GIT_SHA "unknown"
 #endif
 
 namespace gameproto {
@@ -58,40 +58,40 @@ int CmpDottedVersion(const std::string &a, const std::string &b) {
 
 }  // namespace
 
-const char *CompiledSchemaSha256() { return GAMEMESH_SCHEMA_SHA256; }
+const char *CompiledSchemaSha256() { return LUNASERVER_SCHEMA_SHA256; }
 
 std::string EffectiveSchemaSha256() {
-    const char *env = std::getenv("GAMEMESH_SCHEMA_SHA256");
+    const char *env = std::getenv("LUNASERVER_SCHEMA_SHA256");
     if (env && *env)
         return env;
-    return GAMEMESH_SCHEMA_SHA256;
+    return LUNASERVER_SCHEMA_SHA256;
 }
 
 std::string ServerBuildId() {
-    const char *env = std::getenv("GAMEMESH_BUILD_ID");
+    const char *env = std::getenv("LUNASERVER_BUILD_ID");
     if (env && *env)
         return env;
-    return GAMEMESH_GIT_SHA;
+    return LUNASERVER_GIT_SHA;
 }
 
 uint32_t HeartbeatIntervalMs() {
-    return EnvU32("GAMEMESH_HEARTBEAT_INTERVAL_MS", kDefaultHeartbeatIntervalMs);
+    return EnvU32("LUNASERVER_HEARTBEAT_INTERVAL_MS", kDefaultHeartbeatIntervalMs);
 }
 
-uint32_t IdleTimeoutMs() { return EnvU32("GAMEMESH_IDLE_TIMEOUT_MS", kDefaultIdleTimeoutMs); }
+uint32_t IdleTimeoutMs() { return EnvU32("LUNASERVER_IDLE_TIMEOUT_MS", kDefaultIdleTimeoutMs); }
 
 uint32_t HelloDeadlineMs() {
     const uint32_t idle = IdleTimeoutMs();
-    const uint32_t hello = EnvU32("GAMEMESH_HELLO_DEADLINE_MS", kDefaultHelloDeadlineMs);
+    const uint32_t hello = EnvU32("LUNASERVER_HELLO_DEADLINE_MS", kDefaultHelloDeadlineMs);
     return hello < idle ? hello : idle;
 }
 
 uint32_t HeartbeatMinIntervalMs() {
-    return EnvU32("GAMEMESH_HEARTBEAT_MIN_INTERVAL_MS", 250);
+    return EnvU32("LUNASERVER_HEARTBEAT_MIN_INTERVAL_MS", 250);
 }
 
 bool ClientVersionTooOld(const std::string &client_version) {
-    const char *minv = std::getenv("GAMEMESH_MIN_CLIENT_VERSION");
+    const char *minv = std::getenv("LUNASERVER_MIN_CLIENT_VERSION");
     if (!minv || !*minv)
         return false;
     if (client_version.empty())

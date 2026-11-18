@@ -63,7 +63,7 @@ inline ListenBindDecision EvaluateListenBind(const std::string &listen_addr, boo
 }
 
 inline bool AllowPublicBindFromEnv() {
-    const char *v = std::getenv("GAMEMESH_ALLOW_PUBLIC_BIND");
+    const char *v = std::getenv("LUNASERVER_ALLOW_PUBLIC_BIND");
     if (!v || !*v)
         return false;
     return std::strcmp(v, "1") == 0 || std::strcmp(v, "true") == 0 || std::strcmp(v, "TRUE") == 0;

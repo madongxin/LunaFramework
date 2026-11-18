@@ -11,8 +11,8 @@ if [[ ! "$N" =~ ^[0-9]+$ ]] || (( N < 1 )); then
 fi
 
 if [[ "${START_CLUSTER:-0}" == "1" ]]; then
-  export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
-  if [[ -f "$GAMEMESH_RUN_DIR/pids" ]]; then
+  export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
+  if [[ -f "$LUNASERVER_RUN_DIR/pids" ]]; then
     ./scripts/stop_e2e_cluster.sh 2>/dev/null || true
     sleep 1
   fi
@@ -21,7 +21,7 @@ if [[ "${START_CLUSTER:-0}" == "1" ]]; then
   # 冷启动：等 Register/Login 真正可用（避免 Auth RR / GameDB 通道未热）
   CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
   # shellcheck disable=SC1090
-  [[ -f "$GAMEMESH_RUN_DIR/E2E_PORTS.env" ]] && source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+  [[ -f "$LUNASERVER_RUN_DIR/E2E_PORTS.env" ]] && source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
   GW="${E2E_GW0_GAME:-19081}"
   ready=0
   last=""
@@ -40,15 +40,15 @@ if [[ "${START_CLUSTER:-0}" == "1" ]]; then
     echo "$last" >&2
     exit 1
   fi
-elif [[ ! -f "${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}/pids" ]]; then
-  export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+elif [[ ! -f "${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}/pids" ]]; then
+  export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
   ./scripts/run_e2e_cluster.sh
   sleep 2
 fi
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
-if [[ -f "$GAMEMESH_RUN_DIR/E2E_PORTS.env" ]]; then
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
+if [[ -f "$LUNASERVER_RUN_DIR/E2E_PORTS.env" ]]; then
   # shellcheck disable=SC1090
-  source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+  source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 fi
 
 fail=0

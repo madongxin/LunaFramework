@@ -14,16 +14,16 @@ TOOL="${ROOT}/build/test/gamedb_rpc_tool"
   echo "ERROR: missing seed/client/drill/gamedb_rpc_tool"; exit 1
 }
 
-export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
 e2e_ensure_cluster "$ROOT"
 # shellcheck disable=SC1090
-source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
 
 HOST="${E2E_HOST:-127.0.0.1}"
 GW0="${E2E_GW0_GAME}"
 GW1="${E2E_GW1_GAME}"
 RPC_DB1="$(e2e_rpc_of gamedb gamedb-1 || true)"
-[[ -n "$RPC_DB1" && "$RPC_DB1" != "-" ]] || RPC_DB1="127.0.0.1:${E2E_DB1_RPC:-${GAMEMESH_RPC_D1:-}}"
+[[ -n "$RPC_DB1" && "$RPC_DB1" != "-" ]] || RPC_DB1="127.0.0.1:${E2E_DB1_RPC:-${LUNASERVER_RPC_D1:-}}"
 if [[ -z "${RPC_DB1##*:}" || "$RPC_DB1" == "127.0.0.1:" ]]; then
   RPC_DB1="$(e2e_rpc_of gamedb gamedb-0)"
 fi
@@ -32,7 +32,7 @@ fi
 PID_L1="$(e2e_pid_of gamelogic gl-1)" || { echo "ERROR: gl-1 missing"; exit 1; }
 kill -0 "$PID_L1" 2>/dev/null || { echo "ERROR: gl-1 not alive"; exit 1; }
 
-PREFIX="${GAMEMESH_REDIS_PREFIX:-gamemesh:dev:}"
+PREFIX="${LUNASERVER_REDIS_PREFIX:-lunaserver:dev:}"
 REDIS_PASS=""
 [[ -f "$ROOT/config/redis.cnf" ]] && REDIS_PASS="$(awk -F= '/^password=/{print $2; exit}' "$ROOT/config/redis.cnf")"
 RCLI=(redis-cli)

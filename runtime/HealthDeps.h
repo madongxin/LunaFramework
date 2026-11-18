@@ -9,6 +9,6 @@ struct HealthDepsResult {
 
 /**
  * 按角色检查关键依赖（Redis / MySQL / brpc 客户端等）。
- * draining 由调用方另判；GAMEMESH_FORCE_NOT_READY=1 强制失败（演练用）。
+ * draining 由调用方另判；LUNASERVER_FORCE_NOT_READY=1 强制失败（演练用）。
  */
 HealthDepsResult EvaluateHealthDeps(const std::string &role);

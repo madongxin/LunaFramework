@@ -2,7 +2,7 @@
 # 受控 kill 某一角色后观察（默认 gamelogic0）
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/formal}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/formal}"
 TARGET="${1:-logic0}"
 LOG="$RUN_DIR/logs/${TARGET}.log"
 if [[ ! -f "$RUN_DIR/pids" ]]; then

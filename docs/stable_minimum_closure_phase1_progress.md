@@ -1,6 +1,6 @@
 # 稳定最小闭环 — 阶段一进度
 
-对照：`docs/GameMesh_Cursor_Server_Stable_Minimum_Closure_e8ab08f.md`
+对照：`docs/LunaServer_Cursor_Server_Stable_Minimum_Closure_e8ab08f.md`
 基线：`e8ab08f`；**阶段一完成，停止等待确认后再进阶段二。**
 
 | 项 | 状态 |
@@ -33,7 +33,7 @@
 | 命令 | 结果 |
 |------|------|
 | `./scripts/check_deps.sh --full` | PASS |
-| `GAMEMESH_JOBS=2 ./scripts/build.sh Debug` | PASS |
+| `LUNASERVER_JOBS=2 ./scripts/build.sh Debug` | PASS |
 | `./scripts/test.sh unit` | PASS |
 | `./scripts/test.sh integration` | PASS（含 mutation idem + push reserve） |
 | `./scripts/test_sanitizers.sh asan` | PASS |

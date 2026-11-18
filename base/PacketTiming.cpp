@@ -295,80 +295,80 @@ void PacketTimingLogWindow() {
 
 std::string PacketTimingPrometheus() {
     std::ostringstream os;
-    os << "# HELP gamemesh_send_pending_max_bytes Max app send buffer plus kernel unsent bytes in the last 10s window.\n"
-          "# TYPE gamemesh_send_pending_max_bytes gauge\n"
-          "gamemesh_send_pending_max_bytes "
+    os << "# HELP lunaserver_send_pending_max_bytes Max app send buffer plus kernel unsent bytes in the last 10s window.\n"
+          "# TYPE lunaserver_send_pending_max_bytes gauge\n"
+          "lunaserver_send_pending_max_bytes "
        << g_pending_export.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_eventloop_todo_last Callbacks waiting on one event loop.\n"
-          "# TYPE gamemesh_eventloop_todo_last gauge\n"
-          "gamemesh_eventloop_todo_last " << EventLoopMetrics::LastTodoDepth() << "\n";
-    os << "# HELP gamemesh_eventloop_batch_last Callbacks run in the last DoToDoList.\n"
-          "# TYPE gamemesh_eventloop_batch_last gauge\n"
-          "gamemesh_eventloop_batch_last " << EventLoopMetrics::LastBatchSize() << "\n";
-    os << "# HELP gamemesh_eventloop_batch_ms_last Milliseconds spent in the last DoToDoList.\n"
-          "# TYPE gamemesh_eventloop_batch_ms_last gauge\n"
-          "gamemesh_eventloop_batch_ms_last "
+    os << "# HELP lunaserver_eventloop_todo_last Callbacks waiting on one event loop.\n"
+          "# TYPE lunaserver_eventloop_todo_last gauge\n"
+          "lunaserver_eventloop_todo_last " << EventLoopMetrics::LastTodoDepth() << "\n";
+    os << "# HELP lunaserver_eventloop_batch_last Callbacks run in the last DoToDoList.\n"
+          "# TYPE lunaserver_eventloop_batch_last gauge\n"
+          "lunaserver_eventloop_batch_last " << EventLoopMetrics::LastBatchSize() << "\n";
+    os << "# HELP lunaserver_eventloop_batch_ms_last Milliseconds spent in the last DoToDoList.\n"
+          "# TYPE lunaserver_eventloop_batch_ms_last gauge\n"
+          "lunaserver_eventloop_batch_ms_last "
        << static_cast<int>(EventLoopMetrics::LastBatchSeconds() * 1000.0) << "\n";
-    os << "# HELP gamemesh_eventloop_tick_p99_ms Upper edge of the bucket containing the 99th percentile tick.\n"
-          "# TYPE gamemesh_eventloop_tick_p99_ms gauge\n"
-          "gamemesh_eventloop_tick_p99_ms " << EventLoopMetrics::TickP99Ms() << "\n";
-    os << "# HELP gamemesh_eventloop_tick_max_ms Peak event loop iteration since process start, milliseconds.\n"
-          "# TYPE gamemesh_eventloop_tick_max_ms gauge\n"
-          "gamemesh_eventloop_tick_max_ms "
+    os << "# HELP lunaserver_eventloop_tick_p99_ms Upper edge of the bucket containing the 99th percentile tick.\n"
+          "# TYPE lunaserver_eventloop_tick_p99_ms gauge\n"
+          "lunaserver_eventloop_tick_p99_ms " << EventLoopMetrics::TickP99Ms() << "\n";
+    os << "# HELP lunaserver_eventloop_tick_max_ms Peak event loop iteration since process start, milliseconds.\n"
+          "# TYPE lunaserver_eventloop_tick_max_ms gauge\n"
+          "lunaserver_eventloop_tick_max_ms "
        << static_cast<int>(EventLoopMetrics::PeakTickSeconds() * 1000.0) << "\n";
-    os << "# HELP gamemesh_move_offer_total Move AOI frames accepted into the per-connection coalesce slot.\n"
-          "# TYPE gamemesh_move_offer_total counter\n"
-          "gamemesh_move_offer_total " << g_move_offer.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_move_coalesce_total Move frames merged into an already scheduled flush.\n"
-          "# TYPE gamemesh_move_coalesce_total counter\n"
-          "gamemesh_move_coalesce_total " << g_move_coalesce.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_move_flush_total Coalesced move frames handed to the kernel write path.\n"
-          "# TYPE gamemesh_move_flush_total counter\n"
-          "gamemesh_move_flush_total " << g_move_flush.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_move_hold_total Latest move frame parked in the app buffer because kernel unsent exceeded 1KB.\n"
-          "# TYPE gamemesh_move_hold_total counter\n"
-          "gamemesh_move_hold_total " << g_move_hold.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_aoi_skip_retrans_total AOI position kept parked because the connection was retransmitting and the frame was younger than 1s.\n"
-          "# TYPE gamemesh_aoi_skip_retrans_total counter\n"
-          "gamemesh_aoi_skip_retrans_total " << g_aoi_skip_retrans.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_aoi_skip_unsent_total AOI position not written because kernel unsent exceeded 16KB and the frame was younger than 1s.\n"
-          "# TYPE gamemesh_aoi_skip_unsent_total counter\n"
-          "gamemesh_aoi_skip_unsent_total " << g_aoi_skip_unsent.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_aoi_write_room_total AOI position written because kernel unsent was within 16KB.\n"
-          "# TYPE gamemesh_aoi_write_room_total counter\n"
-          "gamemesh_aoi_write_room_total " << g_aoi_write_room.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_aoi_write_starved_total AOI position written because it had been parked for at least 1s.\n"
-          "# TYPE gamemesh_aoi_write_starved_total counter\n"
-          "gamemesh_aoi_write_starved_total " << g_aoi_write_starved.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_move_drop_total Coalesced move frames not queued because non-move app bytes already exceeded 64KB.\n"
-          "# TYPE gamemesh_move_drop_total counter\n"
-          "gamemesh_move_drop_total " << g_move_drop.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_move_pending_entities Entities held in the latest move coalesce slot.\n"
-          "# TYPE gamemesh_move_pending_entities gauge\n"
-          "gamemesh_move_pending_entities " << g_move_pending.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_move_offer_total Move AOI frames accepted into the per-connection coalesce slot.\n"
+          "# TYPE lunaserver_move_offer_total counter\n"
+          "lunaserver_move_offer_total " << g_move_offer.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_move_coalesce_total Move frames merged into an already scheduled flush.\n"
+          "# TYPE lunaserver_move_coalesce_total counter\n"
+          "lunaserver_move_coalesce_total " << g_move_coalesce.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_move_flush_total Coalesced move frames handed to the kernel write path.\n"
+          "# TYPE lunaserver_move_flush_total counter\n"
+          "lunaserver_move_flush_total " << g_move_flush.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_move_hold_total Latest move frame parked in the app buffer because kernel unsent exceeded 1KB.\n"
+          "# TYPE lunaserver_move_hold_total counter\n"
+          "lunaserver_move_hold_total " << g_move_hold.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_aoi_skip_retrans_total AOI position kept parked because the connection was retransmitting and the frame was younger than 1s.\n"
+          "# TYPE lunaserver_aoi_skip_retrans_total counter\n"
+          "lunaserver_aoi_skip_retrans_total " << g_aoi_skip_retrans.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_aoi_skip_unsent_total AOI position not written because kernel unsent exceeded 16KB and the frame was younger than 1s.\n"
+          "# TYPE lunaserver_aoi_skip_unsent_total counter\n"
+          "lunaserver_aoi_skip_unsent_total " << g_aoi_skip_unsent.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_aoi_write_room_total AOI position written because kernel unsent was within 16KB.\n"
+          "# TYPE lunaserver_aoi_write_room_total counter\n"
+          "lunaserver_aoi_write_room_total " << g_aoi_write_room.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_aoi_write_starved_total AOI position written because it had been parked for at least 1s.\n"
+          "# TYPE lunaserver_aoi_write_starved_total counter\n"
+          "lunaserver_aoi_write_starved_total " << g_aoi_write_starved.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_move_drop_total Coalesced move frames not queued because non-move app bytes already exceeded 64KB.\n"
+          "# TYPE lunaserver_move_drop_total counter\n"
+          "lunaserver_move_drop_total " << g_move_drop.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_move_pending_entities Entities held in the latest move coalesce slot.\n"
+          "# TYPE lunaserver_move_pending_entities gauge\n"
+          "lunaserver_move_pending_entities " << g_move_pending.load(std::memory_order_relaxed) << "\n";
 
-    os << "# HELP gamemesh_pkt_stage_ms_sum Sum of packet stage latency in milliseconds.\n"
-          "# TYPE gamemesh_pkt_stage_ms_sum counter\n";
-    os << "# HELP gamemesh_pkt_stage_count Packet stage samples.\n"
-          "# TYPE gamemesh_pkt_stage_count counter\n";
-    os << "# HELP gamemesh_pkt_stage_max_ms Max stage latency in the last 10s window.\n"
-          "# TYPE gamemesh_pkt_stage_max_ms gauge\n";
-    os << "# HELP gamemesh_pkt_slow_total Stages at or above 1000ms.\n"
-          "# TYPE gamemesh_pkt_slow_total counter\n";
+    os << "# HELP lunaserver_pkt_stage_ms_sum Sum of packet stage latency in milliseconds.\n"
+          "# TYPE lunaserver_pkt_stage_ms_sum counter\n";
+    os << "# HELP lunaserver_pkt_stage_count Packet stage samples.\n"
+          "# TYPE lunaserver_pkt_stage_count counter\n";
+    os << "# HELP lunaserver_pkt_stage_max_ms Max stage latency in the last 10s window.\n"
+          "# TYPE lunaserver_pkt_stage_max_ms gauge\n";
+    os << "# HELP lunaserver_pkt_slow_total Stages at or above 1000ms.\n"
+          "# TYPE lunaserver_pkt_slow_total counter\n";
     const char *stage_name[kStageCount] = {"handler", "rpc", "reply_queue"};
     for (int k = 0; k < kKindCount; ++k) {
         for (int s = 0; s < kStageCount; ++s) {
-            os << "gamemesh_pkt_stage_ms_sum{kind=\"" << kKindNames[k] << "\",stage=\""
+            os << "lunaserver_pkt_stage_ms_sum{kind=\"" << kKindNames[k] << "\",stage=\""
                << stage_name[s] << "\"} " << g_stage[k][s].ms_sum.load(std::memory_order_relaxed)
                << "\n";
-            os << "gamemesh_pkt_stage_count{kind=\"" << kKindNames[k] << "\",stage=\""
+            os << "lunaserver_pkt_stage_count{kind=\"" << kKindNames[k] << "\",stage=\""
                << stage_name[s] << "\"} " << g_stage[k][s].n.load(std::memory_order_relaxed)
                << "\n";
-            os << "gamemesh_pkt_stage_max_ms{kind=\"" << kKindNames[k] << "\",stage=\""
+            os << "lunaserver_pkt_stage_max_ms{kind=\"" << kKindNames[k] << "\",stage=\""
                << stage_name[s] << "\"} "
                << g_stage[k][s].export_max.load(std::memory_order_relaxed) << "\n";
         }
-        os << "gamemesh_pkt_slow_total{kind=\"" << kKindNames[k] << "\"} "
+        os << "lunaserver_pkt_slow_total{kind=\"" << kKindNames[k] << "\"} "
            << g_slow[k].load(std::memory_order_relaxed) << "\n";
     }
     os << "\n";

@@ -596,7 +596,7 @@ bool GameDbAssetStore::ApplyMutation(uint64_t player_id, const std::string &idem
         if (!conn->update(ups))
             return fail("DB_ERROR", "bag upsert");
     }
-    if (failpoint("GAMEMESH_FAILPOINT_MUTATION_AFTER_BAG"))
+    if (failpoint("LUNASERVER_FAILPOINT_MUTATION_AFTER_BAG"))
         return fail("FAILPOINT", "after bag");
 
     const uint64_t new_ver = ver + 1;
@@ -610,7 +610,7 @@ bool GameDbAssetStore::ApplyMutation(uint64_t player_id, const std::string &idem
         if (!conn->update(ups))
             return fail("DB_ERROR", "meta bump");
     }
-    if (failpoint("GAMEMESH_FAILPOINT_MUTATION_AFTER_VERSION"))
+    if (failpoint("LUNASERVER_FAILPOINT_MUTATION_AFTER_VERSION"))
         return fail("FAILPOINT", "after version");
 
     GameDbOutbox::Instance().EnsureTable();
@@ -618,7 +618,7 @@ bool GameDbAssetStore::ApplyMutation(uint64_t player_id, const std::string &idem
     payload << "{\"player_id\":" << player_id << ",\"type\":\"" << mutation_type
             << "\",\"item_id\":" << item_id << ",\"count\":" << count << ",\"version\":" << new_ver
             << "}";
-    if (failpoint("GAMEMESH_FAILPOINT_MUTATION_OUTBOX_FAIL") ||
+    if (failpoint("LUNASERVER_FAILPOINT_MUTATION_OUTBOX_FAIL") ||
         !GameDbOutbox::Instance().InsertOnConnection(
             conn.get(), "asset.mutated", "player", std::to_string(player_id), idempotency_key,
             payload.str(), NowSec())) {
@@ -631,12 +631,12 @@ bool GameDbAssetStore::ApplyMutation(uint64_t player_id, const std::string &idem
                       "UPDATE player_asset_idem SET ok=1,error_code='',message='ok',"
                       "asset_version=%llu,remain_count=%u WHERE idempotency_key='%s'",
                       (unsigned long long)new_ver, remain, esc_key.c_str());
-        if (failpoint("GAMEMESH_FAILPOINT_MUTATION_FINALIZE_FAIL") || !conn->update(fin))
+        if (failpoint("LUNASERVER_FAILPOINT_MUTATION_FINALIZE_FAIL") || !conn->update(fin))
             return fail("DB_ERROR", "idem finalize");
     }
 
     // COMMIT 失败：结果未知。禁止二次 COMMIT / 禁止直接标 FAILED；新连接查询。
-    if (failpoint("GAMEMESH_FAILPOINT_MUTATION_COMMIT_FAIL")) {
+    if (failpoint("LUNASERVER_FAILPOINT_MUTATION_COMMIT_FAIL")) {
         conn->rollback();
         conn.reset();
         out->ok = false;

@@ -2,7 +2,7 @@
  * S2：Map JSON / SHA-256 / RLE [value,count] / XZ cell 数学 / 出生点。
  */
 #include "FileHash.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "MapCatalog.h"
 #include "MapStaticData.h"
 #include "SceneKind.h"
@@ -27,7 +27,7 @@ void Expect(bool c, const char *m) {
 
 std::string MapsDir() {
     std::string d;
-    if (GameMeshPaths::ResolveProjectSubdir("config/maps", &d))
+    if (LunaServerPaths::ResolveProjectSubdir("config/maps", &d))
         return d;
     return "config/maps";
 }

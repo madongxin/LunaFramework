@@ -2,7 +2,7 @@
 # 杀死一个 GameLogic 后，对指定 map 调用 MarkRecovering + Migrate（需 Redis + 运行中 session）
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/formal}"
+RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/formal}"
 MAP_ID="${1:-}"
 NEW_OWNER="${2:-gl-1}"
 
@@ -18,7 +18,7 @@ if [[ -f "$RUN_DIR/pids" ]]; then
 fi
 
 # 通过 redis-cli 直接置 RECOVERING（与 PlacementStore Lua 字段兼容）
-PREFIX="${GAMEMESH_REDIS_PREFIX:-gamemesh:dev:}"
+PREFIX="${LUNASERVER_REDIS_PREFIX:-lunaserver:dev:}"
 KEY="${PREFIX}map:inst:${MAP_ID}"
 if command -v redis-cli >/dev/null 2>&1; then
   redis-cli HSET "$KEY" state RECOVERING >/dev/null

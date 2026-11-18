@@ -91,8 +91,8 @@ int main(int argc, char **argv) {
     const int port = std::atoi(argv[2]);
     const bool do_register = (std::strcmp(argv[3], "register") == 0);
 
-#ifndef GAMEMESH_SCHEMA_SHA256
-#define GAMEMESH_SCHEMA_SHA256 ""
+#ifndef LUNASERVER_SCHEMA_SHA256
+#define LUNASERVER_SCHEMA_SHA256 ""
 #endif
 
     int fd = Connect(host, port);
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
         hello.set_seq(0);
         auto *h = hello.mutable_client_hello();
         h->set_protocol_version(1);
-        h->set_schema_sha256(GAMEMESH_SCHEMA_SHA256);
+        h->set_schema_sha256(LUNASERVER_SCHEMA_SHA256);
         h->set_client_version("smoke-1.0.0");
         h->set_platform("cpp-smoke");
         game::GameResponse hr;

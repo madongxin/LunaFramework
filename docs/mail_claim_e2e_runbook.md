@@ -4,7 +4,7 @@
 
 ```text
 cmake --build build --target gamedb_mail_claim_test mail_unit_test -j 2
-env -u GAMEMESH_FORMAL ./build/test/gamedb_mail_claim_test
+env -u LUNASERVER_FORMAL ./build/test/gamedb_mail_claim_test
 ./build/test/mail_unit_test
 ```
 

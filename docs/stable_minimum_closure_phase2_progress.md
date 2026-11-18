@@ -1,6 +1,6 @@
 # 稳定最小闭环 — 阶段二进度
 
-对照：`docs/GameMesh_Cursor_Server_Stable_Minimum_Closure_e8ab08f.md`
+对照：`docs/LunaServer_Cursor_Server_Stable_Minimum_Closure_e8ab08f.md`
 基线：`e8ab08f`；**阶段二完成，停止等待确认后再进阶段三。**
 
 | 项 | 状态 |
@@ -40,7 +40,7 @@
 
 | 命令 | 结果 |
 |------|------|
-| `GAMEMESH_JOBS=2 ./scripts/build.sh Debug` | PASS |
+| `LUNASERVER_JOBS=2 ./scripts/build.sh Debug` | PASS |
 | `./scripts/test.sh unit` | PASS |
 | `./scripts/test.sh integration` | PASS |
 | `./scripts/final_e2e.sh --start-cluster` | PASS（含 scenario 7 动态扩容） |
@@ -58,7 +58,7 @@
 - `runtime/brpc/GameDbServiceImpl.cpp`（failpoint）、`test/gamedb_rpc_tool.cpp`
 - `test/placement_seed_tool.cpp`（`SEED_OWNERS`）
 - `runtime/IGameDbRepository.h`、`MailService.cpp`（同步 Claim 虚接口，修 mail 单测链接）
-- `apps/ServerBootstrap.cpp`（`GAMEMESH_PLACEMENT_SCAN_COUNT` / `RECOVER_IV`）
+- `apps/ServerBootstrap.cpp`（`LUNASERVER_PLACEMENT_SCAN_COUNT` / `RECOVER_IV`）
 
 ### 遗留（阶段三）
 

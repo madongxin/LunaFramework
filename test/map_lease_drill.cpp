@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
                      argv[0], argv[0]);
         return 2;
     }
-    if (!InitRedis() || !PlacementStore::Instance().InitFromSessionPrefix("gamemesh:dev:")) {
+    if (!InitRedis() || !PlacementStore::Instance().InitFromSessionPrefix("lunaserver:dev:")) {
         std::fprintf(stderr, "redis/placement init failed\n");
         return 1;
     }

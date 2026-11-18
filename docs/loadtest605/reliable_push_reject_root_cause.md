@@ -8,7 +8,7 @@
 
 ## gl-1 的 78/s 是断线后的 AOI，不是 fence
 
-`gamemesh_push_rejected_total` 在 gl-1 上的峰值大约 78/s。日志把每一条都写成 `(stale session/fence)`，这句是固定文案，不能当成原因。
+`lunaserver_push_rejected_total` 在 gl-1 上的峰值大约 78/s。日志把每一条都写成 `(stale session/fence)`，这句是固定文案，不能当成原因。
 
 `run/formal/logs/logic1.log` 里，13:47–13:57 的 `PushBatch rejected` 几乎全在 13:55:04–13:55:06：
 
@@ -39,7 +39,7 @@
 
 ## 修复后怎么读
 
-新计数 `gamemesh_reliable_push_reject_total{reason}` 按进程分开，不要把 Gateway 和 GameLogic 加在一起。10 秒增量用 Prometheus `increase(...[10s])`。`reason` 只有：
+新计数 `lunaserver_reliable_push_reject_total{reason}` 按进程分开，不要把 Gateway 和 GameLogic 加在一起。10 秒增量用 Prometheus `increase(...[10s])`。`reason` 只有：
 
 `no_session`、`player_mismatch`、`gateway_mismatch`、`fence_mismatch`、`generation_mismatch`、`seq_allocation_failed`、`bad_frame`、`send_failed`、`closed`、`replay_pending`。
 

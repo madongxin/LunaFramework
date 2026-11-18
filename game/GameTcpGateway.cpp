@@ -1341,7 +1341,7 @@ void GameTcpGateway::Run() {
                 static_cast<int>(static_cast<double>(shared) * 1000.0 / 8.0 * headroom / 100.0);
             const int legacy = AoiMoveCoalesceLedger::LegacyBudgetBytesPerSecWholeHost();
             if (legacy > class_cap) {
-                LOG_WARN << "egress legacy GAMEMESH_EGRESS_BUDGET_MBPS on-wire (" << legacy
+                LOG_WARN << "egress legacy LUNASERVER_EGRESS_BUDGET_MBPS on-wire (" << legacy
                          << " B/s host) exceeds shared class " << headroom << "% cap (" << class_cap
                          << " B/s)";
             }

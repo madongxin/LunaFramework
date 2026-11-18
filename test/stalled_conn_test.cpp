@@ -101,37 +101,37 @@ int main() {
     std::ostringstream prom;
     AoiEvidenceWritePrometheus(prom);
     const std::string text = prom.str();
-    Expect(Has(text, "gamemesh_write_fail_total{frame=\"leave\",reason=\"queue_full\"} 0"),
+    Expect(Has(text, "lunaserver_write_fail_total{frame=\"leave\",reason=\"queue_full\"} 0"),
            "zero write_fail series is present");
-    Expect(Has(text, "gamemesh_write_fail_total{frame=\"move\",reason=\"queue_full\"} 1"),
+    Expect(Has(text, "lunaserver_write_fail_total{frame=\"move\",reason=\"queue_full\"} 1"),
            "nonzero write_fail series");
-    Expect(Has(text, "gamemesh_write_fail_per_conn_count 1"), "per-conn sample count");
-    Expect(Has(text, "gamemesh_write_fail_per_conn{quantile=\"0.5\"} 1"), "per-conn p50");
-    Expect(Has(text, "gamemesh_stalled_conns 1"), "stalled gauge");
-    Expect(Has(text, "gamemesh_stalled_conn_total 1"), "distinct stalled connections");
-    Expect(Has(text, "gamemesh_stalled_conn_age_ms_count 1"), "age sample count");
-    Expect(Has(text, "gamemesh_unsent16_tcpi_backoff_count 2"), "backoff sample count");
-    Expect(text.find("gamemesh_unsent16_tcpi_bytes_retrans_delta{") == std::string::npos,
+    Expect(Has(text, "lunaserver_write_fail_per_conn_count 1"), "per-conn sample count");
+    Expect(Has(text, "lunaserver_write_fail_per_conn{quantile=\"0.5\"} 1"), "per-conn p50");
+    Expect(Has(text, "lunaserver_stalled_conns 1"), "stalled gauge");
+    Expect(Has(text, "lunaserver_stalled_conn_total 1"), "distinct stalled connections");
+    Expect(Has(text, "lunaserver_stalled_conn_age_ms_count 1"), "age sample count");
+    Expect(Has(text, "lunaserver_unsent16_tcpi_backoff_count 2"), "backoff sample count");
+    Expect(text.find("lunaserver_unsent16_tcpi_bytes_retrans_delta{") == std::string::npos,
            "missing bytes_retrans quantile is omitted");
-    Expect(Has(text, "gamemesh_egress_wire_bytes_estimate{frame=\"move\"} 766"),
+    Expect(Has(text, "lunaserver_egress_wire_bytes_estimate{frame=\"move\"} 766"),
            "wire estimate adds the 66 byte header");
-    Expect(Has(text, "gamemesh_tx_frames_by_frame{frame=\"move\"} 1"), "frame counter");
+    Expect(Has(text, "lunaserver_tx_frames_by_frame{frame=\"move\"} 1"), "frame counter");
 
     AoiObserveBusySocket(7, 3, 0, 0);
     std::ostringstream cleared;
     AoiEvidenceWritePrometheus(cleared);
     const std::string after = cleared.str();
-    Expect(Has(after, "gamemesh_stalled_conns 0"), "recovered connection leaves the gauge");
-    Expect(Has(after, "gamemesh_stalled_conn_total 1"), "distinct total stays");
-    Expect(Has(after, "gamemesh_write_fail_per_conn_count 1"), "failure count remains");
+    Expect(Has(after, "lunaserver_stalled_conns 0"), "recovered connection leaves the gauge");
+    Expect(Has(after, "lunaserver_stalled_conn_total 1"), "distinct total stays");
+    Expect(Has(after, "lunaserver_write_fail_per_conn_count 1"), "failure count remains");
 
     AoiResetEvidenceForTest();
     std::ostringstream empty;
     AoiEvidenceWritePrometheus(empty);
-    Expect(Has(empty.str(), "gamemesh_write_fail_total{frame=\"heartbeat\",reason=\"closed\"} 0"),
+    Expect(Has(empty.str(), "lunaserver_write_fail_total{frame=\"heartbeat\",reason=\"closed\"} 0"),
            "zero series still exported after reset");
-    Expect(Has(empty.str(), "gamemesh_write_fail_per_conn_count 0"), "empty per-conn count is 0");
-    Expect(empty.str().find("gamemesh_write_fail_per_conn{quantile=") == std::string::npos,
+    Expect(Has(empty.str(), "lunaserver_write_fail_per_conn_count 0"), "empty per-conn count is 0");
+    Expect(empty.str().find("lunaserver_write_fail_per_conn{quantile=") == std::string::npos,
            "empty distribution has no quantile");
 
     if (fails != 0) {

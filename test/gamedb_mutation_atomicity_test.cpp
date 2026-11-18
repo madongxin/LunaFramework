@@ -20,11 +20,11 @@ int Fail(const char *m) {
 }
 
 void ClearFailpoints() {
-    unsetenv("GAMEMESH_FAILPOINT_MUTATION_AFTER_BAG");
-    unsetenv("GAMEMESH_FAILPOINT_MUTATION_AFTER_VERSION");
-    unsetenv("GAMEMESH_FAILPOINT_MUTATION_OUTBOX_FAIL");
-    unsetenv("GAMEMESH_FAILPOINT_MUTATION_FINALIZE_FAIL");
-    unsetenv("GAMEMESH_FAILPOINT_MUTATION_COMMIT_FAIL");
+    unsetenv("LUNASERVER_FAILPOINT_MUTATION_AFTER_BAG");
+    unsetenv("LUNASERVER_FAILPOINT_MUTATION_AFTER_VERSION");
+    unsetenv("LUNASERVER_FAILPOINT_MUTATION_OUTBOX_FAIL");
+    unsetenv("LUNASERVER_FAILPOINT_MUTATION_FINALIZE_FAIL");
+    unsetenv("LUNASERVER_FAILPOINT_MUTATION_COMMIT_FAIL");
 }
 
 struct Snapshot {
@@ -92,19 +92,19 @@ int main() {
         return 0;
     };
 
-    if (run_failpoint("GAMEMESH_FAILPOINT_MUTATION_AFTER_BAG", "after_bag", base + 1))
+    if (run_failpoint("LUNASERVER_FAILPOINT_MUTATION_AFTER_BAG", "after_bag", base + 1))
         return 1;
-    if (run_failpoint("GAMEMESH_FAILPOINT_MUTATION_AFTER_VERSION", "after_ver", base + 2))
+    if (run_failpoint("LUNASERVER_FAILPOINT_MUTATION_AFTER_VERSION", "after_ver", base + 2))
         return 1;
-    if (run_failpoint("GAMEMESH_FAILPOINT_MUTATION_OUTBOX_FAIL", "outbox", base + 3))
+    if (run_failpoint("LUNASERVER_FAILPOINT_MUTATION_OUTBOX_FAIL", "outbox", base + 3))
         return 1;
-    if (run_failpoint("GAMEMESH_FAILPOINT_MUTATION_FINALIZE_FAIL", "finalize", base + 4))
+    if (run_failpoint("LUNASERVER_FAILPOINT_MUTATION_FINALIZE_FAIL", "finalize", base + 4))
         return 1;
 
     // commit failpoint → UNKNOWN_RESULT，且无部分提交
     {
         ClearFailpoints();
-        setenv("GAMEMESH_FAILPOINT_MUTATION_COMMIT_FAIL", "1", 1);
+        setenv("LUNASERVER_FAILPOINT_MUTATION_COMMIT_FAIL", "1", 1);
         const uint64_t pid = base + 5;
         const std::string key = "atom_commit_" + std::to_string(pid);
         GameDbAssetStore::MutationResult r;

@@ -3,7 +3,7 @@
 # Avoids ENTRYPOINT=gateway + command=[session,...] becoming "gateway session ...".
 set -euo pipefail
 
-ROOT="${GAMEMESH_BIN_DIR:-/opt/gamemesh}"
+ROOT="${LUNASERVER_BIN_DIR:-/opt/lunaserver}"
 
 if [[ $# -eq 0 ]]; then
   echo "usage: gateway|session|gamelogic|globalservice|gamedb [args...]" >&2

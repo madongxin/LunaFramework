@@ -4,7 +4,7 @@
 #include "AuthLoginRateLimit.h"
 #include "BrpcNamingUtil.h"
 #include "FormalMode.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "Logging.h"
 #include "PasswordExec.h"
 #include "PasswordHash.h"
@@ -74,12 +74,12 @@ std::vector<std::string> SplitAddrs(const std::string &gamedb) {
 std::string ReadGamedbList() {
     std::string session_cnf = "../config/session.cnf";
     std::string resolved;
-    if (GameMeshPaths::ResolveProjectSubdir("config/session.cnf", &resolved))
+    if (LunaServerPaths::ResolveProjectSubdir("config/session.cnf", &resolved))
         session_cnf = resolved;
     std::string gamedb = ReadCnfValue(session_cnf, "gamedb_addrs");
     if (gamedb.empty()) {
         std::string gw = "../config/gateway.cnf";
-        if (GameMeshPaths::ResolveProjectSubdir("config/gateway.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/gateway.cnf", &resolved))
             gw = resolved;
         gamedb = ReadCnfValue(gw, "gamedb_addrs");
     }

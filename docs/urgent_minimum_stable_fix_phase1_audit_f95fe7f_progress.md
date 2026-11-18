@@ -1,6 +1,6 @@
-# 稳定评估阶段一进度（对照 `GameMesh_最新稳定版本评估_f95fe7f.md`）
+# 稳定评估阶段一进度（对照 `LunaServer_最新稳定版本评估_f95fe7f.md`）
 
-基线评估：`docs/GameMesh_最新稳定版本评估_f95fe7f.md`（STABLE BLOCKED）。
+基线评估：`docs/LunaServer_最新稳定版本评估_f95fe7f.md`（STABLE BLOCKED）。
 本阶段只做 **数据与执行正确性**，不宣称 STABLE PASS。
 
 ## 已完成

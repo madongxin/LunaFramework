@@ -13,7 +13,7 @@
 
 1. **没有把出口压到共享类 85% 预算以下。** 两轮稳态都贴 HTB ceil（~2.60 Mbps），与开不开 enforce 几乎无区分。
 2. **客户端移动成功率没有改善。** Enforce 复测 ack 率 80.7%（基线 82.9%），timeout 率 19.0%（基线 16.8%），略差。
-3. **预算强制在指标上未生效。** 两轮（含中间一次 enforce 空跑）`gamemesh_egress_admitted_bytes_total` 与 `gamemesh_aoi_move_budget_defer_total` 均为 **0**，无法用 admitted/defer 证明「按字节配额在限流」。
+3. **预算强制在指标上未生效。** 两轮（含中间一次 enforce 空跑）`lunaserver_egress_admitted_bytes_total` 与 `lunaserver_aoi_move_budget_defer_total` 均为 **0**，无法用 admitted/defer 证明「按字节配额在限流」。
 4. **有价值的部分是证据本身：** D1/D2 指标与 A/B/C + 客户端导出对齐完成；可判定「仅打开开关、不修 admitted 接线/计费」不足以改变 2.6 Mbps 贴顶现象。
 
 中间还有一次 enforce 压测（22:39–22:49），服务端行为与复测一致（仍贴 ceil、admitted=0），但客户端移动统计当时未拿到非空导出，**主对比以基线 vs Enforce 复测为准。**
@@ -27,9 +27,9 @@
 | 客户端入口 | `10.0.0.2:8081 / 8083`（VIP/双 Gateway） |
 | 拓扑 | Gateway×2 + GameLogic×2 + Session×2 + GameDB×2 + GlobalService |
 | 压测规模 | online≈**906**（A/B 点）；bot_count=**905** Sparse |
-| 集群预算相关 | `GAMEMESH_EGRESS_BUDGET_MBPS=2.4`（start_formal 默认仍在） |
-| 基线轮 | **不设** `GAMEMESH_EGRESS_ENFORCE`（默认关） |
-| Enforce 轮 | `GAMEMESH_EGRESS_ENFORCE=1`，`GAMEMESH_EGRESS_SHARED_CLASS_KBIT=2600` |
+| 集群预算相关 | `LUNASERVER_EGRESS_BUDGET_MBPS=2.4`（start_formal 默认仍在） |
+| 基线轮 | **不设** `LUNASERVER_EGRESS_ENFORCE`（默认关） |
+| Enforce 轮 | `LUNASERVER_EGRESS_ENFORCE=1`，`LUNASERVER_EGRESS_SHARED_CLASS_KBIT=2600` |
 | 其它实验开关 | `SENDBUF_V2=0`，`READ_BACKPRESSURE=0`，未开 `AOI_V2_*` / `TX_COALESCE` / `AOI_EXTRAPOLATE` |
 | 启动日志（enforce） | `egress_enforce=1`，`egress_shared_class_kbit=2600`，`egress_headroom_percent=85`，`egress_gateway_instances=2`，`egress_bytes_per_sec=138125`（单实例） |
 | 启动 WARN | legacy `EGRESS_BUDGET_MBPS` 折算 on-wire 300000 B/s **高于** shared class 85% 帽 276250 B/s —— 说明旧 Mbps 旋钮与新 shared-class 公式并存，enforce 应以 shared-class 为准 |
@@ -126,8 +126,8 @@ Enforce-1 的 A→C 窗口更长（546s），绝对值更大属预期。Enforce-
 
 | 指标 | 基线 A/C | Enforce-1 A/C | Enforce-2 A/C |
 |------|----------|---------------|---------------|
-| `gamemesh_egress_admitted_bytes_total` | 0 / 0 | 0 / 0 | 0 / 0 |
-| `gamemesh_aoi_move_budget_defer_total` | 0 / 0 | 0 / 0 | 0 / 0 |
+| `lunaserver_egress_admitted_bytes_total` | 0 / 0 | 0 / 0 | 0 / 0 |
+| `lunaserver_aoi_move_budget_defer_total` | 0 / 0 | 0 / 0 | 0 / 0 |
 
 同时 AOI move 帧与 `egress_wire_bytes_estimate{frame="move"}` 在增长（例如 Enforce-2 A 点 gw0 move 帧已累计 144 万量级），说明 **有出站 MOVE，但 admitted 未记账**。按 D1 设计，admitted 应在 `FinishMoveCommit(true)` / `NoteKernelWrite` 路径累加；本次验收将其记为 **「强制预算未在生产指标上闭环」**，而不是「配额充足所以 defer=0」。
 

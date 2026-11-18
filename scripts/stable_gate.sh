@@ -127,22 +127,22 @@ pick_verdict() {
 
 # 破坏性场景后强制健康检查；不健康则 stop+restart
 ensure_e2e_ready() {
-  export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+  export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
   e2e_ensure_cluster "$ROOT" || return 1
   # shellcheck disable=SC1090
-  [[ -f "$GAMEMESH_RUN_DIR/E2E_PORTS.env" ]] && source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+  [[ -f "$LUNASERVER_RUN_DIR/E2E_PORTS.env" ]] && source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
   return 0
 }
 
 restart_e2e_clean() {
-  export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
+  export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
   "$ROOT/scripts/stop_e2e_cluster.sh" 2>/dev/null || true
   sleep 1
-  rm -f "$GAMEMESH_RUN_DIR/pids" "$GAMEMESH_RUN_DIR/inventory.tsv"
+  rm -f "$LUNASERVER_RUN_DIR/pids" "$LUNASERVER_RUN_DIR/inventory.tsv"
   "$ROOT/scripts/run_e2e_cluster.sh" || return 1
   sleep 2
   # shellcheck disable=SC1090
-  source "$GAMEMESH_RUN_DIR/E2E_PORTS.env"
+  source "$LUNASERVER_RUN_DIR/E2E_PORTS.env"
   e2e_cluster_healthy || return 1
   # HTTP live ≠ Register/Login 可用（负载后残留集群曾出现 ready 但 login 全超时）
   local CLIENT="${ROOT}/build/test/game_tcp_e2e_client"
@@ -233,19 +233,19 @@ fi
 
 if [[ "$FULL" -eq 1 ]]; then
   log "phase2 failover scripts (restart topology after each destructive group)"
-  export GAMEMESH_RUN_DIR="${GAMEMESH_RUN_DIR:-$ROOT/run/e2e}"
-  export GAMEMESH_REQUIRE_BRPC_TSAN=1
+  export LUNASERVER_RUN_DIR="${LUNASERVER_RUN_DIR:-$ROOT/run/e2e}"
+  export LUNASERVER_REQUIRE_BRPC_TSAN=1
 
   run_step "ensure_e2e_after_final_e2e" ensure_e2e_ready
   run_step "channel_snapshot_race" --log "$SUMMARY_DIR/failover/channel_snapshot_race.log" \
     ./scripts/test_channel_snapshot_race.sh
 
-  if [[ "${GAMEMESH_EXPERIMENTAL_REGISTRY_OUTAGE:-0}" == "1" ]]; then
+  if [[ "${LUNASERVER_EXPERIMENTAL_REGISTRY_OUTAGE:-0}" == "1" ]]; then
     run_step "registry_outage (experimental)" --log "$SUMMARY_DIR/failover/registry_outage.log" \
       ./scripts/test_registry_outage.sh
     run_step "restart_after_registry" restart_e2e_clean
   else
-    log "skip registry_outage (experimental; set GAMEMESH_EXPERIMENTAL_REGISTRY_OUTAGE=1)"
+    log "skip registry_outage (experimental; set LUNASERVER_EXPERIMENTAL_REGISTRY_OUTAGE=1)"
     SUMMARY_STEPS+=("{\"name\":\"registry_outage\",\"exit_code\":0,\"skipped\":true,\"required\":false}")
   fi
 
@@ -253,12 +253,12 @@ if [[ "$FULL" -eq 1 ]]; then
     ./scripts/test_session_failover.sh
   run_step "restart_after_session" restart_e2e_clean
 
-  if [[ "${GAMEMESH_EXPERIMENTAL_PLACEMENT_RECOVERY:-0}" == "1" ]]; then
+  if [[ "${LUNASERVER_EXPERIMENTAL_PLACEMENT_RECOVERY:-0}" == "1" ]]; then
     run_step "logic_auto_recovery (experimental)" --log "$SUMMARY_DIR/failover/logic_auto_recovery.log" \
       ./scripts/test_logic_auto_recovery.sh
     run_step "restart_after_logic" restart_e2e_clean
   else
-    log "skip logic_auto_recovery (experimental; set GAMEMESH_EXPERIMENTAL_PLACEMENT_RECOVERY=1)"
+    log "skip logic_auto_recovery (experimental; set LUNASERVER_EXPERIMENTAL_PLACEMENT_RECOVERY=1)"
     SUMMARY_STEPS+=("{\"name\":\"logic_auto_recovery\",\"exit_code\":0,\"skipped\":true,\"required\":false}")
   fi
 
@@ -266,12 +266,12 @@ if [[ "$FULL" -eq 1 ]]; then
     ./scripts/test_gamedb_unknown_result_failover.sh
   run_step "restart_after_gamedb" restart_e2e_clean
 
-  if [[ "${GAMEMESH_EXPERIMENTAL_DYNAMIC_SCALE:-0}" == "1" ]]; then
+  if [[ "${LUNASERVER_EXPERIMENTAL_DYNAMIC_SCALE:-0}" == "1" ]]; then
     run_step "dynamic_logic_scale (experimental)" --log "$SUMMARY_DIR/failover/dynamic_logic_scale.log" \
       ./scripts/test_dynamic_logic_scale.sh
     run_step "restart_after_scale" restart_e2e_clean
   else
-    log "skip dynamic_logic_scale (experimental; set GAMEMESH_EXPERIMENTAL_DYNAMIC_SCALE=1)"
+    log "skip dynamic_logic_scale (experimental; set LUNASERVER_EXPERIMENTAL_DYNAMIC_SCALE=1)"
     SUMMARY_STEPS+=("{\"name\":\"dynamic_logic_scale\",\"exit_code\":0,\"skipped\":true,\"required\":false}")
   fi
 

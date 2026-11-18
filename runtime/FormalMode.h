@@ -4,9 +4,9 @@
 #include <cstring>
 #include <string>
 
-/** 正式模式：GAMEMESH_FORMAL=1 时 fail-closed（禁止 Auth 本地降级、禁止 Logic 直写账号）。 */
+/** 正式模式：LUNASERVER_FORMAL=1 时 fail-closed（禁止 Auth 本地降级、禁止 Logic 直写账号）。 */
 inline bool FormalModeEnabled() {
-    const char *v = std::getenv("GAMEMESH_FORMAL");
+    const char *v = std::getenv("LUNASERVER_FORMAL");
     return v && (std::strcmp(v, "1") == 0 || std::strcmp(v, "true") == 0 ||
                  std::strcmp(v, "TRUE") == 0 || std::strcmp(v, "on") == 0);
 }
@@ -27,12 +27,12 @@ inline bool ExperimentalFeatureEnabled(const char *env_name) {
 inline bool MailDevSkipSession() {
     if (FormalModeEnabled())
         return false;
-    return ExperimentalFeatureEnabled("GAMEMESH_MAIL_DEV_SKIP_SESSION");
+    return ExperimentalFeatureEnabled("LUNASERVER_MAIL_DEV_SKIP_SESSION");
 }
 
-/** 危险 HTTP 管理接口：默认关闭；GAMEMESH_ENABLE_ADMIN=1 开启。 */
+/** 危险 HTTP 管理接口：默认关闭；LUNASERVER_ENABLE_ADMIN=1 开启。 */
 inline bool AdminHttpEnabled() {
-    const char *v = std::getenv("GAMEMESH_ENABLE_ADMIN");
+    const char *v = std::getenv("LUNASERVER_ENABLE_ADMIN");
     return v && (std::strcmp(v, "1") == 0 || std::strcmp(v, "true") == 0);
 }
 
@@ -43,7 +43,7 @@ inline bool AdminHttpEnabled() {
 inline bool AllowUnsafeDebugCommandsEnv() {
     if (FormalModeEnabled())
         return false;
-    const char *v = std::getenv("GAMEMESH_ALLOW_UNSAFE_DEBUG_COMMANDS");
+    const char *v = std::getenv("LUNASERVER_ALLOW_UNSAFE_DEBUG_COMMANDS");
     return v && (std::strcmp(v, "1") == 0 || std::strcmp(v, "true") == 0 ||
                  std::strcmp(v, "TRUE") == 0 || std::strcmp(v, "on") == 0);
 }
@@ -58,17 +58,17 @@ inline bool FormalModeAllowsMysql(const std::string &role) {
     return role == "gamedb" || role == "all";
 }
 
-/** 运行期隐式 DDL（CREATE TABLE）。默认关闭；仅本地显式 GAMEMESH_BOOTSTRAP_DDL=1。Formal 同样必须显式开。 */
+/** 运行期隐式 DDL（CREATE TABLE）。默认关闭；仅本地显式 LUNASERVER_BOOTSTRAP_DDL=1。Formal 同样必须显式开。 */
 inline bool BootstrapDdlEnabled() {
-    return ExperimentalFeatureEnabled("GAMEMESH_BOOTSTRAP_DDL");
+    return ExperimentalFeatureEnabled("LUNASERVER_BOOTSTRAP_DDL");
 }
 
 /**
- * Formal 默认强制 ClientHello。GAMEMESH_ALLOW_LEGACY_NO_HELLO=1 为有截止日的兼容开关
+ * Formal 默认强制 ClientHello。LUNASERVER_ALLOW_LEGACY_NO_HELLO=1 为有截止日的兼容开关
  *（文档约定 2026-09-15 后删除）。
  */
 inline bool ClientHelloRequired() {
-    if (ExperimentalFeatureEnabled("GAMEMESH_ALLOW_LEGACY_NO_HELLO"))
+    if (ExperimentalFeatureEnabled("LUNASERVER_ALLOW_LEGACY_NO_HELLO"))
         return false;
     return FormalModeEnabled();
 }

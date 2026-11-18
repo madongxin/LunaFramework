@@ -924,7 +924,7 @@ void TcpConnection::Write() { WriteNonBlocking(); }
 void TcpConnection::ReadNonBlocking() {
     if (state_ != ConnectionState::Connected || in_close_ || connfd_ < 0)
         return;
-    const char *cap_env = std::getenv("GAMEMESH_READ_WAKE_BYTES");
+    const char *cap_env = std::getenv("LUNASERVER_READ_WAKE_BYTES");
     int wake_cap = (cap_env && *cap_env) ? std::atoi(cap_env) : (256 * 1024);
     if (wake_cap < 16 * 1024)
         wake_cap = 16 * 1024;

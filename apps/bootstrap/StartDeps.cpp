@@ -1,0 +1,164 @@
+#include "bootstrap/StartDeps.h"
+
+#include "AoiEvidence.h"
+#include "EventLoop.h"
+#include "FormalMode.h"
+#include "Logging.h"
+#include "ServiceHealth.h"
+
+#ifdef WEBSERVER_ENABLE_MYSQL
+#include "ConnectionPool.h"
+#include "MetricsDbWriter.h"
+#include "PlayerItemPersistQueue.h"
+#include "PlayerItemStore.h"
+#include "PlayerAccountStore.h"
+#include "PlayerProfileStore.h"
+#include "GameDbAssetStore.h"
+#include "GameDbOutbox.h"
+#ifdef WEBSERVER_ENABLE_GAME_PROTOBUF
+#include "MailExpireScanner.h"
+#include "MailService.h"
+#endif
+#endif
+#ifdef WEBSERVER_ENABLE_GAME_PROTOBUF
+#include "GameLogic.h"
+#include "GatewayConnRegistry.h"
+#include "MapRuntime.h"
+#endif
+#ifdef WEBSERVER_ENABLE_REDIS
+#include "PlacementStore.h"
+#include "PushReplayStore.h"
+#include "SessionStore.h"
+#ifdef WEBSERVER_ENABLE_BRPC
+#include "AuthLoginRateLimit.h"
+#include "RedisServiceRegistry.h"
+#endif
+#endif
+#ifdef WEBSERVER_ENABLE_ROCKSDB
+#include "DemoKvStore.h"
+#endif
+
+#include <cstdlib>
+#include <string>
+
+bool BootstrapPrepareRole(const std::string &role, int http_port) {
+#ifdef WEBSERVER_ENABLE_GAME_PROTOBUF
+    if (role == "gateway" || role == "all") {
+        AoiSetConnPlayerFn([](uint64_t conn, uint64_t *player) {
+            GatewayConnRegistry::Bind bind;
+            if (!GatewayConnRegistry::Instance().FindByConnection(conn, &bind))
+                return false;
+            if (player)
+                *player = bind.player_id;
+            return true;
+        });
+    }
+    if (role == "gamelogic" || role == "all") {
+        AoiSetViewerOnlineFn([](uint64_t id, bool *online) {
+            if (online)
+                *online = MapRuntime::Instance().ViewerConnected(id);
+            return true;
+        });
+    }
+    if (role == "gamelogic" && FormalModeEnabled())
+        GameLogic::Instance().SetFriendCommandsEnabled(false);
+#endif
+#ifdef WEBSERVER_ENABLE_MYSQL
+    if (!FormalModeAllowsMysql(role)) {
+        ::setenv("LUNASERVER_FORBID_MYSQL", "1", 1);
+        ConnectionPool::ForbidInit(
+            "formal mode: MySQL only on role=gamedb (use GameDB brpc)");
+    }
+#endif
+    ServiceHealth::Instance().Configure(role, role + "-" + std::to_string(http_port));
+#if !defined(WEBSERVER_ENABLE_BRPC)
+    if (role == "gateway" || role == "gamelogic" || role == "globalservice" || role == "session" ||
+        role == "gamedb") {
+        LOG_ERROR << "role=" << role << " requires cmake -DENABLE_BRPC=ON";
+        return false;
+    }
+#endif
+    return true;
+}
+
+void BootstrapInitMysql(EventLoop *loop, const std::string &role) {
+#ifdef WEBSERVER_ENABLE_MYSQL
+    const bool need_db = FormalModeAllowsMysql(role) &&
+                         (role == "all" || role == "gamelogic" || role == "globalservice" || role == "gamedb");
+    if (FormalModeEnabled() && !FormalModeAllowsMysql(role)) {
+        LOG_INFO << "formal mode: skip MySQL pool/stores for role=" << role
+                 << " (assets/mail via GameDB)";
+    } else if (need_db && ConnectionPool::getconnectionPool()->isInitialized()) {
+        if (role != "gamedb")
+            MetricsDbWriter::Instance().StartPeriodic(loop, 10.0);
+        if (role != "gamedb" && role != "globalservice") {
+            PlayerItemStore::Instance().EnsureTable();
+            PlayerAccountStore::Instance().EnsureTable();
+            PlayerItemPersistQueue::Instance().StartPeriodic(loop, 300.0);
+        } else if (role == "globalservice") {
+            PlayerItemStore::Instance().EnsureTable();
+        } else if (role == "gamedb") {
+            PlayerAccountStore::Instance().EnsureTable();
+            PlayerProfileStore::Instance().EnsureTable();
+            PlayerItemStore::Instance().EnsureTable();
+            GameDbAssetStore::Instance().EnsureTables();
+            GameDbOutbox::Instance().EnsureTable();
+        }
+#ifdef WEBSERVER_ENABLE_GAME_PROTOBUF
+        if (role == "all" || role == "gamelogic" || role == "gamedb") {
+            if (MailService::Instance().Init()) {
+                if (role == "all" || role == "gamedb")
+                    MailExpireScanner::Instance().StartPeriodic(loop, 0.0);
+            } else {
+                LOG_WARN << "MailService init failed";
+            }
+        }
+#endif
+    } else if (need_db) {
+        LOG_WARN << "MySQL pool not initialized (config/mysql.cnf)";
+    }
+#else
+    (void)loop;
+    (void)role;
+#endif
+}
+
+void BootstrapInitRedis(const std::string &role) {
+#ifdef WEBSERVER_ENABLE_REDIS
+    if (role == "all" || role == "gamelogic" || role == "gateway" || role == "globalservice" ||
+        role == "session" || role == "gamedb") {
+        if (!SessionStore::Instance().InitFromConfig())
+            LOG_WARN << "Redis session disabled (config/redis.cnf)";
+        else {
+            if (role == "all" || role == "session" || role == "gamelogic" || role == "globalservice" ||
+                role == "gateway") {
+                PlacementStore::Instance().InitFromSessionPrefix(
+                    SessionStore::Instance().key_prefix());
+            }
+            if (role == "all" || role == "gateway" || role == "gamelogic" || role == "globalservice" ||
+                role == "session" || role == "gamedb") {
+                PushReplayStore::Instance().InitFromSessionPrefix(
+                    SessionStore::Instance().key_prefix());
+            }
+#ifdef WEBSERVER_ENABLE_BRPC
+            AuthLoginRateLimit::Instance().Configure(SessionStore::Instance().key_prefix());
+            RedisServiceRegistry::Get().Configure(SessionStore::Instance().key_prefix());
+            RedisServiceRegistry::Get().InitFromRedisConfig();
+#endif
+        }
+    }
+#else
+    (void)role;
+#endif
+}
+
+void BootstrapInitRocksdb(const std::string &role) {
+#ifdef WEBSERVER_ENABLE_ROCKSDB
+    if (role == "all") {
+        if (!DemoKvStore::Instance().InitFromConfig())
+            LOG_WARN << "RocksDB demo KV disabled (config/rocksdb.cnf)";
+    }
+#else
+    (void)role;
+#endif
+}

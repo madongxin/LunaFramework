@@ -171,20 +171,20 @@ std::atomic<uint32_t> g_trace_seq{0};
 int TraceOn() {
     if (g_trace_on >= 0)
         return g_trace_on;
-    const char *e = std::getenv("GAMEMESH_AOI_TRACE");
+    const char *e = std::getenv("LUNASERVER_AOI_TRACE");
     g_trace_on = (e && e[0] == '1' && e[1] == '\0') ? 1 : 0;
     uint32_t cap = kTraceCapDefault;
-    if (const char *c = std::getenv("GAMEMESH_AOI_TRACE_CAP")) {
+    if (const char *c = std::getenv("LUNASERVER_AOI_TRACE_CAP")) {
         const long v = std::strtol(c, nullptr, 10);
         if (v >= 16 && v <= static_cast<long>(kTraceCapMax))
             cap = static_cast<uint32_t>(v);
     }
-    if (const char *s = std::getenv("GAMEMESH_AOI_TRACE_SAMPLE")) {
+    if (const char *s = std::getenv("LUNASERVER_AOI_TRACE_SAMPLE")) {
         const long v = std::strtol(s, nullptr, 10);
         if (v >= 1 && v <= 10000)
             g_trace_sample = static_cast<int>(v);
     }
-    if (const char *n = std::getenv("GAMEMESH_AOI_TRACE_MAX_VIEWERS")) {
+    if (const char *n = std::getenv("LUNASERVER_AOI_TRACE_MAX_VIEWERS")) {
         const long v = std::strtol(n, nullptr, 10);
         if (v > 0 && v <= 10000)
             g_trace_max_viewers = static_cast<int>(v);
@@ -928,34 +928,34 @@ void AoiObserveBusySocket(uint64_t conn_id, int fd, int app_bytes, int unsent_by
 }
 
 void AoiEvidenceWritePrometheus(std::ostream &os) {
-    os << "# HELP gamemesh_write_fail_total Frames that did not enter the connection send buffer. Unit: events.\n"
-          "# TYPE gamemesh_write_fail_total counter\n";
+    os << "# HELP lunaserver_write_fail_total Frames that did not enter the connection send buffer. Unit: events.\n"
+          "# TYPE lunaserver_write_fail_total counter\n";
     for (int f = 0; f < static_cast<int>(AoiWriteFrame::Count); ++f) {
         for (int r = 0; r < static_cast<int>(AoiWriteFailReason::Count); ++r) {
             const uint64_t n = g_fail[f][r].load(std::memory_order_relaxed);
-            os << "gamemesh_write_fail_total{frame=\"" << AoiWriteFrameName(static_cast<AoiWriteFrame>(f))
+            os << "lunaserver_write_fail_total{frame=\"" << AoiWriteFrameName(static_cast<AoiWriteFrame>(f))
                << "\",reason=\"" << AoiWriteFailReasonName(static_cast<AoiWriteFailReason>(r)) << "\"} " << n
                << "\n";
         }
     }
-    os << "# HELP gamemesh_tx_bytes_by_frame Bytes accepted into the connection, by frame kind. Unit: bytes.\n"
-          "# TYPE gamemesh_tx_bytes_by_frame counter\n";
+    os << "# HELP lunaserver_tx_bytes_by_frame Bytes accepted into the connection, by frame kind. Unit: bytes.\n"
+          "# TYPE lunaserver_tx_bytes_by_frame counter\n";
     for (int f = 0; f < static_cast<int>(AoiWriteFrame::Count); ++f) {
         const uint64_t n = g_tx[f].load(std::memory_order_relaxed);
         if (n == 0)
             continue;
-        os << "gamemesh_tx_bytes_by_frame{frame=\"" << AoiWriteFrameName(static_cast<AoiWriteFrame>(f))
+        os << "lunaserver_tx_bytes_by_frame{frame=\"" << AoiWriteFrameName(static_cast<AoiWriteFrame>(f))
            << "\"} " << n << "\n";
     }
-    os << "# HELP gamemesh_tx_frames_by_frame Frames accepted into the connection, by frame kind. Unit: frames.\n"
-          "# TYPE gamemesh_tx_frames_by_frame counter\n";
-    os << "# HELP gamemesh_egress_wire_bytes_estimate Payload bytes plus kOnWireHeaderBytes (66) from AoiMoveCoalesceLedger.h. 66 is ethernet 14 plus IPv4 20 plus TCP 20 plus 12 bytes of options. One accepted frame adds one header. Unit: bytes.\n"
-          "# TYPE gamemesh_egress_wire_bytes_estimate counter\n";
+    os << "# HELP lunaserver_tx_frames_by_frame Frames accepted into the connection, by frame kind. Unit: frames.\n"
+          "# TYPE lunaserver_tx_frames_by_frame counter\n";
+    os << "# HELP lunaserver_egress_wire_bytes_estimate Payload bytes plus kOnWireHeaderBytes (66) from AoiMoveCoalesceLedger.h. 66 is ethernet 14 plus IPv4 20 plus TCP 20 plus 12 bytes of options. One accepted frame adds one header. Unit: bytes.\n"
+          "# TYPE lunaserver_egress_wire_bytes_estimate counter\n";
     for (int f = 0; f < static_cast<int>(AoiWriteFrame::Count); ++f) {
         const char *name = AoiWriteFrameName(static_cast<AoiWriteFrame>(f));
-        os << "gamemesh_tx_frames_by_frame{frame=\"" << name << "\"} "
+        os << "lunaserver_tx_frames_by_frame{frame=\"" << name << "\"} "
            << g_tx_frames[f].load(std::memory_order_relaxed) << "\n";
-        os << "gamemesh_egress_wire_bytes_estimate{frame=\"" << name << "\"} "
+        os << "lunaserver_egress_wire_bytes_estimate{frame=\"" << name << "\"} "
            << g_wire[f].load(std::memory_order_relaxed) << "\n";
     }
     std::vector<int64_t> move_events;
@@ -965,28 +965,28 @@ void AoiEvidenceWritePrometheus(std::ostream &os) {
         move_events = g_move_frame_events;
         move_payload = g_move_frame_payload;
     }
-    EmitQuantiles(os, "gamemesh_move_frame_events",
+    EmitQuantiles(os, "lunaserver_move_frame_events",
                   "Events in one MOVE frame accepted by the connection. One sample is one frame. Capped at 4096. Unit: events.",
                   move_events);
-    EmitQuantiles(os, "gamemesh_move_frame_payload_bytes",
+    EmitQuantiles(os, "lunaserver_move_frame_payload_bytes",
                   "Payload bytes of one MOVE frame accepted by the connection, including the 4 byte length prefix. One sample is one frame. Capped at 4096. Unit: bytes.",
                   move_payload);
-    os << "# HELP gamemesh_egress_control_bytes_total Control-frame on-wire bytes charged against the per-connection egress window (payload plus 66). Unit: bytes.\n"
-          "# TYPE gamemesh_egress_control_bytes_total counter\n";
+    os << "# HELP lunaserver_egress_control_bytes_total Control-frame on-wire bytes charged against the per-connection egress window (payload plus 66). Unit: bytes.\n"
+          "# TYPE lunaserver_egress_control_bytes_total counter\n";
     for (int f = 0; f < static_cast<int>(AoiWriteFrame::Count); ++f) {
         if (static_cast<AoiWriteFrame>(f) == AoiWriteFrame::Move)
             continue;
         const uint64_t n = g_egress_control[f].load(std::memory_order_relaxed);
-        os << "gamemesh_egress_control_bytes_total{frame=\"" << AoiWriteFrameName(static_cast<AoiWriteFrame>(f))
+        os << "lunaserver_egress_control_bytes_total{frame=\"" << AoiWriteFrameName(static_cast<AoiWriteFrame>(f))
            << "\"} " << n << "\n";
     }
-    os << "# HELP gamemesh_egress_budget_exhausted_total Times Pick returned empty because the per-connection move budget was exhausted. Unit: events.\n"
-          "# TYPE gamemesh_egress_budget_exhausted_total counter\n"
-       << "gamemesh_egress_budget_exhausted_total "
+    os << "# HELP lunaserver_egress_budget_exhausted_total Times Pick returned empty because the per-connection move budget was exhausted. Unit: events.\n"
+          "# TYPE lunaserver_egress_budget_exhausted_total counter\n"
+       << "lunaserver_egress_budget_exhausted_total "
        << ServerStats::egress_budget_exhausted.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_egress_move_wire_bytes_total On-wire bytes for AOI MOVE confirmed into the kernel (payload plus 66). Unit: bytes.\n"
-          "# TYPE gamemesh_egress_move_wire_bytes_total counter\n"
-       << "gamemesh_egress_move_wire_bytes_total "
+    os << "# HELP lunaserver_egress_move_wire_bytes_total On-wire bytes for AOI MOVE confirmed into the kernel (payload plus 66). Unit: bytes.\n"
+          "# TYPE lunaserver_egress_move_wire_bytes_total counter\n"
+       << "lunaserver_egress_move_wire_bytes_total "
        << ServerStats::egress_move_wire_bytes.load(std::memory_order_relaxed) << "\n";
     std::vector<int64_t> silence;
     std::vector<int64_t> visible;
@@ -995,70 +995,70 @@ void AoiEvidenceWritePrometheus(std::ostream &os) {
         silence = g_move_silence_ms;
         visible = g_visible_per_viewer;
     }
-    EmitQuantiles(os, "gamemesh_egress_move_silence_ms",
+    EmitQuantiles(os, "lunaserver_egress_move_silence_ms",
                   "Silence between two kernel-confirmed position writes for the same entity on one connection. Unit: milliseconds.",
                   silence);
-    EmitQuantiles(os, "gamemesh_aoi_visible_per_viewer",
+    EmitQuantiles(os, "lunaserver_aoi_visible_per_viewer",
                   "Visible entity count per viewer sample. Unit: entities.", visible);
-    os << "# HELP gamemesh_move_requests_total MOVE requests by result. Unit: requests.\n"
-          "# TYPE gamemesh_move_requests_total counter\n"
-       << "gamemesh_move_requests_total{result=\"ok\"} " << g_move_req_ok.load() << "\n"
-       << "gamemesh_move_requests_total{result=\"stale_seq\"} " << g_move_req_stale.load() << "\n"
-       << "gamemesh_move_requests_total{result=\"too_fast\"} " << g_move_req_too_fast.load() << "\n"
-       << "gamemesh_move_requests_total{result=\"out_of_bounds\"} " << g_move_req_oob.load() << "\n"
-       << "gamemesh_move_requests_total{result=\"not_on_map\"} " << g_move_req_not_on_map.load()
+    os << "# HELP lunaserver_move_requests_total MOVE requests by result. Unit: requests.\n"
+          "# TYPE lunaserver_move_requests_total counter\n"
+       << "lunaserver_move_requests_total{result=\"ok\"} " << g_move_req_ok.load() << "\n"
+       << "lunaserver_move_requests_total{result=\"stale_seq\"} " << g_move_req_stale.load() << "\n"
+       << "lunaserver_move_requests_total{result=\"too_fast\"} " << g_move_req_too_fast.load() << "\n"
+       << "lunaserver_move_requests_total{result=\"out_of_bounds\"} " << g_move_req_oob.load() << "\n"
+       << "lunaserver_move_requests_total{result=\"not_on_map\"} " << g_move_req_not_on_map.load()
        << "\n"
-       << "gamemesh_move_requests_total{result=\"duplicate_target\"} "
+       << "lunaserver_move_requests_total{result=\"duplicate_target\"} "
        << g_move_req_dup_target.load() << "\n"
-       << "gamemesh_move_requests_total{result=\"disconnected\"} "
+       << "lunaserver_move_requests_total{result=\"disconnected\"} "
        << g_move_req_disconnected.load() << "\n"
-       << "gamemesh_move_requests_total{result=\"other\"} " << g_move_req_other.load() << "\n";
-    os << "# HELP gamemesh_heartbeat_requests_total Heartbeat requests handled. Unit: requests.\n"
-          "# TYPE gamemesh_heartbeat_requests_total counter\n"
-       << "gamemesh_heartbeat_requests_total " << g_heartbeat_req.load() << "\n";
+       << "lunaserver_move_requests_total{result=\"other\"} " << g_move_req_other.load() << "\n";
+    os << "# HELP lunaserver_heartbeat_requests_total Heartbeat requests handled. Unit: requests.\n"
+          "# TYPE lunaserver_heartbeat_requests_total counter\n"
+       << "lunaserver_heartbeat_requests_total " << g_heartbeat_req.load() << "\n";
     std::vector<int64_t> req_per;
     {
         std::lock_guard<std::mutex> lk(g_move_req_mu);
         req_per = g_move_req_per_conn;
     }
-    EmitQuantiles(os, "gamemesh_move_requests_per_conn",
+    EmitQuantiles(os, "lunaserver_move_requests_per_conn",
                   "MOVE requests per connection (or player key) in one-second windows. Unit: requests per second.",
                   req_per);
-    os << "# HELP gamemesh_aoi_leave_write_fail_total LEAVE pushes the gateway did not accept. Unit: events.\n"
-          "# TYPE gamemesh_aoi_leave_write_fail_total counter\n"
-       << "gamemesh_aoi_leave_write_fail_total " << g_leave_fail.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_aoi_leave_write_recovered_total Failed LEAVE that a later send accepted. Unit: events.\n"
-          "# TYPE gamemesh_aoi_leave_write_recovered_total counter\n"
-       << "gamemesh_aoi_leave_write_recovered_total " << g_leave_recovered.load(std::memory_order_relaxed)
+    os << "# HELP lunaserver_aoi_leave_write_fail_total LEAVE pushes the gateway did not accept. Unit: events.\n"
+          "# TYPE lunaserver_aoi_leave_write_fail_total counter\n"
+       << "lunaserver_aoi_leave_write_fail_total " << g_leave_fail.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_aoi_leave_write_recovered_total Failed LEAVE that a later send accepted. Unit: events.\n"
+          "# TYPE lunaserver_aoi_leave_write_recovered_total counter\n"
+       << "lunaserver_aoi_leave_write_recovered_total " << g_leave_recovered.load(std::memory_order_relaxed)
        << "\n";
-    os << "# HELP gamemesh_aoi_leave_write_given_up_total Failed LEAVE abandoned before a later send was accepted. Unit: events.\n"
-          "# TYPE gamemesh_aoi_leave_write_given_up_total counter\n"
-       << "gamemesh_aoi_leave_write_given_up_total " << g_leave_give_up.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_aoi_leave_write_dropped_total Failed LEAVE dropped because the viewer was offline. Unit: events.\n"
-          "# TYPE gamemesh_aoi_leave_write_dropped_total counter\n"
-       << "gamemesh_aoi_leave_write_dropped_total{reason=\"viewer_offline\"} "
+    os << "# HELP lunaserver_aoi_leave_write_given_up_total Failed LEAVE abandoned before a later send was accepted. Unit: events.\n"
+          "# TYPE lunaserver_aoi_leave_write_given_up_total counter\n"
+       << "lunaserver_aoi_leave_write_given_up_total " << g_leave_give_up.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_aoi_leave_write_dropped_total Failed LEAVE dropped because the viewer was offline. Unit: events.\n"
+          "# TYPE lunaserver_aoi_leave_write_dropped_total counter\n"
+       << "lunaserver_aoi_leave_write_dropped_total{reason=\"viewer_offline\"} "
        << g_leave_dropped_offline.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_aoi_leave_pending_drop_total LEAVE pending pairs removed from the retry queue and the evidence table. Unit: pairs.\n"
-          "# TYPE gamemesh_aoi_leave_pending_drop_total counter\n";
+    os << "# HELP lunaserver_aoi_leave_pending_drop_total LEAVE pending pairs removed from the retry queue and the evidence table. Unit: pairs.\n"
+          "# TYPE lunaserver_aoi_leave_pending_drop_total counter\n";
     const char *drop_names[] = {"viewer_offline", "back_in_window", "version_superseded", "acked", "given_up"};
     for (int i = 0; i < static_cast<int>(AoiLeaveDropReason::Count); ++i) {
-        os << "gamemesh_aoi_leave_pending_drop_total{reason=\"" << drop_names[i] << "\"} "
+        os << "lunaserver_aoi_leave_pending_drop_total{reason=\"" << drop_names[i] << "\"} "
            << g_leave_drop[i].load(std::memory_order_relaxed) << "\n";
     }
-    os << "# HELP gamemesh_aoi_leave_pending_inconsistent Evidence rows whose pair is absent from the leave retry queue. Unit: pairs.\n"
-          "# TYPE gamemesh_aoi_leave_pending_inconsistent gauge\n"
-       << "gamemesh_aoi_leave_pending_inconsistent " << g_leave_inconsistent.load(std::memory_order_relaxed)
+    os << "# HELP lunaserver_aoi_leave_pending_inconsistent Evidence rows whose pair is absent from the leave retry queue. Unit: pairs.\n"
+          "# TYPE lunaserver_aoi_leave_pending_inconsistent gauge\n"
+       << "lunaserver_aoi_leave_pending_inconsistent " << g_leave_inconsistent.load(std::memory_order_relaxed)
        << "\n";
-    os << "# HELP gamemesh_aoi_tombstone_move_reject_total MOVE dropped by the post-LEAVE tombstone. Unit: events.\n"
-          "# TYPE gamemesh_aoi_tombstone_move_reject_total counter\n"
-       << "gamemesh_aoi_tombstone_move_reject_total " << g_tomb_reject.load(std::memory_order_relaxed) << "\n";
-    os << "# HELP gamemesh_aoi_tombstone_reject_then_enter_total Tombstone-rejected entities that later got ENTER. Unit: entities.\n"
-          "# TYPE gamemesh_aoi_tombstone_reject_then_enter_total counter\n"
-       << "gamemesh_aoi_tombstone_reject_then_enter_total " << g_tomb_then_enter.load(std::memory_order_relaxed)
+    os << "# HELP lunaserver_aoi_tombstone_move_reject_total MOVE dropped by the post-LEAVE tombstone. Unit: events.\n"
+          "# TYPE lunaserver_aoi_tombstone_move_reject_total counter\n"
+       << "lunaserver_aoi_tombstone_move_reject_total " << g_tomb_reject.load(std::memory_order_relaxed) << "\n";
+    os << "# HELP lunaserver_aoi_tombstone_reject_then_enter_total Tombstone-rejected entities that later got ENTER. Unit: entities.\n"
+          "# TYPE lunaserver_aoi_tombstone_reject_then_enter_total counter\n"
+       << "lunaserver_aoi_tombstone_reject_then_enter_total " << g_tomb_then_enter.load(std::memory_order_relaxed)
        << "\n";
 
-    os << "# HELP gamemesh_aoi_leave_cells LEAVE events by reason and chebyshev cell distance. cells=8 means 8 or more. Unit: events.\n"
-          "# TYPE gamemesh_aoi_leave_cells counter\n";
+    os << "# HELP lunaserver_aoi_leave_cells LEAVE events by reason and chebyshev cell distance. cells=8 means 8 or more. Unit: events.\n"
+          "# TYPE lunaserver_aoi_leave_cells counter\n";
     static const char *kReason[] = {"out_of_window", "cap_evict", "disconnect", "remove_interest",
                                     "retry_resend", "reconnect_resync", "other", "other"};
     for (int r = 0; r < 8; ++r) {
@@ -1066,13 +1066,13 @@ void AoiEvidenceWritePrometheus(std::ostream &os) {
             const uint64_t n = g_leave_cells[r][c].load(std::memory_order_relaxed);
             if (n == 0)
                 continue;
-            os << "gamemesh_aoi_leave_cells{reason=\"" << kReason[r] << "\",cells=\"" << c << "\"} " << n
+            os << "lunaserver_aoi_leave_cells{reason=\"" << kReason[r] << "\",cells=\"" << c << "\"} " << n
                << "\n";
         }
     }
 
-    os << "# HELP gamemesh_move_stage_us Move path stage samples. parked=1 means that connection's unsent queue was above 16KB. parked is omitted when the socket is not in this process. Unit: microseconds.\n"
-          "# TYPE gamemesh_move_stage_us histogram\n";
+    os << "# HELP lunaserver_move_stage_us Move path stage samples. parked=1 means that connection's unsent queue was above 16KB. parked is omitted when the socket is not in this process. Unit: microseconds.\n"
+          "# TYPE lunaserver_move_stage_us histogram\n";
     static const char *kUs[] = {"50", "100", "200", "500", "1000", "2000", "5000", "10000",
                                 "20000", "50000", "100000", "200000", "500000", "1000000", "+Inf"};
     for (int s = 0; s < static_cast<int>(AoiMoveStage::Count); ++s) {
@@ -1085,18 +1085,18 @@ void AoiEvidenceWritePrometheus(std::ostream &os) {
             uint64_t acc = 0;
             for (int b = 0; b < 15; ++b) {
                 acc += g_stage[s][parked][b].load(std::memory_order_relaxed);
-                os << "gamemesh_move_stage_us_bucket{stage=\"" << AoiMoveStageName(static_cast<AoiMoveStage>(s))
+                os << "lunaserver_move_stage_us_bucket{stage=\"" << AoiMoveStageName(static_cast<AoiMoveStage>(s))
                    << "\",parked=\"" << parked_label << "\",le=\"" << kUs[b] << "\"} " << acc << "\n";
             }
-            os << "gamemesh_move_stage_us_count{stage=\"" << AoiMoveStageName(static_cast<AoiMoveStage>(s))
+            os << "lunaserver_move_stage_us_count{stage=\"" << AoiMoveStageName(static_cast<AoiMoveStage>(s))
                << "\",parked=\"" << parked_label << "\"} "
                << g_stage_n[s][parked].load(std::memory_order_relaxed) << "\n";
         }
     }
     if (g_present_n.load(std::memory_order_relaxed) > 0) {
-        os << "# HELP gamemesh_aoi_present_slice_entities_max Largest entity count in one AdvancePresented slice. Unit: entities.\n"
-              "# TYPE gamemesh_aoi_present_slice_entities_max gauge\n"
-           << "gamemesh_aoi_present_slice_entities_max " << g_present_entities_max.load(std::memory_order_relaxed)
+        os << "# HELP lunaserver_aoi_present_slice_entities_max Largest entity count in one AdvancePresented slice. Unit: entities.\n"
+              "# TYPE lunaserver_aoi_present_slice_entities_max gauge\n"
+           << "lunaserver_aoi_present_slice_entities_max " << g_present_entities_max.load(std::memory_order_relaxed)
            << "\n";
     }
 
@@ -1170,127 +1170,127 @@ void AoiEvidenceWritePrometheus(std::ostream &os) {
                 oldest_offline = row.second;
         }
     }
-    os << "# HELP gamemesh_aoi_leave_write_pending Failed LEAVE not yet recovered or given up. Unit: pairs.\n"
-          "# TYPE gamemesh_aoi_leave_write_pending gauge\n"
-       << "gamemesh_aoi_leave_write_pending " << pending_pairs.size() << "\n";
+    os << "# HELP lunaserver_aoi_leave_write_pending Failed LEAVE not yet recovered or given up. Unit: pairs.\n"
+          "# TYPE lunaserver_aoi_leave_write_pending gauge\n"
+       << "lunaserver_aoi_leave_write_pending " << pending_pairs.size() << "\n";
     if (know_online) {
-        os << "# HELP gamemesh_aoi_leave_write_pending_viewer Failed LEAVE split by whether the viewer is still connected. Unit: pairs.\n"
-              "# TYPE gamemesh_aoi_leave_write_pending_viewer gauge\n";
-        os << "gamemesh_aoi_leave_write_pending_viewer{viewer=\"online\"} " << pending_online << "\n";
-        os << "gamemesh_aoi_leave_write_pending_viewer{viewer=\"offline\"} " << pending_offline << "\n";
+        os << "# HELP lunaserver_aoi_leave_write_pending_viewer Failed LEAVE split by whether the viewer is still connected. Unit: pairs.\n"
+              "# TYPE lunaserver_aoi_leave_write_pending_viewer gauge\n";
+        os << "lunaserver_aoi_leave_write_pending_viewer{viewer=\"online\"} " << pending_online << "\n";
+        os << "lunaserver_aoi_leave_write_pending_viewer{viewer=\"offline\"} " << pending_offline << "\n";
     }
     if (oldest >= 0 && now_ms >= oldest) {
-        os << "# HELP gamemesh_aoi_leave_write_pending_oldest_ms Age of the oldest failed LEAVE still pending. Unit: milliseconds.\n"
-              "# TYPE gamemesh_aoi_leave_write_pending_oldest_ms gauge\n"
-           << "gamemesh_aoi_leave_write_pending_oldest_ms " << (now_ms - oldest) << "\n";
+        os << "# HELP lunaserver_aoi_leave_write_pending_oldest_ms Age of the oldest failed LEAVE still pending. Unit: milliseconds.\n"
+              "# TYPE lunaserver_aoi_leave_write_pending_oldest_ms gauge\n"
+           << "lunaserver_aoi_leave_write_pending_oldest_ms " << (now_ms - oldest) << "\n";
     }
     if (know_online && (oldest_online >= 0 || oldest_offline >= 0)) {
-        os << "# HELP gamemesh_aoi_leave_write_pending_oldest_ms_viewer Age of the oldest failed LEAVE split by viewer connectivity. Empty side is omitted. Unit: milliseconds.\n"
-              "# TYPE gamemesh_aoi_leave_write_pending_oldest_ms gauge\n";
+        os << "# HELP lunaserver_aoi_leave_write_pending_oldest_ms_viewer Age of the oldest failed LEAVE split by viewer connectivity. Empty side is omitted. Unit: milliseconds.\n"
+              "# TYPE lunaserver_aoi_leave_write_pending_oldest_ms gauge\n";
         if (oldest_online >= 0 && now_ms >= oldest_online) {
-            os << "gamemesh_aoi_leave_write_pending_oldest_ms{viewer=\"online\"} "
+            os << "lunaserver_aoi_leave_write_pending_oldest_ms{viewer=\"online\"} "
                << (now_ms - oldest_online) << "\n";
         }
         if (oldest_offline >= 0 && now_ms >= oldest_offline) {
-            os << "gamemesh_aoi_leave_write_pending_oldest_ms{viewer=\"offline\"} "
+            os << "lunaserver_aoi_leave_write_pending_oldest_ms{viewer=\"offline\"} "
                << (now_ms - oldest_offline) << "\n";
         }
     }
-    os << "# HELP gamemesh_stalled_conns Connections whose kernel unsent plus app buffer is above 16KB right now. Unit: connections.\n"
-          "# TYPE gamemesh_stalled_conns gauge\n"
-       << "gamemesh_stalled_conns " << stall_age.size() << "\n";
-    os << "# HELP gamemesh_stalled_conn_total Distinct connections that have entered the stalled state. Capped at 8192. Unit: connections.\n"
-          "# TYPE gamemesh_stalled_conn_total counter\n"
-       << "gamemesh_stalled_conn_total " << g_stalled_total.load(std::memory_order_relaxed) << "\n";
-    EmitQuantiles(os, "gamemesh_stalled_conn_age_ms",
+    os << "# HELP lunaserver_stalled_conns Connections whose kernel unsent plus app buffer is above 16KB right now. Unit: connections.\n"
+          "# TYPE lunaserver_stalled_conns gauge\n"
+       << "lunaserver_stalled_conns " << stall_age.size() << "\n";
+    os << "# HELP lunaserver_stalled_conn_total Distinct connections that have entered the stalled state. Capped at 8192. Unit: connections.\n"
+          "# TYPE lunaserver_stalled_conn_total counter\n"
+       << "lunaserver_stalled_conn_total " << g_stalled_total.load(std::memory_order_relaxed) << "\n";
+    EmitQuantiles(os, "lunaserver_stalled_conn_age_ms",
                   "Age of each connection currently above 16KB unsent. One sample is one connection at scrape time. Unit: milliseconds.",
                   stall_age);
     if (fails.empty()) {
-        os << "# HELP gamemesh_write_fail_per_conn_count Connections in the write_fail_per_conn quantiles. A connection is included after its first write failure. Unit: connections.\n"
-              "# TYPE gamemesh_write_fail_per_conn_count gauge\n"
-           << "gamemesh_write_fail_per_conn_count 0\n";
+        os << "# HELP lunaserver_write_fail_per_conn_count Connections in the write_fail_per_conn quantiles. A connection is included after its first write failure. Unit: connections.\n"
+              "# TYPE lunaserver_write_fail_per_conn_count gauge\n"
+           << "lunaserver_write_fail_per_conn_count 0\n";
     } else {
-        EmitQuantiles(os, "gamemesh_write_fail_per_conn",
+        EmitQuantiles(os, "lunaserver_write_fail_per_conn",
                       "Write failures accumulated on one connection. One sample is one connection that has failed at least once. Connections with zero failures are omitted. Unit: events.",
                       fails);
         std::sort(top.begin(), top.end(),
                   [](const std::pair<uint64_t, uint64_t> &a, const std::pair<uint64_t, uint64_t> &b) {
                       return a.second > b.second;
                   });
-        os << "# HELP gamemesh_write_fail_conn_top Connections with the most write failures. Unit: events.\n"
-              "# TYPE gamemesh_write_fail_conn_top gauge\n";
+        os << "# HELP lunaserver_write_fail_conn_top Connections with the most write failures. Unit: events.\n"
+              "# TYPE lunaserver_write_fail_conn_top gauge\n";
         const size_t n = std::min<size_t>(10, top.size());
         for (size_t i = 0; i < n; ++i) {
-            os << "gamemesh_write_fail_conn_top{rank=\"" << (i + 1) << "\",conn=\"" << top[i].first << "\"} "
+            os << "lunaserver_write_fail_conn_top{rank=\"" << (i + 1) << "\",conn=\"" << top[i].first << "\"} "
                << top[i].second << "\n";
         }
     }
     if (tx.empty()) {
-        os << "# HELP gamemesh_conn_tx_bytes_count Connections in the conn_tx_bytes quantiles. Unit: connections.\n"
-              "# TYPE gamemesh_conn_tx_bytes_count gauge\n"
-           << "gamemesh_conn_tx_bytes_count 0\n";
+        os << "# HELP lunaserver_conn_tx_bytes_count Connections in the conn_tx_bytes quantiles. Unit: connections.\n"
+              "# TYPE lunaserver_conn_tx_bytes_count gauge\n"
+           << "lunaserver_conn_tx_bytes_count 0\n";
     } else {
-        EmitQuantiles(os, "gamemesh_conn_tx_bytes",
+        EmitQuantiles(os, "lunaserver_conn_tx_bytes",
                       "Bytes accepted on one connection during this process. One sample is one connection. Unit: bytes.",
                       tx);
     }
-    EmitQuantiles(os, "gamemesh_aoi_leave_recover_ms",
+    EmitQuantiles(os, "lunaserver_aoi_leave_recover_ms",
                   "Milliseconds from the first failed LEAVE write to a later accepted write. Unit: milliseconds.",
                   recover);
     if (g_busy_samples.load(std::memory_order_relaxed) > 0) {
-        os << "# HELP gamemesh_unsent16_samples_total Samples of a connection whose app buffer plus kernel unsent exceeded 16KB. At most one TCP_INFO read per second per connection. Unit: samples.\n"
-              "# TYPE gamemesh_unsent16_samples_total counter\n"
-           << "gamemesh_unsent16_samples_total " << g_busy_samples.load(std::memory_order_relaxed) << "\n";
-        os << "# HELP gamemesh_unsent16_class_total How those samples looked. retrans is TCP retransmission. cwnd_low is snd_cwnd at most 2. quiet_tcp has neither. Unit: samples.\n"
-              "# TYPE gamemesh_unsent16_class_total counter\n";
-        os << "gamemesh_unsent16_class_total{class=\"retrans\"} " << g_busy_retrans.load(std::memory_order_relaxed)
+        os << "# HELP lunaserver_unsent16_samples_total Samples of a connection whose app buffer plus kernel unsent exceeded 16KB. At most one TCP_INFO read per second per connection. Unit: samples.\n"
+              "# TYPE lunaserver_unsent16_samples_total counter\n"
+           << "lunaserver_unsent16_samples_total " << g_busy_samples.load(std::memory_order_relaxed) << "\n";
+        os << "# HELP lunaserver_unsent16_class_total How those samples looked. retrans is TCP retransmission. cwnd_low is snd_cwnd at most 2. quiet_tcp has neither. Unit: samples.\n"
+              "# TYPE lunaserver_unsent16_class_total counter\n";
+        os << "lunaserver_unsent16_class_total{class=\"retrans\"} " << g_busy_retrans.load(std::memory_order_relaxed)
            << "\n";
-        os << "gamemesh_unsent16_class_total{class=\"cwnd_low\"} " << g_busy_cwnd_low.load(std::memory_order_relaxed)
+        os << "lunaserver_unsent16_class_total{class=\"cwnd_low\"} " << g_busy_cwnd_low.load(std::memory_order_relaxed)
            << "\n";
-        os << "gamemesh_unsent16_class_total{class=\"quiet_tcp\"} " << g_busy_quiet.load(std::memory_order_relaxed)
+        os << "lunaserver_unsent16_class_total{class=\"quiet_tcp\"} " << g_busy_quiet.load(std::memory_order_relaxed)
            << "\n";
-        os << "# HELP gamemesh_unsent16_with_enter_total Samples taken in a second that also accepted an ENTER frame. Unit: samples.\n"
-              "# TYPE gamemesh_unsent16_with_enter_total counter\n"
-           << "gamemesh_unsent16_with_enter_total " << g_busy_with_enter.load(std::memory_order_relaxed) << "\n";
-        os << "# HELP gamemesh_unsent16_with_snapshot_total Samples taken in a second that also accepted a full snapshot. Unit: samples.\n"
-              "# TYPE gamemesh_unsent16_with_snapshot_total counter\n"
-           << "gamemesh_unsent16_with_snapshot_total " << g_busy_with_snapshot.load(std::memory_order_relaxed)
+        os << "# HELP lunaserver_unsent16_with_enter_total Samples taken in a second that also accepted an ENTER frame. Unit: samples.\n"
+              "# TYPE lunaserver_unsent16_with_enter_total counter\n"
+           << "lunaserver_unsent16_with_enter_total " << g_busy_with_enter.load(std::memory_order_relaxed) << "\n";
+        os << "# HELP lunaserver_unsent16_with_snapshot_total Samples taken in a second that also accepted a full snapshot. Unit: samples.\n"
+              "# TYPE lunaserver_unsent16_with_snapshot_total counter\n"
+           << "lunaserver_unsent16_with_snapshot_total " << g_busy_with_snapshot.load(std::memory_order_relaxed)
            << "\n";
-        os << "# HELP gamemesh_unsent16_tcp_ok_total Samples that read TCP_INFO. Unit: samples.\n"
-              "# TYPE gamemesh_unsent16_tcp_ok_total counter\n"
-           << "gamemesh_unsent16_tcp_ok_total " << g_busy_tcp_ok.load(std::memory_order_relaxed) << "\n";
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_unacked",
+        os << "# HELP lunaserver_unsent16_tcp_ok_total Samples that read TCP_INFO. Unit: samples.\n"
+              "# TYPE lunaserver_unsent16_tcp_ok_total counter\n"
+           << "lunaserver_unsent16_tcp_ok_total " << g_busy_tcp_ok.load(std::memory_order_relaxed) << "\n";
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_unacked",
                       "tcpi_unacked while unsent exceeded 16KB. One sample is one TCP_INFO read. Unit: segments.",
                       unacked);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_retrans",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_retrans",
                       "tcpi_retrans while unsent exceeded 16KB. One sample is one TCP_INFO read. Unit: segments.",
                       retrans);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_rto_us",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_rto_us",
                       "tcpi_rto while unsent exceeded 16KB. One sample is one TCP_INFO read. Unit: microseconds.",
                       rto);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_snd_cwnd",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_snd_cwnd",
                       "tcpi_snd_cwnd while unsent exceeded 16KB. One sample is one TCP_INFO read. Unit: segments.",
                       cwnd);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_rtt_us",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_rtt_us",
                       "tcpi_rtt while unsent exceeded 16KB. One sample is one TCP_INFO read. Unit: microseconds.",
                       rtt);
-        EmitQuantiles(os, "gamemesh_unsent16_notsent_bytes",
+        EmitQuantiles(os, "lunaserver_unsent16_notsent_bytes",
                       "Bytes not yet handed to the NIC, from SIOCOUTQNSD. This header has no tcpi_notsent_bytes. One sample is one read. Unit: bytes.",
                       notsent);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_backoff",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_backoff",
                       "tcpi_backoff while unsent exceeded 16KB. Omitted when the kernel did not return the field. Unit: steps.",
                       backoff);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_last_ack_recv_ms",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_last_ack_recv_ms",
                       "tcpi_last_ack_recv while unsent exceeded 16KB. Unit: milliseconds.", last_ack);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_last_data_sent_ms",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_last_data_sent_ms",
                       "tcpi_last_data_sent while unsent exceeded 16KB. Unit: milliseconds.", last_sent);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_bytes_acked_delta",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_bytes_acked_delta",
                       "Increase of tcpi_bytes_acked between samples. Omitted when the kernel struct did not include the field. Unit: bytes.",
                       acked_delta);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_bytes_retrans_delta",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_bytes_retrans_delta",
                       "Increase of tcpi_bytes_retrans between samples. Omitted when the header has no such field. Unit: bytes.",
                       retrans_delta);
-        EmitQuantiles(os, "gamemesh_unsent16_tcpi_total_retrans_delta",
+        EmitQuantiles(os, "lunaserver_unsent16_tcpi_total_retrans_delta",
                       "Increase of tcpi_total_retrans between samples. This is the substitute for tcpi_bytes_retrans on headers that lack that field. Unit: segments.",
                       total_retrans_delta);
     }

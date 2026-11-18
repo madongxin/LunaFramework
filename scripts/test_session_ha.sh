@@ -16,7 +16,7 @@ if [[ -z "$SESSION_BIN" ]]; then
   exit 1
 fi
 
-RUN="${TMPDIR:-/tmp}/gamemesh_session_ha_$$"
+RUN="${TMPDIR:-/tmp}/lunaserver_session_ha_$$"
 mkdir -p "$RUN"
 cleanup() {
   if [[ -f "$RUN/pids" ]]; then
@@ -26,18 +26,18 @@ cleanup() {
 }
 trap cleanup EXIT
 
-S0_PORT="${GAMEMESH_HA_SESSION0:-18401}"
-S1_PORT="${GAMEMESH_HA_SESSION1:-18402}"
-H0="${GAMEMESH_HA_HTTP0:-18093}"
-H1="${GAMEMESH_HA_HTTP1:-18096}"
+S0_PORT="${LUNASERVER_HA_SESSION0:-18401}"
+S1_PORT="${LUNASERVER_HA_SESSION1:-18402}"
+H0="${LUNASERVER_HA_HTTP0:-18093}"
+H1="${LUNASERVER_HA_HTTP1:-18096}"
 
 : >"$RUN/pids"
 start_one() {
   local id="$1" http="$2" brpc="$3" log="$4"
   if [[ "$(basename "$SESSION_BIN")" == "server" ]]; then
-    GAMEMESH_INSTANCE_ID="$id" nohup "$SESSION_BIN" session "$http" "$brpc" >"$log" 2>&1 &
+    LUNASERVER_INSTANCE_ID="$id" nohup "$SESSION_BIN" session "$http" "$brpc" >"$log" 2>&1 &
   else
-    GAMEMESH_INSTANCE_ID="$id" nohup "$SESSION_BIN" "$http" "$brpc" >"$log" 2>&1 &
+    LUNASERVER_INSTANCE_ID="$id" nohup "$SESSION_BIN" "$http" "$brpc" >"$log" 2>&1 &
   fi
   echo $! >>"$RUN/pids"
 }

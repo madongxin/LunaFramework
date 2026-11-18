@@ -3,7 +3,7 @@
 #include "AuthServiceImpl.h"
 #include "AuthTokenStore.h"
 #include "BrpcSslUtil.h"
-#include "GameMeshPaths.h"
+#include "LunaServerPaths.h"
 #include "Logging.h"
 #include "OpsMetrics.h"
 #include "PlacementStore.h"
@@ -72,7 +72,7 @@ const std::string &SessionCnf() {
     if (!once) {
         once = true;
         std::string resolved;
-        if (GameMeshPaths::ResolveProjectSubdir("config/session.cnf", &resolved))
+        if (LunaServerPaths::ResolveProjectSubdir("config/session.cnf", &resolved))
             path = std::move(resolved);
     }
     return path;

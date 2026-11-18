@@ -349,9 +349,9 @@ int CrowdLeaveInside(MapRuntime &rt, const std::shared_ptr<const MapStaticData> 
 }
 
 bool RunSeed(uint32_t seed) {
-    ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
-    ::unsetenv("GAMEMESH_AOI_V2_HYSTERESIS");
-    ::unsetenv("GAMEMESH_AOI_V2_LAYERS");
+    ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
+    ::unsetenv("LUNASERVER_AOI_V2_HYSTERESIS");
+    ::unsetenv("LUNASERVER_AOI_V2_LAYERS");
     auto data = MakeMap();
     if (!data)
         return false;
@@ -544,7 +544,7 @@ bool RunSeed(uint32_t seed) {
 }
 
 bool RunExpiry() {
-    ::unsetenv("GAMEMESH_AOI_V2_VISIBLE_SET");
+    ::unsetenv("LUNASERVER_AOI_V2_VISIBLE_SET");
     auto data = MakeMap();
     if (!data)
         return false;
@@ -603,18 +603,18 @@ bool RunExpiry() {
 
 int main() {
     Logger::setLogLevel(Logger::ERROR);
-    ::unsetenv("GAMEMESH_AOI_MEMBERSHIP_UNIFIED");
+    ::unsetenv("LUNASERVER_AOI_MEMBERSHIP_UNIFIED");
     const uint64_t base = ServerStats::aoi_unexpected_leave.load(std::memory_order_relaxed);
     if (!RunSeed(kSeed) || !RunExpiry()) {
         std::printf("FAIL aoi_client_model_test seed=%u\n", kSeed);
         return 1;
     }
     const uint64_t off = ServerStats::aoi_unexpected_leave.load(std::memory_order_relaxed) - base;
-    ::setenv("GAMEMESH_AOI_MEMBERSHIP_UNIFIED", "1", 1);
+    ::setenv("LUNASERVER_AOI_MEMBERSHIP_UNIFIED", "1", 1);
     const uint64_t mid = ServerStats::aoi_unexpected_leave.load(std::memory_order_relaxed);
     const bool unified_ok = RunSeed(kSeed);
     const uint64_t on = ServerStats::aoi_unexpected_leave.load(std::memory_order_relaxed) - mid;
-    ::unsetenv("GAMEMESH_AOI_MEMBERSHIP_UNIFIED");
+    ::unsetenv("LUNASERVER_AOI_MEMBERSHIP_UNIFIED");
     std::printf("unexpected_leave unified_off=%llu unified_on=%llu\n",
                 static_cast<unsigned long long>(off), static_cast<unsigned long long>(on));
     if (!unified_ok) {
