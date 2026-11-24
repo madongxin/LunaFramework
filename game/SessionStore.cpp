@@ -1,3 +1,17 @@
+/**
+ * SessionStore 实现：Redis Hash + Lua 脚本保证踢号/重连/切线的原子性。
+ *
+ * 主要 key（均带 key_prefix_，默认 lunaserver:dev:）：
+ *   session:{player_id}     — Hash：token/state/generation/gateway/logic/map…
+ *   online:players          — Set：当前 ONLINE 玩家（对账用）
+ *   grace:deadline          — ZSET：DISCONNECTED 宽限到期扫描
+ *   transfer:deadline       — ZSET：切线未 Commit 超时回滚
+ *   op:{operation_id}       — 幂等 Acquire/Reconnect 结果
+ *   reconnect:pending:{op}  — PrepareReconnect 候选 fence（短 TTL）
+ *
+ * 脚本区：kLuaAcquire / MarkDisconnected / Reconnect / Transfer / Kick 等。
+ * 公开 API 语义见 SessionStore.h；MarkDisconnected ≠ Logout。
+ */
 #include "SessionStore.h"
 
 #include "ServerStats.h"
@@ -81,7 +95,10 @@ bool ParseConfig(const std::string &path, std::string *host, int *port, std::str
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// Redis Lua：会话写路径必须走脚本（CAS generation / fence / state）
 // AcquireSession：原子踢号/建会话/递增 generation
+// ---------------------------------------------------------------------------
 const char kLuaAcquire[] = R"LUA(
 local key = KEYS[1]
 local kick = tonumber(ARGV[1])
@@ -660,6 +677,7 @@ int64_t ParseI64(const std::string &s) {
 
 }  // namespace
 
+/** 进程内单例；真正权威在 Redis，多 session 进程共享同一 key_prefix。 */
 SessionStore &SessionStore::Instance() {
     static SessionStore g;
     return g;
@@ -688,6 +706,9 @@ SessionState SessionStore::StateFromString(const std::string &s) {
     return SessionState::Offline;
 }
 
+// ---------------------------------------------------------------------------
+// 配置 / key 工具 / 幂等操作元数据
+// ---------------------------------------------------------------------------
 bool SessionStore::InitFromConfig() {
     const std::string &path = RedisConfigPath::RedisCnf();
     std::string host = "127.0.0.1";
@@ -1079,6 +1100,9 @@ std::vector<std::string> SessionStore::LogicInstanceIds() const {
     return logic_instance_ids_;
 }
 
+// ---------------------------------------------------------------------------
+// AcquireSession / Login / Reconnect（含 Prepare-Commit）
+// ---------------------------------------------------------------------------
 bool SessionStore::AcquireSessionUnlocked(const AcquireSessionInput &in, AcquireSessionResult *out) {
     if (!out)
         return false;
@@ -1573,6 +1597,9 @@ bool SessionStore::AbortReconnect(uint64_t player_id, const std::string &operati
     return reply[0] == "1";
 }
 
+// ---------------------------------------------------------------------------
+// Bind / MarkDisconnected / Kick / Logout / Validate
+// ---------------------------------------------------------------------------
 bool SessionStore::BindConnection(uint64_t player_id, const std::string &token,
                                   const std::string &gateway_id, uint64_t connection_id) {
     if (!available_ || player_id == 0 || token.empty())
@@ -1844,6 +1871,9 @@ bool SessionStore::Logout(const game::LogoutReq &req, game::LogoutRsp *rsp) {
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// 路由更新与玩家切线（Begin/Commit/Abort Transfer）
+// ---------------------------------------------------------------------------
 bool SessionStore::UpdatePlayerRoute(uint64_t player_id, const std::string &fence_token,
                                      const std::string &gamelogic_instance_id,
                                      uint64_t map_instance_id, uint64_t map_owner_epoch,
@@ -2078,6 +2108,9 @@ bool SessionStore::ValidateToken(uint64_t player_id, const std::string &token, s
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// 在线集合 / 宽限索引 / Session 定时过期与对账
+// ---------------------------------------------------------------------------
 std::string SessionStore::OnlineSetKey() const {
     return key_prefix_ + "online:players";
 }
@@ -2393,6 +2426,9 @@ void SessionStore::UntrackOnline(uint64_t player_id) {
     (void)lease->SRem(OnlineSetKey(), std::to_string(player_id));
 }
 
+// ---------------------------------------------------------------------------
+// 配额、好友/屏蔽缓存、公网 presence、推送目标批量查询
+// ---------------------------------------------------------------------------
 bool SessionStore::ConsumeKeyedQuota(const std::string &key, int limit, int window_sec) {
     if (!available_ || key.empty() || limit <= 0)
         return false;

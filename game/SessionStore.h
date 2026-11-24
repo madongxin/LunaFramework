@@ -8,14 +8,40 @@
 #include <string>
 #include <vector>
 
+/**
+ * SessionStore — 玩家会话在 Redis 中的权威存储（连接池 + Lua CAS）。
+ *
+ * 职责边界（与 Auth 分离）：
+ * - AuthService：账号校验、access_token（另一套 Redis key）；**不**创建 Session。
+ * - SessionStore / SessionService：AcquireSession 后的 fence / ONLINE / DISCONNECTED、
+ *   Logic 路由、断线宽限、踢号、切线 transfer。Gateway 登录链是
+ *   Auth.Login → Session.AcquireSession → GameLogic.BindPlayer。
+ *
+ * 状态机（Redis hash 字段 state）：
+ *   Offline →（Acquire/Login）→ Online
+ *   Online  →（TCP 断）→ Disconnected（宽限 grace_sec，可 Reconnect）
+ *   Disconnected →（宽限到期 / ExpireDue*）→ 删 Session（≠ Logout 语义上的主动下线）
+ *   Online  →（Logout / Kick 清会话）→ Offline
+ *   MarkDisconnected ≠ Logout：前者保留会话等重连；后者主动销会话。
+ *
+ * 关键字段：
+ * - fence_token（存为 token）：绑定连接与业务写权限；DISCONNECTED 时 ValidateToken 拒业务写。
+ * - generation：踢号/重登递增；旧连接迟到的 MarkDisconnected 因 gen/token 不匹配被忽略。
+ * - gamelogic_instance_id / map_* / route_version：权威路由，进图与 transfer 用 fence CAS 更新。
+ *
+ * 配置：config/redis.cnf（InitFromConfig）；key_prefix 默认 lunaserver:dev:。
+ * 权威并发靠 Redis Lua；cfg_mu_ 只保护进程内 logic_instance_ids_ 等本地配置。
+ */
+
 /** 会话状态（Redis 字段 state） */
 enum class SessionState {
     Offline = 0,
     Online = 1,
-    Disconnected = 2,
+    Disconnected = 2,  // 断线宽限中，可带 ticket/fence 重连
     Closing = 3,
 };
 
+/** 一条玩家会话在 Redis 中的镜像（HGETALL session:{player_id}） */
 struct SessionRecord {
     std::string token;  // fence_token
     std::string session_id;
@@ -26,19 +52,20 @@ struct SessionRecord {
     std::string gateway_id;
     uint64_t connection_id = 0;
     uint64_t generation = 0;
-    int64_t disconnect_deadline_sec = 0;
+    int64_t disconnect_deadline_sec = 0;  // DISCONNECTED 宽限截止（unix 秒）
     std::string gamelogic_instance_id;
     uint64_t map_instance_id = 0;
     uint64_t map_owner_epoch = 0;
     uint64_t route_version = 0;
 };
 
+/** Gateway → Session.AcquireSession 入参（正式登录创建/顶号会话） */
 struct AcquireSessionInput {
     uint64_t account_id = 0;
     uint64_t player_id = 0;
     std::string device_id;
     uint32_t server_id = 0;
-    uint32_t ttl_sec = 0;
+    uint32_t ttl_sec = 0;  // 0=用配置 default_ttl_sec_
     bool kick_other_device = true;
     std::string gateway_instance_id;
     std::string preferred_gamelogic_instance_id;
@@ -52,6 +79,7 @@ enum class SessionOpStatus {
     Done = 2,
 };
 
+/** Gateway ReconnectV2 入参（含可选 operation_id 幂等） */
 struct ReconnectSessionInput {
     uint64_t player_id = 0;
     std::string session_id;
@@ -61,6 +89,10 @@ struct ReconnectSessionInput {
     std::string operation_id;
 };
 
+/**
+ * Acquire / Reconnect / Prepare-Commit 共用出参。
+ * kicked_previous / previous_*：顶号时带回旧会话，供 Gateway 踢旧连接或 Bind 失败回滚。
+ */
 struct AcquireSessionResult {
     bool ok = false;
     std::string message;
@@ -93,6 +125,7 @@ class SessionStore {
 public:
     static SessionStore &Instance();
 
+    /** 读 redis.cnf，初始化连接池；失败则 Available()==false，正式路径应 fail-closed。 */
     bool InitFromConfig();
     bool Available() const { return available_; }
     int grace_sec() const { return grace_sec_; }
@@ -101,11 +134,15 @@ public:
     static constexpr int kTransferTtlSec = 30;
     const std::string &key_prefix() const { return key_prefix_; }
 
-    /** 配置可分配的 GameLogic instance_id 列表（勿写死端口）。 */
+    /** 配置可分配的 GameLogic instance_id 列表（勿写死端口）。空列表时 Acquire 失败。 */
     void SetLogicInstanceIds(std::vector<std::string> ids, bool publish_snapshot = true);
     std::vector<std::string> LogicInstanceIds() const;
 
+    // ----- 登录 / 重连 / 下线（核心会话生命周期）-----
+
+    /** 正式路径：创建或顶号会话，分配 fence + Logic 路由；支持 operation_id 幂等。 */
     bool AcquireSession(const AcquireSessionInput &in, AcquireSessionResult *out);
+    /** 旧 proto Login 封装（内部仍走会话写入；正式 Gateway 应走 Auth+Acquire）。 */
     bool Login(const game::LoginReq &req, game::LoginRsp *rsp);
     bool Reconnect(const game::ReconnectReq &req, game::ReconnectRsp *rsp);
     /** Reconnect 并输出权威路由（logic/map/epoch/version） */
@@ -113,6 +150,10 @@ public:
     /** 带 operation_id 幂等的重连（Gateway ReconnectV2） */
     bool ReconnectSession(const ReconnectSessionInput &in, AcquireSessionResult *out,
                           SessionRecord *route_out);
+    /**
+     * 两阶段重连：Prepare 写出候选 fence（短 TTL）→ Gateway Bind 成功后再 Commit。
+     * 失败或超时应 Abort，避免半开会话。
+     */
     bool PrepareReconnect(const ReconnectSessionInput &in, AcquireSessionResult *out);
     bool CommitReconnect(uint64_t player_id, const std::string &operation_id,
                          const std::string &candidate_fence, uint64_t candidate_generation,
@@ -125,6 +166,7 @@ public:
                              std::string *op_kind, AcquireSessionResult *out);
     bool Validate(const game::ValidateSessionReq &req, game::ValidateSessionRsp *rsp);
     bool CheckOnline(const game::CheckOnlineReq &req, game::CheckOnlineRsp *rsp);
+    /** 主动下线：删 Session；与 MarkDisconnected（断线宽限）不同。 */
     bool Logout(const game::LogoutReq &req, game::LogoutRsp *rsp);
 
     /** 仅 ONLINE 且 token 匹配才通过（DISCONNECTED 拒业务写） */
@@ -140,11 +182,14 @@ public:
      * 不等于 Logout。
      */
     bool MarkDisconnected(uint64_t player_id, const std::string &token, uint64_t generation);
+
+    // ----- Session 进程定时清理 / 对账（leader 侧调用）-----
+
     /**
      * 扫描宽限已到期的 DISCONNECTED 会话：删 Session、ReleaseByPlayer、从分线占位摘除。
      * 不等于 Logout；只处理 deadline 已过的断线号。Session 进程定时调用。
+     * 只处理 score ≤ now 的成员，单次最多 limit 条。
      */
-    /** 只处理 score ≤ now 的成员，单次最多 100 条。 */
     size_t ExpireDueDisconnected(size_t limit = 100);
     /** 转移记录超过 kTransferTtlSec 未 Commit 时回滚为 ONLINE。 */
     size_t ExpireDueTransfers(size_t limit = 100);
@@ -160,6 +205,7 @@ public:
      * Session leader 定时调用；单次最多 limit 条。
      */
     size_t ExpireOnlineMissingGatewayClaim(size_t limit = 100);
+
     struct KickResult {
         bool ok = false;
         std::string message;
@@ -182,6 +228,8 @@ public:
                                 const AcquireSessionResult &previous, const std::string &operation_id,
                                 std::string *err);
     bool InvalidateOperation(const std::string &operation_id);
+
+    // ----- 路由 / 切线（GameLogic 权威，fence CAS）-----
 
     /** 进图/迁移后更新权威路由（fence CAS；route_version 单调） */
     bool UpdatePlayerRoute(uint64_t player_id, const std::string &fence_token,
@@ -242,6 +290,8 @@ public:
     }
     /** 用过期本地快照走 CAS；Redis 权威记录可能已被重连更新。 */
     bool ForceExpireGraceFromStaleLocalForTest(uint64_t player_id);
+
+    // ----- 在线态 / 推送目标 / 社交旁路缓存（不把 fence 泄漏给公网）-----
 
     struct OnlinePushTarget {
         uint64_t player_id = 0;
@@ -327,7 +377,7 @@ private:
     bool available_ = false;
     int default_ttl_sec_ = 7200;
     int long_ttl_sec_ = 86400;
-    int grace_sec_ = 45;
+    int grace_sec_ = 45;           // MarkDisconnected 后允许重连的秒数
     int pool_size_ = 8;
     std::string key_prefix_ = "lunaserver:dev:";
     std::vector<std::string> logic_instance_ids_{"gl-0"};

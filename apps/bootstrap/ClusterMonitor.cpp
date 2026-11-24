@@ -1,3 +1,7 @@
+/**
+ * 集群观察页数据源：读 inventory.tsv、本机探活 /live|/ready、拼 JSON、代理 PromQL。
+ * Prom 查询有槽位上限，避免堵死 gamedb HTTP 线程。
+ */
 #include "bootstrap/ClusterMonitor.h"
 
 #include "bootstrap/AdminHttpUtil.h"
@@ -23,6 +27,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+
+// ----- inventory /proc / 本机 HTTP 探活工具 -----
 std::string InventoryTsvPath() {
     if (const char *run = std::getenv("LUNASERVER_RUN_DIR")) {
         if (*run)
@@ -170,6 +176,8 @@ void ProbeClusterProc(ClusterProc *p) {
         p->git_sha = JsonStringField(body, "git_sha");
 }
 
+
+// ----- /api/cluster：进程表 + alive/ready 汇总 -----
 Json::Value BuildClusterStatusJson() {
     Json::Value out;
     out["ok"] = true;
@@ -349,6 +357,8 @@ int MetricCount(const std::string &text, const char *name) {
     return n;
 }
 
+
+// ----- /api/monitor/live：网关在线、出口、Move 等摘要 -----
 Json::Value BuildMonitorLiveJson() {
     Json::Value out;
     Json::Value gws(Json::arrayValue);
@@ -439,6 +449,8 @@ struct PromQuerySlot {
     }
 };
 
+
+// ----- /api/prometheus/query(_range)：限流后转发 Prometheus -----
 void HandlePrometheusInstant(const HttpRequest &request, HttpResponse *response, bool head_only) {
     PromQuerySlot slot;
     if (!slot.held) {

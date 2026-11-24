@@ -1,3 +1,7 @@
+/**
+ * 启动依赖：角色门禁（PrepareRole）+ MySQL / Redis / RocksDB 初始化。
+ * 在主 EventLoop 创建之后、HTTP/brpc 之前由 RunServer 调用。
+ */
 #include "bootstrap/StartDeps.h"
 
 #include "AoiEvidence.h"
@@ -41,8 +45,13 @@
 #include <cstdlib>
 #include <string>
 
+
+// ---------------------------------------------------------------------------
+// BootstrapPrepareRole：AOI 钩子、Formal 禁 MySQL、ServiceHealth、brpc 编译检查
+// ---------------------------------------------------------------------------
 bool BootstrapPrepareRole(const std::string &role, int http_port) {
 #ifdef WEBSERVER_ENABLE_GAME_PROTOBUF
+    // Gateway：AOI 证据需要 connection→player；从本机 ConnRegistry 查
     if (role == "gateway" || role == "all") {
         AoiSetConnPlayerFn([](uint64_t conn, uint64_t *player) {
             GatewayConnRegistry::Bind bind;
@@ -53,6 +62,7 @@ bool BootstrapPrepareRole(const std::string &role, int http_port) {
             return true;
         });
     }
+    // GameLogic：判断 viewer 是否仍挂在本机地图运行时
     if (role == "gamelogic" || role == "all") {
         AoiSetViewerOnlineFn([](uint64_t id, bool *online) {
             if (online)
@@ -60,16 +70,19 @@ bool BootstrapPrepareRole(const std::string &role, int http_port) {
             return true;
         });
     }
+    // Formal：好友相关客户端命令默认关闭（走专用策略）
     if (role == "gamelogic" && FormalModeEnabled())
         GameLogic::Instance().SetFriendCommandsEnabled(false);
 #endif
 #ifdef WEBSERVER_ENABLE_MYSQL
+    // Formal：非 gamedb 禁止初始化连接池，资产经 GameDB brpc
     if (!FormalModeAllowsMysql(role)) {
         ::setenv("LUNASERVER_FORBID_MYSQL", "1", 1);
         ConnectionPool::ForbidInit(
             "formal mode: MySQL only on role=gamedb (use GameDB brpc)");
     }
 #endif
+    // /live /ready 与监控页用的服务名
     ServiceHealth::Instance().Configure(role, role + "-" + std::to_string(http_port));
 #if !defined(WEBSERVER_ENABLE_BRPC)
     if (role == "gateway" || role == "gamelogic" || role == "globalservice" || role == "session" ||
@@ -81,6 +94,10 @@ bool BootstrapPrepareRole(const std::string &role, int http_port) {
     return true;
 }
 
+
+// ---------------------------------------------------------------------------
+// MySQL：仅 Formal 允许的角色建池上 Store；gamedb 负责账号/资产/邮件过期扫描
+// ---------------------------------------------------------------------------
 void BootstrapInitMysql(EventLoop *loop, const std::string &role) {
 #ifdef WEBSERVER_ENABLE_MYSQL
     const bool need_db = FormalModeAllowsMysql(role) &&
@@ -123,6 +140,10 @@ void BootstrapInitMysql(EventLoop *loop, const std::string &role) {
 #endif
 }
 
+
+// ---------------------------------------------------------------------------
+// Redis：Session / Placement / PushReplay；可选登录限流与服务发现
+// ---------------------------------------------------------------------------
 void BootstrapInitRedis(const std::string &role) {
 #ifdef WEBSERVER_ENABLE_REDIS
     if (role == "all" || role == "gamelogic" || role == "gateway" || role == "globalservice" ||
@@ -152,6 +173,10 @@ void BootstrapInitRedis(const std::string &role) {
 #endif
 }
 
+
+// ---------------------------------------------------------------------------
+// RocksDB demo（仅 role=all，默认构建通常关闭 ENABLE_ROCKSDB）
+// ---------------------------------------------------------------------------
 void BootstrapInitRocksdb(const std::string &role) {
 #ifdef WEBSERVER_ENABLE_ROCKSDB
     if (role == "all") {

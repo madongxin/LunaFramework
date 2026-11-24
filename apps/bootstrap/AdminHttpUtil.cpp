@@ -1,3 +1,7 @@
+/**
+ * 管理 HTTP 响应拼装与 URL 参数工具实现。
+ * 不负责鉴权（见 HttpServer）与路由（见 AdminHttpRouter）。
+ */
 #include "bootstrap/AdminHttpUtil.h"
 
 #include <cctype>
@@ -15,6 +19,7 @@ void SendHtml(HttpResponse *response, const std::string &body, bool head_only) {
     response->SetStatusCode(HttpResponse::HttpStatusCode::k200K);
     response->SetStatusMessage("OK");
     response->SetContentType("text/html; charset=utf-8");
+    // HEAD：只回头部，body 长度为 0
     response->SetContentLength(static_cast<int>(head_only ? 0 : body.size()));
     response->SetBody(head_only ? "" : body);
 }
@@ -43,17 +48,20 @@ void SendJson(HttpResponse *response, const Json::Value &v,
 void SendPrometheusMetrics(HttpResponse *response, const std::string &body, bool head_only) {
     response->SetStatusCode(HttpResponse::HttpStatusCode::k200K);
     response->SetStatusMessage("OK");
+    // Prometheus 文本 exposition 约定的 Content-Type
     response->SetContentType("text/plain; version=0.0.4; charset=utf-8");
     response->SetContentLength(static_cast<int>(head_only ? 0 : body.size()));
     response->SetBody(head_only ? "" : body);
 }
 
+/** 从 HttpRequest 已解析的 request_params 取查询参数（非原始 query string）。 */
 std::string UrlParam(const HttpRequest &request, const char *key) {
     const auto &m = request.request_params();
     const auto it = m.find(key);
     return it != m.end() ? it->second : "";
 }
 
+/** application/x-www-form-urlencoded 风格解码（+ → 空格，%XX）。 */
 std::string UrlDecodeParam(std::string s) {
     std::string out;
     out.reserve(s.size());
@@ -82,4 +90,3 @@ std::string UrlDecodeParam(std::string s) {
     }
     return out;
 }
-

@@ -1,3 +1,13 @@
+/**
+ * 管理口路径分发。鉴权在 HttpServer；此处按 URL 调 ClusterMonitor / GmAdmin / 健康检查等。
+ *
+ * 分区大致：
+ *   /login /gm          — 需 ENABLE_ADMIN
+ *   /metrics 与诊断     — Prometheus 文本、AOI/连接诊断
+ *   /api/prometheus/*   — 监控页代理查询
+ *   /health/* /api/*    — live/ready/version/cluster/monitor
+ *   静态页 /monitor 等
+ */
 #include "bootstrap/AdminHttpRouter.h"
 
 #include "bootstrap/AdminHttpUtil.h"
@@ -37,10 +47,16 @@
 #include "SessionStore.h"
 #endif
 
+
+// ---------------------------------------------------------------------------
+// 统一回调：顺序匹配路径，先匹配先生效
+// ---------------------------------------------------------------------------
 void HttpResponseCallback(const HttpRequest &request, HttpResponse *response) {
     const bool head_only = (request.method() == HttpRequest::Method::kHead);
     const std::string &url = request.url();
 
+
+    // ----- 危险管理：登录发 gm_sid Cookie；asan 账号可触发崩溃 -----
     if (url == "/login" && request.method() == HttpRequest::Method::kPost) {
         if (!AdminHttpEnabled()) {
             SendPlain(response, "admin disabled", HttpResponse::HttpStatusCode::k403Forbidden);
@@ -91,6 +107,8 @@ void HttpResponseCallback(const HttpRequest &request, HttpResponse *response) {
         }
     }
 
+
+    // ----- 本进程指标与诊断 -----
     if (url == "/metrics") {
         if (g_process_role == "gateway" || g_process_role == "all") {
 #ifdef WEBSERVER_ENABLE_GAME_PROTOBUF
@@ -130,6 +148,8 @@ void HttpResponseCallback(const HttpRequest &request, HttpResponse *response) {
         SendPlain(response, AoiTraceJson(viewer, subject, limit));
         return;
     }
+
+    // ----- 监控页：Prometheus 代理 + DB/GM API -----
     if (url == "/api/prometheus/query") {
         HandlePrometheusInstant(request, response, head_only);
         return;
@@ -273,6 +293,8 @@ void HttpResponseCallback(const HttpRequest &request, HttpResponse *response) {
 #endif
 #endif
     // /health/live|/api/liveness|/api/health：进程 EventLoop 心跳存活
+
+    // ----- 存活/就绪/版本/集群/观察页 JSON -----
     if (url == "/health/live" || url == "/api/health" || url == "/api/liveness") {
         const bool live = ServiceHealth::Instance().IsLive(30);
         response->SetContentType("application/json");
@@ -389,6 +411,8 @@ void HttpResponseCallback(const HttpRequest &request, HttpResponse *response) {
         return;
     }
 
+
+    // ----- 静态 HTML（monitor.html 等来自 static/）-----
     if (url == "/" || url == "/index.html") {
         std::string body = ReadFile(LunaServerPaths::StaticRoot() + "/index.html");
         if (body.empty())

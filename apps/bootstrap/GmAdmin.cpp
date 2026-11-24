@@ -1,3 +1,7 @@
+/**
+ * GM 会话 Cookie、简易文件列表/下载、危险调试命令与崩溃触发器。
+ * 路由层须 LUNASERVER_ENABLE_ADMIN=1；勿对公网开放。
+ */
 #include "bootstrap/GmAdmin.h"
 
 #include "bootstrap/AdminHttpUtil.h"
@@ -23,6 +27,8 @@
 std::mutex g_gm_sess_mu;
 std::unordered_set<std::string> g_gm_sessions;
 
+
+// ----- GM 登录态（进程内 set，重启失效）-----
 std::string NewGmSessionId() {
     static const char hex[] = "0123456789abcdef";
     std::random_device rd;
@@ -57,6 +63,8 @@ std::string GmSidFromRequest(const HttpRequest &request) {
     return cookie.substr(p + key.size(), end == std::string::npos ? std::string::npos : end - p - key.size());
 }
 
+
+// ----- files/ 目录列表与安全下载（SafeJoinUnderRoot 防路径穿越）-----
 void FindAllFiles(const std::string &dir, std::vector<std::string> *out) {
     DIR *d = ::opendir(dir.c_str());
     if (!d)
@@ -116,6 +124,8 @@ bool DownloadFile(const std::string &name, HttpResponse *response, bool head_onl
     return true;
 }
 
+
+// ----- GM 控制台页与命令执行 -----
 std::string GmConsolePage(const HttpRequest &, const std::string &sid) {
     std::ostringstream os;
     os << "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>GM</title></head><body>"
@@ -152,6 +162,8 @@ Json::Value GmExecute(const std::string &cmd) {
     return root;
 }
 
+
+// ----- 仅调试：故意崩溃（需 ENABLE_ASAN_CRASH 等显式开关）-----
 static int *g_uaf_ptr = nullptr;
 
 void crash_uaf() {

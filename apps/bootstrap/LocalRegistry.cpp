@@ -1,3 +1,7 @@
+/**
+ * 本进程已 Register 的服务实例列表，供 DRAINING / Unregister / Renew 批量操作。
+ * 与 StaticServiceRegistry、RedisServiceRegistry 双写；etcd 路径由 StartRoles 单独处理。
+ */
 #include "bootstrap/LocalRegistry.h"
 
 #include "IServiceRegistry.h"
@@ -51,6 +55,7 @@ void UnregisterAll() {
     Entries().clear();
 }
 
+/** 周期任务调用：续约 TTL，避免被发现层摘除。 */
 void RenewAll() {
     std::lock_guard<std::mutex> lk(Mu());
     for (const auto &r : Entries()) {
@@ -61,6 +66,7 @@ void RenewAll() {
 }
 
 std::string ResolveInstanceId(const std::string &prefix, int port, const char *fallback) {
+    // 正式多开必须设 LUNASERVER_INSTANCE_ID（如 gw-0、gl-1），否则 Push/路由会对不上
     if (const char *env = std::getenv("LUNASERVER_INSTANCE_ID")) {
         if (env[0])
             return env;

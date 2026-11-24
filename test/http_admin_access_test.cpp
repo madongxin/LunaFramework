@@ -32,6 +32,11 @@ int main() {
     Expect(HttpQueryParam("/monitor?access_token=abc&x=1", "access_token") == "abc", "query token");
     Expect(HttpCookieValue("a=b; lunaserver_token=abc", "lunaserver_token") == "abc", "cookie token");
 
+    Expect(IsHttpMonitorPublicPath("/monitor"), "monitor path");
+    Expect(IsHttpMonitorPublicPath("/vendor/chart.umd.min.js"), "vendor chart path");
+    Expect(IsHttpMonitorPublicPath("/api/prometheus/query?q=up"), "prom query path");
+    Expect(!IsHttpMonitorPublicPath("/gm"), "gm stays private");
+
     if (fails) {
         std::printf("http_admin_access_test FAIL %d\n", fails);
         return 1;

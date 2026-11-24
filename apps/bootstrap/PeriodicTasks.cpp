@@ -1,3 +1,7 @@
+/**
+ * 按角色向主 EventLoop 注册周期任务（续约、Session 清扫、租约、健康心跳等）。
+ * 已有部分行内注释；此处补文件级说明。
+ */
 #include "bootstrap/PeriodicTasks.h"
 
 #include "bootstrap/LocalRegistry.h"
@@ -41,6 +45,10 @@
 #include <string>
 #include <vector>
 
+
+// ---------------------------------------------------------------------------
+// 入口：按 role 条件安装 RunEvery；具体间隔见各分支
+// ---------------------------------------------------------------------------
 void BootstrapInstallPeriodicTasks(EventLoop *loop, const std::string &role) {
     // 非 gateway 角色：进程内注册续租 + Redis 发现续租
     if (role == "session" || role == "gamelogic" || role == "globalservice" || role == "gamedb") {

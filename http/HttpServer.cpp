@@ -117,8 +117,12 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &requ
     }
     if (presented.empty())
         presented = query_token;
+    // 显式放开观察页时，监控路径跳过令牌（GM 等其它管理口仍走原判定）。
+    const bool monitor_open =
+        HttpMonitorOpenFromEnv() && IsHttpMonitorPublicPath(request.url());
     const HttpAdminAccessDecision access =
-        EvaluateHttpAdminAccess(FormalModeEnabled(), peer, configured, presented);
+        monitor_open ? HttpAdminAccessDecision{true, "monitor_open"}
+                     : EvaluateHttpAdminAccess(FormalModeEnabled(), peer, configured, presented);
     if (!access.allow) {
         LOG_WARN << "HttpServer refused admin request from " << peer << " reason=" << access.reason;
         conn->Send("HTTP/1.1 403 Forbidden\r\nContent-Length: 10\r\nConnection: close\r\n\r\nforbidden\n");

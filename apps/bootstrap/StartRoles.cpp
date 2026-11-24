@@ -1,3 +1,9 @@
+/**
+ * 按 role 启动 brpc 服务并注册到 Static/Redis/etcd，配置下游地址与 Push。
+ * 返回非 0 表示该角色关键服务未能 listen，RunServer 应退出。
+ *
+ * 分支：session → gamedb → gamelogic → gateway → globalservice（及部分 all 逻辑）。
+ */
 #include "bootstrap/StartRoles.h"
 
 #include "bootstrap/ConfigKv.h"
@@ -41,6 +47,10 @@
 #include <string>
 #include <vector>
 
+
+// ---------------------------------------------------------------------------
+// 入口：可选 etcd，再按 role 分支
+// ---------------------------------------------------------------------------
 int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
 #if !defined(WEBSERVER_ENABLE_BRPC)
     (void)loop;
@@ -60,6 +70,8 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
             LOG_INFO << "etcd_endpoints empty; using static *_addrs + brpc list:// naming";
     }
 
+
+    // ----- session：Auth+Session brpc，注册 session，配置 gamedb / push -----
     if (role == "session") {
         if (logic_port_override > 0) {
             char buf[64];
@@ -106,6 +118,8 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
                 BrpcGameDbRepository::Instance().Init(SplitAddrList(gamedb_addr));
         }
         LOG_INFO << "role=session listen=" << listen << " instance_id=" << sid;
+
+    // ----- gamedb：GameDB brpc + MySQL 资产面 -----
     } else if (role == "gamedb") {
         if (logic_port_override > 0) {
             char buf[64];
@@ -151,6 +165,8 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
         ApplyGatewayPushAddrsFromConfig();
         LOG_INFO << "role=gamedb listen=" << listen << " instance_id=" << gid
                  << " advertise=" << adv;
+
+    // ----- gamelogic：玩法 brpc、地图租约、下游 gamedb/session/push -----
     } else if (role == "gamelogic") {
         std::string listen = "127.0.0.1:8201";
         if (logic_port_override > 0) {
@@ -221,6 +237,8 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
                 EtcdDiscovery::Instance().Register("gamelogic", inst.instance_id, adv, 30);
             LOG_INFO << "gamelogic registered id=" << inst.instance_id << " advertise=" << adv;
         }
+
+    // ----- gateway：Push 服务端 + Auth/Session/Logic 客户端编排 -----
     } else if (role == "gateway") {
         std::vector<std::string> addrs;
         std::vector<std::string> ids;
@@ -444,6 +462,8 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
                 }
             });
         }
+
+    // ----- globalservice：全局能力（邮件等）brpc -----
     } else if (role == "globalservice") {
         {
             std::string gamedb_addr = GatewayConfigPath::ReadValue("gamedb_addrs");

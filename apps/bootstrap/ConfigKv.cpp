@@ -1,3 +1,7 @@
+/**
+ * 扁平 cnf 读取与 Push 地址注入。
+ * gateway_push_addrs 形如：gw-0=127.0.0.1:8181,gw-1=127.0.0.1:8183
+ */
 #include "bootstrap/ConfigKv.h"
 
 #include "LunaServerPaths.h"
@@ -63,6 +67,7 @@ std::vector<std::string> SplitAddrList(const std::string &csv) {
 }
 
 void ApplyGatewayPushAddrsFromConfig() {
+    // 优先 GatewayConfigPath（已解析的运行配置），否则依次试各角色 cnf
     std::string push_map = GatewayConfigPath::ReadValue("gateway_push_addrs");
     auto try_cnf = [&](const char *rel) {
         if (!push_map.empty())
@@ -81,8 +86,8 @@ void ApplyGatewayPushAddrsFromConfig() {
         const auto eq = e.find('=');
         if (eq == std::string::npos)
             continue;
-        const std::string id = e.substr(0, eq);
-        const std::string addr = e.substr(eq + 1);
+        const std::string id = e.substr(0, eq);    // gateway_instance_id
+        const std::string addr = e.substr(eq + 1); // host:push_port
         GatewayPushClient::Instance().SetGatewayPushAddr(id, addr);
         IServiceRegistry::ServiceInstance inst;
         inst.service = "gateway_push";

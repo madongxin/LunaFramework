@@ -232,8 +232,10 @@ if [[ -n "${SESSION2}" ]]; then
   LUNASERVER_INSTANCE_ID=sess-1 start_proc "$SESSION_BIN" session "$RUN_DIR/logs/session1.log" \
     sess-1 "127.0.0.1:${SESSION2}" "$HTTP_S2" - "$HTTP_S2" "$SESSION2"
 fi
-# 监控页需从公网 EIP:8094 打开；仅 gamedb-0 的 HTTP 管理口离开 loopback
-LUNASERVER_HTTP_BIND=0.0.0.0 LUNASERVER_ALLOW_PUBLIC_BIND=1 LUNASERVER_INSTANCE_ID=gamedb-0 start_proc "$GAMEDB_BIN" gamedb "$RUN_DIR/logs/gamedb0.log" \
+# 监控页需从公网 EIP:8094 打开；仅 gamedb-0 的 HTTP 管理口离开 loopback。
+# MONITOR_OPEN=1：/monitor 及只读 API 公网免令牌；/gm 等仍要 token。
+LUNASERVER_HTTP_BIND=0.0.0.0 LUNASERVER_ALLOW_PUBLIC_BIND=1 LUNASERVER_HTTP_MONITOR_OPEN=1 \
+  LUNASERVER_INSTANCE_ID=gamedb-0 start_proc "$GAMEDB_BIN" gamedb "$RUN_DIR/logs/gamedb0.log" \
   gamedb-0 "127.0.0.1:${GAMEDB0}" "$HTTP_D0" - "$HTTP_D0" "$GAMEDB0"
 LUNASERVER_INSTANCE_ID=gamedb-1 start_proc "$GAMEDB_BIN" gamedb "$RUN_DIR/logs/gamedb1.log" \
   gamedb-1 "127.0.0.1:${GAMEDB1}" "$HTTP_D1" - "$HTTP_D1" "$GAMEDB1"
@@ -300,7 +302,7 @@ echo "  Port0 : ${GAME_G0}   ← 推荐默认"
 echo "  Port1 : ${GAME_G1}"
 echo "  安全组只需 TCP ${GAME_G0},${GAME_G1}"
 echo "  登录: Gateway→Auth→Session→BindPlayer"
-echo "  观察页: http://127.0.0.1:${HTTP_D0}/monitor  （Prometheus job=lunaserver，按实例）"
+echo "  观察页: http://${ADVERTISE_HOST}:${HTTP_D0}/monitor  （公网免令牌；本机也可用 127.0.0.1）"
 echo "  采集  : /etc/prometheus/file_sd/lunaserver.json  ← scripts/sync_prometheus_sd.sh"
 echo "=============================================="
 echo
