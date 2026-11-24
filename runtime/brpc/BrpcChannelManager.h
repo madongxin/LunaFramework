@@ -2,8 +2,10 @@
 
 
 /**
- * BrpcChannelManager.h — brpc Channel 池/管理。
- * 路径: runtime/brpc/BrpcChannelManager.h
+ * @file BrpcChannelManager.h
+ * @brief brpc Channel 池：按地址复用，避免每次 RPC 新建连接
+ *
+ * 支持 SSL options（BrpcSslUtil）；Formal 寻址仍受 Registry/静态 addrs 约束。
  */
 #include "RpcChannelSnapshot.h"
 

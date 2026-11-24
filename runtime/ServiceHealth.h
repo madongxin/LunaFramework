@@ -1,10 +1,16 @@
 #pragma once
 
-
 /**
- * ServiceHealth.h — /live /ready draining 状态机。
- * 路径: runtime/ServiceHealth.h
+ * @file ServiceHealth.h
+ * @brief 进程级 /live /ready /version 与 draining 状态机
+ *
+ * SIGTERM 应置 draining/not-ready，停止接新登录与进图（AcceptsNewWork）。
+ * MarkAlive 由 EventLoop 心跳刷新；IsLive 超时未心跳则视为不存活。
+ * ReadinessJson 组合 ready/draining 与外部 deps_ok。
+ *
+ * 协作：HealthDeps / HealthProbe；LB 探针打 HTTP 管理口（受 HttpAdminAccess 约束）。
  */
+
 #include <atomic>
 #include <cstdint>
 #include <string>
@@ -14,6 +20,7 @@ class ServiceHealth {
 public:
     static ServiceHealth &Instance();
 
+    /** 设置服务名与 server_id（写入 JSON）。 */
     void Configure(const std::string &service, const std::string &server_id);
     void SetReady(bool v);
     void SetDraining(bool v);
@@ -21,18 +28,23 @@ public:
     bool draining() const { return draining_.load(); }
     bool alive() const { return alive_.load(); }
 
-    /** EventLoop 心跳：刷新 alive 与 last_alive_unix */
+    /** EventLoop 心跳：刷新 alive 与 last_alive_unix。 */
     void MarkAlive();
-    /** 超过 max_stale_sec 未 MarkAlive 则视为不存活（默认 30s） */
+    /** 超过 max_stale_sec 未 MarkAlive 则视为不存活（默认 30s）。 */
     bool IsLive(int max_stale_sec = 30) const;
 
-    /** 是否接受新登录/进图（非 draining） */
+    /** 是否接受新登录/进图（非 draining 且 ready）。 */
     bool AcceptsNewWork() const { return !draining_.load() && ready_.load(); }
 
     int64_t last_alive_unix() const { return last_alive_unix_.load(); }
 
     std::string VersionJson() const;
     std::string LivenessJson() const;
+    /**
+     * 组装 readiness JSON。
+     * @param deps_ok 依赖检查结果；false 时整体 not ready
+     * @param deps_detail 写入 JSON 的依赖说明
+     */
     std::string ReadinessJson(bool deps_ok, const std::string &deps_detail) const;
 
     const std::string &service() const { return service_; }

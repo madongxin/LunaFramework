@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * SecureRandom.h — 密码学安全随机（token/fence）。
- * 路径: runtime/SecureRandom.h
+ * @file SecureRandom.h
+ * @brief 密码学安全随机字节（token/盐/fence 材料）
+ *
+ * 禁止用 rand()；失败时调用方必须中止发证。
  */
+
 #include <cstddef>
 #include <cstdint>
 #include <string>

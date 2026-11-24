@@ -1,7 +1,8 @@
 /**
- * ResourceWatchdog.cpp — ResourceWatchdog：挂 EventLoop RunEvery。
- * 路径: base/ResourceWatchdog.cpp
+ * @file ResourceWatchdog.cpp
+ * @brief 周期采样实现与趋势启发式分析
  */
+
 #include "ResourceWatchdog.h"
 
 #include <algorithm>
@@ -10,12 +11,14 @@
 #include "EventLoop.h"
 #include "ProcSelfStats.h"
 
+/** RunEvery：到期调用 PushSample */
 void ResourceWatchdog::StartPeriodic(EventLoop *loop, double interval_sec) {
     if (!loop || interval_sec <= 0.0)
         return;
     loop->RunEvery(interval_sec, [this]() { PushSample(); });
 }
 
+/** FillProc + 追加到 samples_（超 kMaxSamples 丢最旧） */
 void ResourceWatchdog::PushSample() {
     ProcResourceSnapshot snap{};
     if (!FillProcResourceSnapshot(&snap, 0))
@@ -34,6 +37,7 @@ void ResourceWatchdog::PushSample() {
         samples_.erase(samples_.begin(), samples_.begin() + (samples_.size() - kMaxSamples));
 }
 
+/** 进程单例 */
 ResourceWatchdog &ResourceWatchdog::Instance() {
     static ResourceWatchdog w;
     return w;
@@ -98,6 +102,7 @@ Json::Value ResourceWatchdog::HistoryJson(int max_points) const {
     return arr;
 }
 
+/** 对比近期样本斜率/跳变，输出告警 JSON */
 Json::Value ResourceWatchdog::AnalyzeTrends() const {
     std::lock_guard<std::mutex> lk(mutex_);
     Json::Value root;

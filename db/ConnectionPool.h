@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * ConnectionPool.h — MySQL 连接池（单例）：预建、借还、空闲回收；Formal 下可 ForbidInit。
- * 路径: db/ConnectionPool.h
- */
 /**
  * @file ConnectionPool.h
  * @brief MySQL 连接池（单例）：预建、按需扩容、空闲回收、RAII 借还

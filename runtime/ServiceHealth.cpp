@@ -1,7 +1,8 @@
 /**
- * ServiceHealth.cpp — 运行时：业务服务逻辑。健康检查。
- * 路径: runtime/ServiceHealth.cpp
+ * @file ServiceHealth.cpp
+ * @brief ServiceHealth 实现：live/ready/draining 与 JSON 探针
  */
+
 #include "ServiceHealth.h"
 
 #include <chrono>

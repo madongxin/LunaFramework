@@ -1,6 +1,6 @@
 /**
- * GlobalServiceForwardServiceImpl.cpp — 运行时：业务服务逻辑。转发。
- * 路径: runtime/brpc/GlobalServiceForwardServiceImpl.cpp
+ * @file GlobalServiceForwardServiceImpl.cpp
+ * @brief GlobalServiceForwardServiceImpl 实现
  */
 #include "GlobalServiceForwardServiceImpl.h"
 

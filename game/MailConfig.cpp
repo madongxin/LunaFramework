@@ -1,7 +1,8 @@
 /**
- * MailConfig.cpp — 玩法/网关：配置路径或读取。邮件相关。
- * 路径: game/MailConfig.cpp
+ * @file MailConfig.cpp
+ * @brief mail.cnf 数值配置加载
  */
+
 #include "MailConfig.h"
 
 #include "Logging.h"

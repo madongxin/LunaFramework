@@ -1,7 +1,8 @@
 /**
- * PushReplayCache.cpp — 运行时：推送相关。重放缓存。
- * 路径: runtime/PushReplayCache.cpp
+ * @file PushReplayCache.cpp
+ * @brief PushReplayCache 实现：推送重放窗口缓存
  */
+
 #include "PushReplayCache.h"
 
 PushReplayCache &PushReplayCache::Instance() {

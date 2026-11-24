@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * ReplyStage.h — 回包阶段耗时埋点（组包/排队/写出）。
- * 路径: runtime/ReplyStage.h
+ * @file ReplyStage.h
+ * @brief 回包阶段耗时埋点：组包 / 排队 / 写出
+ *
+ * 供 OpsMetrics Prometheus 附加导出；热路径轻量累加。
  */
+
 #include <cstdint>
 #include <string>
 

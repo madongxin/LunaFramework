@@ -1,11 +1,15 @@
 #pragma once
 
-
 /**
- * GameLogic.h — 玩法业务单例：处理已鉴权的 GameRequest（移动/AOI/邮件领取等）。
- * Formal 下不接受密码；好友命令可关；资产经 GameDB。
- * 路径: game/GameLogic.h
+ * @file GameLogic.h
+ * @brief 玩法业务单例：处理已鉴权的 GameRequest（移动/AOI/邮件领取等）
+ *
+ * 由 GameService::HandleFrame / Gateway 转发在反序列化后调用。
+ * Formal 下不接受密码/凭证；好友命令可关（正式集群好友在 World）；
+ * 资产权威在 GameDB，内存背包仅缓存；AOI 推送必须在 MapRuntime 锁外。
+ * BindAuthenticatedPlayer 只加载已认证身份，不得经此入口做 Login 验密。
  */
+
 #include "game.pb.h"
 #include "IGameDbRepository.h"
 #include "MapRuntime.h"
@@ -17,11 +21,17 @@
 #include <unordered_map>
 #include <vector>
 
-/** 游戏业务单例：由 GameService::HandleFrame 在反序列化 GameRequest 后调用 */
+/**
+ * 本进程玩法状态与命令分发中心（单例）。
+ * 不拥有 TCP；不创建 Session；跨 Logic 迁移只导出/导入运行时态。
+ */
 class GameLogic {
 public:
     static GameLogic &Instance();
-    /** 按 oneof body 分发到各 HandleXxx；填充 GameResponse（含 seq） */
+    /**
+     * 按 oneof body 分发到各 HandleXxx，填充 GameResponse（含 seq）。
+     * 需 session_token 的命令在入口 RequireSessionToken；危险命令由 CommandPolicy 先拦。
+     */
     bool Handle(const game::GameRequest &req, game::GameResponse *rsp);
     /**
      * 正式集群的 GameLogic 不处理好友命令（好友在 World）。
@@ -41,17 +51,22 @@ public:
      */
     bool ApplyItemRewardsWithVersion(uint64_t player_id, const std::vector<GameDbGrantedItem> &grants,
                                      uint64_t committed_asset_version);
-    /** 当前内存资产版本（测试/调试） */
+    /** 当前内存资产版本（与 GameDB asset_version 对齐；测试/调试可读）。 */
     uint64_t GetAssetVersion(uint64_t player_id);
+    /** 内存与权威可能不一致（重载失败等）；为 true 时应先 EnsureAssetsSynced。 */
     bool IsAssetDirty(uint64_t player_id);
     /** dirty 时尝试权威重载；成功后允许资产写 */
     bool EnsureAssetsSynced(uint64_t player_id);
     /** 从 GameDB 重载背包。失败时把角色标脏。 */
     bool ReloadAuthoritativeAssets(uint64_t player_id);
+    /** 单测：阻断从 GameDB 重载，模拟权威不可达。 */
     void SetAssetReloadBlockedForTest(bool v);
+    /** 单测：阻断 ApplyItemReward 写内存。 */
     void SetAssetApplyBlockedForTest(bool v);
+    /** 单测：重载时注入指定背包与版本，跳过真实 GameDB。 */
     void SetAssetReloadOverrideForTest(const std::map<uint32_t, uint32_t> &bag, uint64_t ver);
     void ClearAssetReloadOverrideForTest();
+    /** 单测入口：绕过 Handle 分发直接测消耗。 */
     bool HandleConsumeItemForTest(const game::ConsumeItemReq &req, game::GameResponse *rsp) {
         return HandleConsumeItem(req, rsp);
     }
@@ -67,32 +82,48 @@ public:
     /** 事务失败时回退内存（尽力而为） */
     bool RollbackItemReward(uint64_t player_id, uint32_t item_id, uint32_t count);
 
-    /** Gateway BindPlayer：已认证玩家加载内存态（不接收凭证）；失败 fail-closed */
+    /**
+     * Gateway BindPlayer：已认证玩家加载内存态（背包/画像/进图前置）。
+     * 不接收密码或 access_token；失败 fail-closed，不得半加载放行。
+     */
     bool BindAuthenticatedPlayer(uint64_t player_id, std::string *err = nullptr,
                                  game::PlayerAttributes *profile_out = nullptr);
+    /** 读内存画像；未加载返回 false。 */
     bool GetPlayerAttributes(uint64_t player_id, game::PlayerAttributes *out);
+    /** 将内存背包异步/同步刷到持久化队列；reason 仅用于日志。 */
     bool FlushBag(uint64_t player_id, const std::string &reason);
     /** 锁外推送 AOI（brpc/Redis 不得在 MapRuntime 锁内） */
     void EmitAoi(const AoiPushBatch &batch);
     /** 宽限到期后删掉断线实体，并再通知周围还在线的人。 */
     void SweepDisconnected();
+    /** 推进客户端可见运动插值（定时器调用；与权威 Move 解耦）。 */
     void AdvancePresentedMotion();
     /** 进程退出前排空并收回 AOI 发布线程。没启动过则什么都不做。 */
     void StopAoiPublisher();
     /** 转移冻结期间暂存该玩家的 AOI，Commit/Import 后按原顺序重放。 */
     void SetAoiHold(uint64_t player_id, bool hold);
 
-    /** 跨 Logic 迁移：导出/导入运行时背包与技能 CD（不含凭证） */
+    /**
+     * 跨 Logic 迁移导出：运行时背包与技能 CD（不含凭证/Session）。
+     * 配合 SessionStore Begin/CommitPlayerTransfer 与对端 ImportRuntimeState。
+     */
     bool ExportRuntimeState(uint64_t player_id, std::map<uint32_t, uint32_t> *bag,
                             std::map<uint32_t, int64_t> *skill_cds, uint64_t *asset_version);
+    /** 迁移导入：写入本进程内存态并抬升 asset_version；随后可重放 AOI hold。 */
     bool ImportRuntimeState(uint64_t player_id, const std::map<uint32_t, uint32_t> &bag,
                             const std::map<uint32_t, int64_t> &skill_cds, uint64_t asset_version);
-    /** 全量快照（Push 缺口 / WorldSnapshot）：填充 FullStateSnapshotRsp */
+    /** 全量快照（Push 缺口 / WorldSnapshot）：填充 FullStateSnapshotRsp。 */
     bool BuildFullStateSnapshot(uint64_t player_id, game::FullStateSnapshotRsp *out);
+    /**
+     * 同上，并带 baseline_server_seq（可靠 Push 水位），供重连 NEED_SNAPSHOT 对齐。
+     */
     bool BuildFullStateSnapshot(uint64_t player_id, uint64_t baseline_server_seq,
                                 game::FullStateSnapshotRsp *out);
+    /** 将 LastSafe 落盘/刷出（下线、切图、停服）；reason 写日志。 */
     void FlushLastSafe(uint64_t player_id, const char *reason);
+    /** 进程退出或停服：刷出全部玩家 LastSafe。 */
     void FlushAllLastSafe(const char *reason);
+    /** 单测：注入生命态（hp/life_state）以测复活与 AOI。 */
     void SetLifeStateForTest(uint64_t player_id, int32_t hp, const std::string &life_state);
     /** 顶号、登出、解绑时丢掉该玩家的进程内 token 缓存。 */
     void InvalidateSessionTokenCache(uint64_t player_id);

@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * GameDbOutbox.h — GameDB 本地 outbox 表。
- * 路径: db/GameDbOutbox.h
- */
 /**
  * @file GameDbOutbox.h
  * @brief 本地 outbox 表：与资产事务同提交，后台发布（阶段 4 先落库+标记，不上 NATS）
@@ -31,9 +26,11 @@ class GameDbOutbox {
 public:
     static GameDbOutbox &Instance();
 
-    bool EnsureTable();
+    /** 建 outbox 表 */
+bool EnsureTable();
     bool Available() const { return available_; }
 
+/** 与业务事务同连接插入事件 */
     bool InsertOnConnection(Connection *conn, const std::string &event_type,
                             const std::string &aggregate_type, const std::string &aggregate_id,
                             const std::string &idempotency_key, const std::string &payload,
@@ -48,7 +45,8 @@ public:
      */
     bool ClaimUnpublished(int limit, std::vector<GameDbOutboxRow> *out);
 
-    bool MarkPublished(uint64_t id, int64_t published_at);
+    /** 标记已发布 */
+bool MarkPublished(uint64_t id, int64_t published_at);
     bool ReleaseClaim(uint64_t id);
 
     /** 测试：按幂等键计数 */

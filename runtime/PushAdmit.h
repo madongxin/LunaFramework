@@ -1,10 +1,13 @@
 #pragma once
 
-
 /**
- * PushAdmit.h — 推送准入（可靠/不可靠）。
- * 路径: runtime/PushAdmit.h
+ * @file PushAdmit.h
+ * @brief Gateway PushBatch 单条准入：连接/玩家/网关/fence/代次校验后再分配可靠序号
+ *
+ * 顺序固定；序号一旦分配就留在回放里，发送失败记 ReplayPending，不回滚。
+ * AdmitPushItem 经 PushAdmitEnv 注入 assign_seq/encode/send，便于单测。
  */
+
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -68,6 +71,7 @@ struct PushAdmitOut {
     int send_code = 0;
 };
 
+/** 对单条 Push 做完整准入；结果含 reason、是否入队、是否待回放与 server_seq。 */
 PushAdmitOut AdmitPushItem(const PushMsgView &msg, const PushBindView &bind, const PushAdmitEnv &env);
 
 inline const char *PushAdmitReasonName(PushAdmitReason reason) {

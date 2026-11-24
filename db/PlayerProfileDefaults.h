@@ -1,10 +1,10 @@
 #pragma once
 
-
 /**
- * PlayerProfileDefaults.h — 新建角色默认档案。
- * 路径: db/PlayerProfileDefaults.h
+ * @file PlayerProfileDefaults.h
+ * @brief 新建角色默认属性（HP/MP/攻击等）
  */
+
 #include <cstdint>
 #include <string>
 

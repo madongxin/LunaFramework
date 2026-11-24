@@ -2,8 +2,10 @@
 
 
 /**
- * GatewayPushClient.h — 向指定 gateway_instance_id 发 Push 的客户端。
- * 路径: runtime/brpc/GatewayPushClient.h
+ * @file GatewayPushClient.h
+ * @brief 指向单 Gateway 的 PushBatch 客户端
+ *
+ * 按 instance_id 选 Channel；失败记 OpsMetrics，可靠帧进回放。
  */
 #include "RpcChannelSnapshot.h"
 #include "gateway_push.pb.h"

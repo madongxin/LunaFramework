@@ -1,6 +1,6 @@
 /**
- * BrpcChannelManager.cpp — 运行时：brpc 相关。Channel/连接通道。
- * 路径: runtime/brpc/BrpcChannelManager.cpp
+ * @file BrpcChannelManager.cpp
+ * @brief BrpcChannelManager 实现
  */
 #include "BrpcChannelManager.h"
 

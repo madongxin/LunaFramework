@@ -1,10 +1,10 @@
 #pragma once
 
-
 /**
- * ForwardMetaContext.h — brpc Forward 元数据（session/fence/route）上下文。
- * 路径: runtime/ForwardMetaContext.h
+ * @file ForwardMetaContext.h
+ * @brief 转发路径元数据上下文（gateway/session/fence 等）在调用栈间传递
  */
+
 #include <cstdint>
 #include <string>
 

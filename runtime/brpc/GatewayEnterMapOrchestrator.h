@@ -2,8 +2,10 @@
 
 
 /**
- * GatewayEnterMapOrchestrator.h — 进图编排。
- * 路径: runtime/brpc/GatewayEnterMapOrchestrator.h
+ * @file GatewayEnterMapOrchestrator.h
+ * @brief Gateway 进图编排：Session Placement → GameLogic EnterMap
+ *
+ * 携带 SessionHandle 地图路由字段；满员/排空时映射 PublicError。
  */
 #include "SessionHandle.h"
 

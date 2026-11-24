@@ -1,7 +1,8 @@
 /**
- * BotLoginWave.cpp — 运行时：压测机器人。登录。
- * 路径: runtime/BotLoginWave.cpp
+ * @file BotLoginWave.cpp
+ * @brief BotLoginWave 实现：压测登录波次调度与并发控制
  */
+
 #include "BotLoginWave.h"
 
 #include "Logging.h"

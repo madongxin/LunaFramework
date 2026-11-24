@@ -1,8 +1,10 @@
 #pragma once
 
 /**
- * GameDbBrpcServer.h — GameDB brpc Server。
- * 路径: runtime/brpc/GameDbBrpcServer.h
+ * @file GameDbBrpcServer.h
+ * @brief GameDB brpc Server 启动封装
+ *
+ * Formal 下可按需 allow_public_bind；注册 GameDbServiceImpl。
  */
 #include <memory>
 #include <string>

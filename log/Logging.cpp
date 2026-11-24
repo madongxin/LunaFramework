@@ -1,6 +1,9 @@
 /**
- * Logging.cpp — Logger 实现与默认 stderr 输出。
- * 路径: log/Logging.cpp
+ * @file Logging.cpp
+ * @brief Logger 构造时写时间/级别/文件:行；析构时调用 OutputFunc
+ *
+ * 默认 OutputFunc 写 stderr；业务可换成 AsyncLogging::Append。
+ * t_time / t_lastsecond：按线程缓存秒级时间串，减少同一秒内重复 strftime。
  */
 #include "Logging.h"
 #include "CurrentThread.h"
@@ -39,6 +42,7 @@ inline LogStream& operator<<(LogStream& s, const Logger::SourceFile& v){
 }
 
 
+/** 剥路径只留 basename，供日志头 "file:line" */
 Logger::SourceFile::SourceFile(const char *data) : data_(data), size_(static_cast<int>(strlen(data_)))
 {
     const char *forward_slash = strrchr(data, '/');
@@ -49,6 +53,7 @@ Logger::SourceFile::SourceFile(const char *data) : data_(data), size_(static_cas
     }
 }
 
+/** 拼时间戳、级别、线程 id、源文件位置到 stream_ */
 Logger::Impl::Impl(Logger::LogLevel level, const Logger::SourceFile &source, int line)
     : level_(level),
       sourcefile_(source),
@@ -61,6 +66,7 @@ Logger::Impl::Impl(Logger::LogLevel level, const Logger::SourceFile &source, int
     stream_ << Template(loglevel(), 6);
 }
 
+/** 同一秒内复用 t_time，只更新毫秒 */
 void Logger::Impl::FormattedTime(){
     //格式化输出时间
     TimeStamp now = TimeStamp::Now();
@@ -171,10 +177,12 @@ Logger::OutputFunc g_output = defaultOutput;
 Logger::FlushFunc g_flush = defaultFlush;
 Logger::LogLevel g_logLevel = Logger::LogLevel::INFO;
 
+/** LOG_* 宏入口：构造 Impl，析构时输出整行 */
 Logger::Logger(const char *file_, int line, Logger::LogLevel level)
     : impl_(level, file_, line){};
 
 
+/** 追加换行并调用 g_output；FATAL 再 g_flush 后 abort */
 Logger::~Logger()
 {
     impl_.Finish(); // 补足源代码位置和行数
@@ -225,10 +233,12 @@ Logger::~Logger()
 
 LogStream &Logger::stream() { return impl_.stream(); }
 
+/** 替换全局输出（通常指向 AsyncLogging::Append） */
 void Logger::setOutput(Logger::OutputFunc func){
     g_output = func;
 }
 
+/** 替换全局 flush（通常指向 AsyncLogging / LogFile Flush） */
 void Logger::setFlush(Logger::FlushFunc func){
     g_flush = func;
 }

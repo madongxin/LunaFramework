@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * BotLoginWave.h — 压测登录波次工具。
- * 路径: runtime/BotLoginWave.h
+ * @file BotLoginWave.h
+ * @brief 压测登录波次工具：按波次并发发起 Bot 登录
+ *
+ * 仅联调/压测；Formal 生产路径勿启用。
  */
+
 #include <cstdint>
 #include <string>
 

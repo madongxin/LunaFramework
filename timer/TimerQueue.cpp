@@ -1,6 +1,6 @@
 /**
- * TimerQueue.cpp — TimerQueue 插入、触发与重复定时器重置。
- * 路径: timer/TimerQueue.cpp
+ * @file TimerQueue.cpp
+ * @brief timerfd 触发、到期 Timer 执行与周期任务重入队
  */
 
 #include "Timer.h"
@@ -23,6 +23,7 @@ TimerQueue::TimerQueue(EventLoop *loop)
     channel_->EnableRead();
 }
 
+/** 创建 CLOCK_MONOTONIC 非阻塞 timerfd */
 void TimerQueue::CreateTimerfd(){
     timerfd_ = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
     if(timerfd_  < 0){
@@ -38,6 +39,7 @@ TimerQueue::~TimerQueue(){
     }
 }
 
+/** drain timerfd，避免水平触发空转 */
 void TimerQueue::ReadTimerFd(){
     uint64_t read_byte;
     ssize_t readn = ::read(timerfd_, &read_byte, sizeof(read_byte));
@@ -46,6 +48,7 @@ void TimerQueue::ReadTimerFd(){
     }
 }
 
+/** 取出所有 expiration<=now 的 Timer，run，再 ResetTimers */
 void TimerQueue::HandleRead(){
     ReadTimerFd();
     active_timers_.clear();
@@ -63,6 +66,7 @@ void TimerQueue::HandleRead(){
 
 
 
+/** 必须在所属 EventLoop 线程调用；最早到期则重置 timerfd */
 void TimerQueue::AddTimer(TimeStamp timestamp, std::function<void()> const &cb, double interval){
     // timers_ 是 std::set，只能由所属 EventLoop 线程改。跨线程插入会在 erase 时 SIGSEGV。
     assert(loop_->IsInLoopThread());
@@ -74,6 +78,7 @@ void TimerQueue::AddTimer(TimeStamp timestamp, std::function<void()> const &cb, 
     }
 }
 
+/** @return 是否成为新的队首（需立刻 ResetTimerFd） */
 bool TimerQueue::Insert(Timer * timer){
     bool reset_instantly = false;
     if(timers_.empty() || timer->expiration() < timers_.begin()->first){
@@ -84,6 +89,7 @@ bool TimerQueue::Insert(Timer * timer){
 }
 
 
+/** 周期任务重新 Insert；一次性 delete */
 void TimerQueue::ResetTimers() {
     for (auto& entry: active_timers_) {
         if ((entry.second)->repeat()) {
@@ -101,6 +107,7 @@ void TimerQueue::ResetTimers() {
 }
 
 
+/** 按 timer->expiration 设置 itimerspec */
 void TimerQueue::ResetTimerFd(Timer *timer){
     struct itimerspec new_;
     struct itimerspec old_;

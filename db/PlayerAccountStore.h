@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * PlayerAccountStore.h — 账号表读写（注册/登录校验数据面）。
- * 路径: db/PlayerAccountStore.h
- */
 /**
  * @file PlayerAccountStore.h
  * @brief 玩家账号注册表 player_account（仅 GameDB 进程应写入；Auth 经 GameDB RPC）
@@ -27,6 +22,7 @@ struct AccountAuthRow {
 
 class PlayerAccountStore {
 public:
+    /** 单例 */
     static PlayerAccountStore &Instance();
 
     bool EnsureTable();
@@ -36,6 +32,7 @@ public:
     bool Register(const std::string &device_id, const std::string &display_name, uint64_t *player_id,
                   std::string *err);
 
+    /** 带密码注册 */
     bool RegisterWithPassword(const std::string &device_id, const std::string &display_name,
                               const std::string &password_hash, const std::string &password_salt,
                               int password_iters, uint64_t *player_id, std::string *err);
@@ -44,14 +41,17 @@ public:
      * 带幂等键注册：相同 idempotency_key 重试返回首次 player_id，不重复建号。
      * idempotency_key 空则退化为非幂等 RegisterWithPassword。
      */
+    /** 幂等注册：同 idempotency_key 重放返回原 player_id */
     bool RegisterWithPasswordIdempotent(const std::string &device_id, const std::string &display_name,
                                         const std::string &password_hash,
                                         const std::string &password_salt, int password_iters,
                                         const std::string &idempotency_key, uint64_t *player_id,
                                         std::string *err, bool *replayed = nullptr);
 
+    /** 账号是否存在 */
     bool Exists(uint64_t player_id);
     bool LoadAuth(uint64_t player_id, AccountAuthRow *out);
+    /** 按幂等键查找已注册 player_id */
     bool FindByIdempotencyKey(const std::string &idempotency_key, uint64_t *player_id);
 
 private:

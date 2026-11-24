@@ -1,10 +1,10 @@
 #pragma once
 
-
 /**
- * SocialText.h — 运行时：模块实现，见同名头文件与调用方。
- * 路径: runtime/SocialText.h
+ * @file SocialText.h
+ * @brief 社交/聊天文本校验与截断辅助
  */
+
 #include "Utf8Text.h"
 
 #include <string>

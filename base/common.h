@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * common.h — 公共宏与禁止拷贝工具（DISALLOW_COPY_AND_MOVE 等），被 tcp/log 等广泛包含。
- * 路径: base/common.h
+ * @file common.h
+ * @brief 全库公共前置声明与 DISALLOW_COPY_AND_MOVE
+ *
+ * 被 tcp/log/timer 等广泛包含；具体类型定义在各自头文件。
  */
+
 class Epoller;
 class Channel;
 class Buffer;

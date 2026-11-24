@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * MoveSendConfig.h — 运行时：配置路径或读取。移动相关。
- * 路径: runtime/MoveSendConfig.h
+ * @file MoveSendConfig.h
+ * @brief 移动/AOI 出口发送相关环境变量与默认常量读取
+ *
+ * 供 AoiMoveCoalesceLedger、AoiOutboundOrder、慢客户端策略共用，避免魔法数散落。
  */
+
 #include "ControlResponseOutbox.h"
 
 #include <cstdlib>

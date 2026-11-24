@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * RocksDbClient.h — RocksDB 打开/读写薄封装。
- * 路径: rocksdb/RocksDbClient.h
- */
 /**
  * @file RocksDbClient.h
  * @brief RocksDB 同步客户端封装（本地 KV，与 MySQL/Redis 并存）
@@ -48,17 +43,22 @@ public:
     RocksDbClient(const RocksDbClient &) = delete;
     RocksDbClient &operator=(const RocksDbClient &) = delete;
 
-    bool Open(const std::string &db_path, bool create_if_missing = true);
+    /** 打开 db_path */
+bool Open(const std::string &db_path, bool create_if_missing = true);
+/** 关闭 DB */
     void Close();
 
     bool Available() const { return db_ != nullptr; }
     const std::string &db_path() const { return db_path_; }
 
-    bool Put(const std::string &key, const std::string &value);
+    /** 写原始 KV */
+bool Put(const std::string &key, const std::string &value);
     bool Get(const std::string &key, std::string *value);
-    bool Delete(const std::string &key);
+    /** 删 key */
+bool Delete(const std::string &key);
 
     bool PutProto(const std::string &key, const google::protobuf::Message &msg);
+/** 读原始 KV */
     bool GetProto(const std::string &key, google::protobuf::Message *msg);
 
 private:

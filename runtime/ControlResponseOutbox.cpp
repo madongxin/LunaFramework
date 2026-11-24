@@ -1,7 +1,8 @@
 /**
- * ControlResponseOutbox.cpp — 运行时：发件箱/可靠发送。控制面出站。
- * 路径: runtime/ControlResponseOutbox.cpp
+ * @file ControlResponseOutbox.cpp
+ * @brief ControlResponseOutbox 实现：控制类响应出站排队与刷写
  */
+
 #include "ControlResponseOutbox.h"
 
 #include "Logging.h"

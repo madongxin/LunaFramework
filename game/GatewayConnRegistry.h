@@ -1,21 +1,21 @@
 #pragma once
 
-
 /**
- * GatewayConnRegistry.h — conn_id ↔ player/session/fence 本机绑定表。
- * 路径: game/GatewayConnRegistry.h
+ * @file GatewayConnRegistry.h
+ * @brief Gateway 本机连接表：conn ↔ player/session/fence 与发送回调
+ *
+ * Push 按 session_id 查找；业务转发按粘性 gamelogic_instance_id。
+ * by_conn_ / session_to_conn_ / player_to_conn_ 的增删改都在 mu_ 内完成。
+ * 跨线程只拷贝 Bind 回调；碰 TCP 的 send/close 经 queue_on_loop 回到该连接 EventLoop。
+ * 顶号用 NotifyAndCloseIfMatch；旧连接 MarkDisconnected 前用 HasNewerBinding 防拆新会话。
  */
+
 #include <cstdint>
 #include <functional>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 
-/**
- * Gateway 连接表：Push 按 session_id 查找；转发按粘性 gamelogic_instance_id。
- * by_conn_ / session_to_conn_ / player_to_conn_ 的增删改都在 mu_ 内完成。
- * 跨线程只拷贝回调；碰 TCP 的 send/close 经 queue_on_loop 回到该连接的 EventLoop。
- */
 class GatewayConnRegistry {
 public:
     struct Bind {
@@ -50,7 +50,9 @@ public:
 
     static GatewayConnRegistry &Instance();
 
+    /** 登记或覆盖 connection_id 的绑定；同 player 旧连接会触发 close_previous。 */
     void Remember(uint64_t connection_id, Bind bind);
+    /** 连接关闭时摘除索引；仅当索引仍指向本 connection 才删，避免误伤新绑。 */
     void Forget(uint64_t connection_id);
     /**
      * 权威路由 cutover：仅当 connection 仍绑定且新 route_version >= 旧值时更新。
@@ -68,7 +70,7 @@ public:
     bool FindBySession(const std::string &session_id, Bind *out);
     bool FindByConnection(uint64_t connection_id, Bind *out);
     bool FindByPlayer(uint64_t player_id, Bind *out);
-    /** 当前绑定的不重复 player_id 数（在线玩家）。 */
+    /** 当前绑定的不重复 player_id 数（本机在线玩家）。 */
     int64_t BoundPlayerCount();
     /** 该 player 已由其它 connection 接管（重连/顶号后关旧连接不得拆 Session）。 */
     bool HasNewerBinding(uint64_t connection_id, uint64_t player_id);
@@ -78,7 +80,7 @@ public:
      */
     int SendBySession(const std::string &session_id, const std::string &frame,
                       bool urgent = false);
-    /** 仅关闭匹配 player_id+session_id+generation 的旧连接；generation=0 时忽略 generation */
+    /** 仅关闭匹配 player_id+session_id+generation 的旧连接；generation=0 时忽略 generation。 */
     bool CloseIfMatch(uint64_t player_id, const std::string &session_id, uint64_t generation);
     /**
      * 先向匹配连接发送 frame（顶号通知），再经 run_after 有界延迟关闭。

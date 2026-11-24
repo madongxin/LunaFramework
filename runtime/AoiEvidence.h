@@ -1,10 +1,13 @@
 #pragma once
 
-
 /**
- * AoiEvidence.h — AOI 证据采集接口（压测/审计）。
- * 路径: runtime/AoiEvidence.h
+ * @file AoiEvidence.h
+ * @brief AOI 证据采集：写失败/阶段耗时/静默采样（压测与审计，不参与发帧决策）
+ *
+ * 只计数、采样和导出；未采集的量不要写成 0——Prometheus 省略序列，JSON 用 null。
+ * LUNASERVER_AOI_TRACE=1 才记热路径明细。与 MapRuntime::NoteAoiWrite / 出口预算指标配合。
  */
+
 #include <cstdint>
 #include <ostream>
 #include <string>

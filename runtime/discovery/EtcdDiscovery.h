@@ -2,8 +2,10 @@
 
 
 /**
- * EtcdDiscovery.h — 可选 etcd 发现。
- * 路径: runtime/discovery/EtcdDiscovery.h
+ * @file EtcdDiscovery.h
+ * @brief 可选 etcd v2 HTTP 服务发现
+ *
+ * endpoints 空则 no-op；正式拓扑可关 etcd 走静态/Redis Registry。
  */
 #include <string>
 #include <vector>

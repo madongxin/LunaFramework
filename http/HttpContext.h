@@ -1,77 +1,77 @@
 #pragma once
 
 /**
- * HttpContext.h — HTTP 请求解析状态机（挂在 TcpConnection context）。
- * 路径: http/HttpContext.h
+ * @file HttpContext.h
+ * @brief 按连接挂载的 HTTP 请求解析状态机
+ *
+ * 每次 onMessage 喂入增量字节；GetCompleteRequest() 为真后再取 request()。
+ * ResetContextStatus() 在处理完一请求后调用，以支持 keep-alive 下一请求。
  */
+
 #include <string>
 #include <memory>
-class HttpRequest;
 
+class HttpRequest;
 
 #define CR '\r'
 #define LF '\n'
 
-enum HttpRequestParaseState
-{
-    kINVALID,         // 无效
-    kINVALID_METHOD,  // 无效请求方法
-    kINVALID_URL,     // 无效请求路径
-    kINVALID_VERSION, // 无效的协议版本号
-    kINVALID_HEADER,  // 无效请求头
+/** 解析器状态（行/头/body） */
+enum HttpRequestParaseState {
+    kINVALID,
+    kINVALID_METHOD,
+    kINVALID_URL,
+    kINVALID_VERSION,
+    kINVALID_HEADER,
 
-    START,  // 解析开始
-    METHOD, // 请求方法
+    START,
+    METHOD,
 
-    BEFORE_URL, // 请求连接前的状态，需要'/'开头
-    IN_URL,     // url处理
+    BEFORE_URL,
+    IN_URL,
 
-    BEFORE_URL_PARAM_KEY, // URL请求参数键之前
-    URL_PARAM_KEY, // URL请求参数键
-    BEFORE_URL_PARAM_VALUE, // URL请求参数值之前
-    URL_PARAM_VALUE, // URL请求参数值
+    BEFORE_URL_PARAM_KEY,
+    URL_PARAM_KEY,
+    BEFORE_URL_PARAM_VALUE,
+    URL_PARAM_VALUE,
 
-    BEFORE_PROTOCOL, // 协议解析之前
-    PROTOCOL,        // 协议
+    BEFORE_PROTOCOL,
+    PROTOCOL,
 
-    BEFORE_VERSION, // 版本开始前
-    VERSION_SPLIT,  // 版本分割符
-    VERSION,        // 版本
+    BEFORE_VERSION,
+    VERSION_SPLIT,
+    VERSION,
 
     HEADER,
-    HEADER_KEY, //
+    HEADER_KEY,
 
-    HEADER_BEFORE_COLON, // 请求头冒号之前
-    HEADER_AFTER_COLON,  // 请求头冒号
-    HEADER_VALUE,        // 请求值
+    HEADER_BEFORE_COLON,
+    HEADER_AFTER_COLON,
+    HEADER_VALUE,
 
-    WHEN_CR, // 遇到一个回车
+    WHEN_CR,
+    CR_LF,
+    CR_LF_CR,
 
-    CR_LF, // 回车换行
-
-    CR_LF_CR, // 回车换行之后的状态
-
-    BODY = 100, // 请求体
-
-    COMPLETE=101, // 完成
-
+    BODY = 100,
+    COMPLETE = 101,
 };
 
-class HttpContext
-{
-
+class HttpContext {
 public:
-
-    // 状态转换机，保存解析的状态
-
     HttpContext();
     ~HttpContext();
 
+    /** 喂入一段原始字节，推进状态机；返回是否仍合法 */
     bool ParaseRequest(const char *begin, int size);
-    bool ParaseRequest(const std::string& msg);
+    bool ParaseRequest(const std::string &msg);
     bool ParaseRequest(const char *begin);
+
+    /** 当前是否已凑齐完整请求（可进入业务回调） */
     bool GetCompleteRequest();
+    /** 解析结果；生命周期随 Context */
     HttpRequest *request();
+    /** 重置状态与 request，准备解析下一请求 */
     void ResetContextStatus();
 
 private:

@@ -1,9 +1,12 @@
 #pragma once
 
 /**
- * Latch.h — 可复用倒计时门闩，测试与启动同步用。
- * 路径: base/Latch.h
+ * @file Latch.h
+ * @brief 倒计时门闩：CountDown 减到 0 时唤醒 Wait
+ *
+ * 用于 AsyncLogging 启动同步、测试等待后台就绪。
  */
+
 #include "common.h"
 #include <thread>
 #include <condition_variable>
@@ -18,6 +21,7 @@ public:
     DISALLOW_COPY_AND_MOVE(Latch);
 
     explicit Latch(int count) : count_(count){}
+    /** 阻塞直到 count_==0 */
     void wait(){
         std::unique_lock<std::mutex> lock(mux_);
         while(count_ > 0){
@@ -25,6 +29,7 @@ public:
         }
     }
 
+    /** count_--；到 0 时 notify_all */
     void notify(){
         std::unique_lock<std::mutex> lock(mux_);
         --count_;

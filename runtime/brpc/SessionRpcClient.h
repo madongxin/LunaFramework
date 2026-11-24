@@ -2,8 +2,10 @@
 
 
 /**
- * SessionRpcClient.h — Session RPC 客户端。
- * 路径: runtime/brpc/SessionRpcClient.h
+ * @file SessionRpcClient.h
+ * @brief Gateway/Logic 侧 Session RPC 客户端封装
+ *
+ * Acquire/MarkDisconnected/Reconnect/Placement/HeartbeatOwner 等。
  */
 #include "game.pb.h"
 #include "session.pb.h"

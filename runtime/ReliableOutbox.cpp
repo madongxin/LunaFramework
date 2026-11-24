@@ -1,7 +1,8 @@
 /**
- * ReliableOutbox.cpp — 运行时：发件箱/可靠发送。
- * 路径: runtime/ReliableOutbox.cpp
+ * @file ReliableOutbox.cpp
+ * @brief ReliableOutbox 实现：可靠推送发件箱与重试
  */
+
 #include "ReliableOutbox.h"
 
 #include "GatewayConnRegistry.h"

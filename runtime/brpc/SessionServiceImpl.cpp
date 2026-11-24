@@ -1,6 +1,8 @@
 /**
- * SessionServiceImpl.cpp — 运行时：业务服务逻辑。会话相关。
- * 路径: runtime/brpc/SessionServiceImpl.cpp
+ * @file SessionServiceImpl.cpp
+ * @brief SessionServiceImpl 实现：会话获取、断线标记、重连两阶段与 Logout
+ *
+ * 正式业务经 Dispatch；与 SessionStore/Redis Lua 协作。
  */
 #include "SessionServiceImpl.h"
 

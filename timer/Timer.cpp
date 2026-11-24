@@ -1,27 +1,24 @@
 /**
- * Timer.cpp — Timer 实现。
- * 路径: timer/Timer.cpp
+ * @file Timer.cpp
+ * @brief Timer 构造与周期重启
  */
+
 #include "Timer.h"
 #include <functional>
 #include "TimeStamp.h"
-Timer::Timer(TimeStamp timestamp, std::function<void()>const &cb, double interval = 0.0)
+
+Timer::Timer(TimeStamp timestamp, std::function<void()> const &cb, double interval)
     : expiration_(timestamp),
       callback_(std::move(cb)),
       interval_(interval),
-      repeat_(interval > 0.0){};
-    
-void Timer::ReStart(TimeStamp now){
+      repeat_(interval > 0.0) {}
+
+void Timer::ReStart(TimeStamp now) {
     expiration_ = TimeStamp::AddTime(now, interval_);
 }
 
-
-void Timer::run() const{
-    callback_();
-}
+void Timer::run() const { callback_(); }
 
 TimeStamp Timer::expiration() const { return expiration_; }
 
 bool Timer::repeat() const { return repeat_; }
-
-

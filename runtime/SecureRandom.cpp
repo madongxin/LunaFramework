@@ -1,7 +1,8 @@
 /**
- * SecureRandom.cpp — 运行时：安全随机。
- * 路径: runtime/SecureRandom.cpp
+ * @file SecureRandom.cpp
+ * @brief SecureRandom 实现：密码学安全随机字节
  */
+
 #include "SecureRandom.h"
 
 #include <openssl/rand.h>

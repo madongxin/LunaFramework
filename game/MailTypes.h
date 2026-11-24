@@ -1,13 +1,11 @@
 #pragma once
 
-
-/**
- * MailTypes.h — 邮件类型/结构。
- * 路径: game/MailTypes.h
- */
 /**
  * @file MailTypes.h
- * @brief 邮件枚举、错误码与状态机校验（无外部框架依赖）
+ * @brief 邮件枚举、错误码、行结构与状态机校验（无外部框架依赖）
+ *
+ * VisibleState / AttachmentState 转换见 CanTransit*；投递入参为 DeliverRequest。
+ * 错误码写入 Rsp.error_code，message 为人读文案。
  */
 
 #include <cstdint>

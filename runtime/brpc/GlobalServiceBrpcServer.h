@@ -2,8 +2,10 @@
 
 
 /**
- * GlobalServiceBrpcServer.h — GlobalService brpc Server。
- * 路径: runtime/brpc/GlobalServiceBrpcServer.h
+ * @file GlobalServiceBrpcServer.h
+ * @brief GlobalService（globalservice）brpc Server 启动封装
+ *
+ * 邮件/社交等全局请求入口。
  */
 #include <memory>
 #include <string>

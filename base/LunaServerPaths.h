@@ -1,19 +1,19 @@
 #pragma once
 
-
 /**
- * LunaServerPaths.h — 根据 /proc/self/exe 解析项目 static/files 等路径，避免 cwd 不同导致空白页。
- * 路径: base/LunaServerPaths.h
+ * @file LunaServerPaths.h
+ * @brief 按 /proc/self/exe 解析项目 static/、files/ 等目录
+ *
+ * 避免启动 cwd 不同导致监控页空白或上传路径错误。
  */
+
 #include <cstdlib>
 #include <string>
 #include <unistd.h>
 
-// 将 static / files 目录解析为可执行文件所在 build/test/ 上两级下的目录，
-// 避免因启动 shell 的当前工作目录不同而出现空白页或上传路径错误。
-
 namespace LunaServerPaths {
 
+/** 从 exe 目录上两级解析 subdir（如 static/files）；处理 "(deleted)" 后缀 */
 inline bool ResolveProjectSubdir(const char *subdir, std::string *out) {
     char buf[4096];
     ssize_t n = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
@@ -42,6 +42,7 @@ inline bool ResolveProjectSubdir(const char *subdir, std::string *out) {
     return true;
 }
 
+/** 监控静态资源根；解析失败则回退 "../static" */
 inline const std::string &StaticRoot() {
     static std::string dir = "../static";
     static bool once = false;
@@ -53,6 +54,7 @@ inline const std::string &StaticRoot() {
     return dir;
 }
 
+/** 上传/文件根；解析失败则回退 "../files" */
 inline const std::string &FilesRoot() {
     static std::string dir = "../files";
     static bool once = false;

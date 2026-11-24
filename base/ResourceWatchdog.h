@@ -1,17 +1,18 @@
 #pragma once
 
-
 /**
- * ResourceWatchdog.h — 周期性采样进程资源并写入指标/历史。
- * 路径: base/ResourceWatchdog.h
+ * @file ResourceWatchdog.h
+ * @brief 周期采样 RSS/fd/TCP 队列，供 GM 启发式告警
+ *
+ * 挂在 EventLoop 定时器上；历史样本供「缓增、暴涨、fd 爬升」判断。
  */
+
 #include <json/json.h>
 #include <mutex>
 #include <vector>
 
 class EventLoop;
 
-// 定时采样 VmRSS / fd / TCP 队列，供 GM 命令做「缓增、暴涨、fd 爬升、网络队列爬升」等启发式判断。
 class ResourceWatchdog {
 public:
     struct Sample {
@@ -23,14 +24,20 @@ public:
         uint64_t tcp_recv_q = 0;
     };
 
+    /** 进程单例 */
     static ResourceWatchdog &Instance();
 
+    /** 在 loop 上挂周期定时器，每 interval_sec 秒 PushSample */
     void StartPeriodic(EventLoop *loop, double interval_sec);
 
+    /** 立刻采一次 /proc 并写入 samples_ 环形历史 */
     void PushSample();
 
+    /** 最近一条样本的 JSON */
     Json::Value LastSampleJson() const;
+    /** 启发式：缓增/暴涨/fd 爬升/队列爬升等告警标志 */
     Json::Value AnalyzeTrends() const;
+    /** 返回至多 max_points 条历史样本 */
     Json::Value HistoryJson(int max_points) const;
 
 private:

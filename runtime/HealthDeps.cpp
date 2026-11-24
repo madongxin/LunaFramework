@@ -1,7 +1,8 @@
 /**
- * HealthDeps.cpp — 运行时：健康检查。
- * 路径: runtime/HealthDeps.cpp
+ * @file HealthDeps.cpp
+ * @brief HealthDeps 实现：按角色探测 Redis/MySQL/brpc 依赖
  */
+
 #include "HealthDeps.h"
 
 #include "FormalMode.h"

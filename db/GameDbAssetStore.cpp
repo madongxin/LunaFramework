@@ -1,7 +1,8 @@
 /**
- * GameDbAssetStore.cpp — MySQL/GameDB：数据访问/存储封装。资产。
- * 路径: db/GameDbAssetStore.cpp
+ * @file GameDbAssetStore.cpp
+ * @brief 资产事务与 outbox 同提交
  */
+
 #include "GameDbAssetStore.h"
 
 #include "ConnectionPool.h"

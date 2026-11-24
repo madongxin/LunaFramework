@@ -1,7 +1,8 @@
 /**
- * BrpcGameDbRepository.cpp — MySQL/GameDB：brpc 相关。游戏逻辑。
- * 路径: db/BrpcGameDbRepository.cpp
+ * @file BrpcGameDbRepository.cpp
+ * @brief brpc Channel 调用远端 GameDB RPC
  */
+
 #include "BrpcGameDbRepository.h"
 
 #include "BrpcSslUtil.h"
@@ -20,6 +21,7 @@
 #include <atomic>
 #include <utility>
 
+/** 进程单例 */
 BrpcGameDbRepository &BrpcGameDbRepository::Instance() {
     static BrpcGameDbRepository g;
     return g;
@@ -59,6 +61,7 @@ bool BrpcGameDbRepository::Init(const std::vector<std::string> &addrs, int timeo
     return true;
 }
 
+/** 热更新 Channel 列表；空列表保留现有 */
 bool BrpcGameDbRepository::ApplySnapshot(const std::vector<std::string> &addrs) {
     if (addrs.empty()) {
         LOG_WARN << "BrpcGameDbRepository: ignore empty ApplySnapshot";

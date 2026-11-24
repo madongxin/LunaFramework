@@ -1,6 +1,6 @@
 /**
  * @file MailBrpcServiceImpl.cpp
- * @brief brpc 适配层：ValidateToken → MailService::Handle* → 抽出 *Rsp
+ * @brief brpc 适配层：ValidateToken/内部投递 token → MailService::Handle* → 抽出 *Rsp
  */
 
 #include "MailBrpcServiceImpl.h"

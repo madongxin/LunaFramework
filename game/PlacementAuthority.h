@@ -1,25 +1,32 @@
 #pragma once
 
-
 /**
- * PlacementAuthority.h — 占位权威辅助。
- * 路径: game/PlacementAuthority.h
+ * @file PlacementAuthority.h
+ * @brief Formal 地图写：权威 Placement 字段校验（与 Redis/RPC 拉取解耦）
+ *
+ * GameLogic 在进图写/Move 等路径用 ValidateAuthorityWrite 核对本地缓存的
+ * PlacementRecord 是否仍 Ready、本 Logic 为 Owner、epoch/route/lease 未过期。
+ * 纯函数便于单测；不访问 Redis。
  */
+
 #include "PlacementStore.h"
 
 #include <chrono>
 #include <cstdint>
 #include <string>
 
-/** Formal 地图写：权威 Placement 字段校验（与 Redis/RPC 拉取解耦，便于单测）。 */
+/** 当前 unix 秒（权威 lease_until 比较用）。 */
 inline int64_t PlacementNowUnixSec() {
     using namespace std::chrono;
     return duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
 }
 
 /**
- * @param require_complete_fence Formal：epoch/route 不得为 0，且必须精确匹配权威 epoch。
+ * 校验一次权威地图写是否允许。
+ * @param require_complete_fence Formal：epoch/route 不得为 0，且必须精确匹配权威 epoch；
  *        非 Formal 兼容：epoch/route 为 0 时跳过对应比较。
+ * @param err_code 失败时写入 ERR_PLACEMENT_NOT_READY / ERR_WRONG_GAMELOGIC_OWNER /
+ *        ERR_STALE_EPOCH / ERR_ROUTE_STALE / ERR_LEASE_* 等
  */
 inline bool ValidateAuthorityWrite(const PlacementRecord &auth, uint64_t req_epoch,
                                    uint64_t req_route_ver, const std::string &local_logic_id,

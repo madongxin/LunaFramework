@@ -1,15 +1,14 @@
 #pragma once
 
-
-/**
- * MapPlacement.h — 玩家应落到哪条线/哪个 Owner 的放置算法配置。
- * 路径: runtime/MapPlacement.h
- */
 /**
  * @file MapPlacement.h
  * @brief 地图 Placement 表（阶段 5 骨架）：map_instance → owner + epoch + route_version
  *
  * 进程内权威（Gateway / role=all）；多 Gateway 共享需后续 Redis。无 AOI/Tick。
+ * ResolveOrAllocate 在 map_instance_id==0 时 RR 选 owner 并分配新实例 ID；
+ * Migrate 换 owner 并升 epoch/route_version，旧 epoch 写应被 Logic 拒绝。
+ *
+ * 协作：SessionHandle 携带 map/owner/route；MapInstanceRegistry 在 Logic 侧 Claim。
  */
 
 #include <cstdint>
@@ -18,6 +17,7 @@
 #include <unordered_map>
 #include <vector>
 
+/** 一张地图实例的放置记录（owner、租约、分线元数据）。 */
 struct MapPlacementRecord {
     uint32_t realm_id = 0;
     uint64_t map_template_id = 0;
@@ -37,7 +37,7 @@ class MapPlacement {
 public:
     static MapPlacement &Instance();
 
-    /** 可放置的同构 Logic 实例 ID 列表（与 gateway logic_addrs 对齐） */
+    /** 可放置的同构 Logic 实例 ID 列表（与 gateway logic_addrs 对齐）。 */
     void ConfigureOwners(std::vector<std::string> owner_ids);
 
     const std::vector<std::string> &owners() const { return owners_; }
@@ -49,6 +49,7 @@ public:
     bool ResolveOrAllocate(uint32_t realm_id, uint64_t map_template_id, uint64_t map_instance_id,
                            MapPlacementRecord *out);
 
+    /** 按实例 ID 查缓存表。 */
     bool Get(uint64_t map_instance_id, MapPlacementRecord *out) const;
 
     /**
@@ -57,7 +58,7 @@ public:
     bool Migrate(uint64_t map_instance_id, const std::string &new_owner,
                  MapPlacementRecord *out);
 
-    /** 用权威 Placement 刷新本地缓存（非事实源） */
+    /** 用权威 Placement 刷新本地缓存（非事实源）。 */
     void UpsertCache(const MapPlacementRecord &rec);
 
     void ClearForTest();

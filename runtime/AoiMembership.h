@@ -1,10 +1,13 @@
 #pragma once
 
-
 /**
- * AoiMembership.h — 兴趣集成员关系。
- * 路径: runtime/AoiMembership.h
+ * @file AoiMembership.h
+ * @brief 统一兴趣集成员判定开关（进入半径 / 离开半径 + 固定 cap）
+ *
+ * LUNASERVER_AOI_MEMBERSHIP_UNIFIED=1 时 Move/RefreshViewers/sync_pose/SyncVisibleSubject
+ * 共用同一套规则；默认关闭。人数上限 AoiUnifiedCap()=200。
  */
+
 #include <cstdlib>
 
 /**

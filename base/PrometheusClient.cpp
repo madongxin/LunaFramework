@@ -1,7 +1,8 @@
 /**
- * PrometheusClient.cpp — PrometheusClient：限流并发的 instant/range 查询。
- * 路径: base/PrometheusClient.cpp
+ * @file PrometheusClient.cpp
+ * @brief 对本机 Prometheus 发 HTTP GET（query / query_range）
  */
+
 #include "PrometheusClient.h"
 
 #include <arpa/inet.h>
@@ -184,10 +185,12 @@ PrometheusClientResult QueryPath(const std::string &path) {
 
 }  // namespace
 
+/** GET /api/v1/query */
 PrometheusClientResult PrometheusInstantQuery(const std::string &query) {
     return QueryPath("/api/v1/query?query=" + UrlEncode(query));
 }
 
+/** GET /api/v1/query_range */
 PrometheusClientResult PrometheusQueryRange(const std::string &query, const std::string &start,
                                             const std::string &end, const std::string &step) {
     return QueryPath("/api/v1/query_range?query=" + UrlEncode(query) + "&start=" + UrlEncode(start) +

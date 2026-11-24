@@ -1,6 +1,6 @@
 /**
- * AuthServiceImpl.cpp — 运行时：业务服务逻辑。鉴权相关。
- * 路径: runtime/brpc/AuthServiceImpl.cpp
+ * @file AuthServiceImpl.cpp
+ * @brief AuthServiceImpl 实现：Login/VerifyToken 与限流、口令卸载
  */
 #include "AuthServiceImpl.h"
 

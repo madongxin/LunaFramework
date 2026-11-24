@@ -2,8 +2,10 @@
 
 
 /**
- * GlobalServiceForwardServiceImpl.h — GlobalService Forward 实现。
- * 路径: runtime/brpc/GlobalServiceForwardServiceImpl.h
+ * @file GlobalServiceForwardServiceImpl.h
+ * @brief GlobalService Forward：邮件与社交等全局请求处理
+ *
+ * 邮件持久化最终落 GameDB；Formal 下会话故障不放行（见 MailDevSkipSession）。
  */
 #include "forward.pb.h"
 

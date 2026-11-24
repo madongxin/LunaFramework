@@ -1,16 +1,15 @@
 #pragma once
 
-
 /**
- * ProcSelfStats.h — /proc/self 资源采样（GM/stat 用）。
- * 路径: base/ProcSelfStats.h
+ * @file ProcSelfStats.h
+ * @brief 读 /proc/self 得到 RSS/VIRT/fd/TCP 队列快照
+ *
+ * 对齐 top(RES/VIRT)；TCP 队列对本进程 fd 做 ioctl(SIOCOUTQ/SIOCINQ)。
  */
+
 #include <cstdint>
 #include <string>
 #include <sys/types.h>
-
-// 对齐 top(RES/VIRT)、/proc/pid/status；fd 数来自 /proc/pid/fd。
-// TCP 收发队列：对本进程各 fd 做 ioctl(SIOCOUTQ/SIOCINQ)，近似 ss/netstat 中的 Send-Q/Recv-Q。
 
 struct ProcResourceSnapshot {
     pid_t pid = 0;
@@ -30,5 +29,7 @@ struct ProcResourceSnapshot {
     uint64_t tcp_recv_queue_bytes = 0;
 };
 
+/** 填充快照；pid==0 表示本进程。失败字段保持 -1/false */
 bool FillProcResourceSnapshot(ProcResourceSnapshot *out, pid_t pid = 0);
+/** 单行人类可读摘要（GM/日志） */
 std::string ProcResourceSnapshotFormatLine(const ProcResourceSnapshot &s);

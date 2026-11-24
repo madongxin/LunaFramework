@@ -1,7 +1,8 @@
 /**
- * RpcOffloadPool.cpp — 运行时：连接/对象池。卸载线程池。
- * 路径: runtime/RpcOffloadPool.cpp
+ * @file RpcOffloadPool.cpp
+ * @brief RpcOffloadPool 实现：RPC 卸载线程池
  */
+
 #include "RpcOffloadPool.h"
 
 #include "Logging.h"

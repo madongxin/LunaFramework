@@ -1,94 +1,83 @@
 #pragma once
 
-
 /**
- * Logging.h — 日志门面：级别、宏 LOG_*、可替换 output/flush。
- * 路径: log/Logging.h
+ * @file Logging.h
+ * @brief 日志门面：级别过滤、流式拼装、可替换 output/flush
+ *
+ * 用法：LOG_INFO << "x=" << x;
+ * 析构 Impl 时把缓冲交给全局 OutputFunc（正式环境多为 AsyncLogging::Append）。
+ * SetLogService/Player/Session/ErrorCode 供 JSON 结构化字段。
  */
+
 #include <string.h>
 #include "common.h"
 #include "TimeStamp.h"
 #include "LogStream.h"
 
-class Logger{
+class Logger {
+public:
+    DISALLOW_COPY_AND_MOVE(Logger);
 
+    enum LogLevel { DEBUG, INFO, WARN, ERROR, FATAL };
+
+    /** 从 __FILE__ 截取 basename，避免整路径过长 */
+    class SourceFile {
     public:
-        DISALLOW_COPY_AND_MOVE(Logger);
-        enum LogLevel
-        {
-            DEBUG,
-            INFO,
-            WARN,
-            ERROR,
-            FATAL
-        };
+        SourceFile(const char *data);
+        const char *data_;
+        int size_;
+    };
 
-        // 编译器计算源文件名
-        class SourceFile{
-            public:
-                SourceFile(const char *data);
-                const char *data_;
-                int size_;
-        };
+    Logger(const char *file_, int line, LogLevel level);
+    ~Logger();
 
-        // 构造函数，主要是用于构造Impl
-        Logger(const char *file_, int line, LogLevel level);
-        ~Logger();
+    /** 返回拼装流，供 LOG_* 宏链式写入 */
+    LogStream &stream();
 
+    static LogLevel logLevel();
+    static void setLogLevel(LogLevel level);
 
-        // 用于日志宏，返回Impl的输出流
+    typedef void (*OutputFunc)(const char *data, int len);
+    typedef void (*FlushFunc)();
+    /** 默认 fwrite stdout；RunServer 可换成 AsyncLogging */
+    static void setOutput(OutputFunc);
+    static void setFlush(FlushFunc);
+
+private:
+    /** 组装时间、级别、正文、源文件行号 */
+    class Impl {
+    public:
+        DISALLOW_COPY_AND_MOVE(Impl);
+        typedef Logger::LogLevel LogLevel;
+        Impl(Logger::LogLevel level, const SourceFile &source, int line);
+        void FormattedTime();
+        void Finish();
         LogStream &stream();
-
-        // 全局方法，设置日志全局日志级别，flush输出目的地
-        static LogLevel logLevel();
-        static void setLogLevel(LogLevel level);
-
-        typedef void (*OutputFunc)(const char *data, int len); // 定义函数指针
-        typedef void (*FlushFunc)();
-        // 默认fwrite到stdout
-        static void setOutput(OutputFunc);
-        // 默认fflush到stdout
-        static void setFlush(FlushFunc);
+        const char *loglevel() const;
+        LogLevel level_;
 
     private:
-        // 私有类，对日志信息进行组装，不对外开放
-        class Impl{
-            public:
-                DISALLOW_COPY_AND_MOVE(Impl);
-                typedef Logger::LogLevel LogLevel;
-                Impl(Logger::LogLevel level, const SourceFile &source, int line);
-                void FormattedTime();// 格式化时间信息
-                void Finish();// 完成格式化，并补充输出源码文件和源码位置
-
-                LogStream &stream();
-                const char *loglevel() const;// 获取LogLevel的字符串
-                LogLevel level_;// 日志级别
-
-            private:
-                Logger::SourceFile sourcefile_; // 源代码名称
-                int line_;// 源代码行数
-                LogStream stream_;// 日志缓存流
-        };
-        Impl impl_;
+        Logger::SourceFile sourcefile_;
+        int line_;
+        LogStream stream_;
+    };
+    Impl impl_;
 };
 
-// 全局的日志级别，静态成员函数定义，静态成员函数实现
 extern Logger::LogLevel g_logLevel;
-inline Logger::LogLevel Logger::logLevel(){
-    return g_logLevel;
-}
+inline Logger::LogLevel Logger::logLevel() { return g_logLevel; }
 
-
-// 日志宏
-#define LOG_DEBUG if (Logger::logLevel() <= Logger::DEBUG) \
-    Logger(__FILE__, __LINE__, Logger::DEBUG, __func__).stream()
-#define LOG_INFO if (Logger::logLevel() <= Logger::INFO) \
+#define LOG_DEBUG                          \
+    if (Logger::logLevel() <= Logger::DEBUG) \
+    Logger(__FILE__, __LINE__, Logger::DEBUG).stream()
+#define LOG_INFO                         \
+    if (Logger::logLevel() <= Logger::INFO) \
     Logger(__FILE__, __LINE__, Logger::INFO).stream()
 #define LOG_WARN Logger(__FILE__, __LINE__, Logger::WARN).stream()
 #define LOG_ERROR Logger(__FILE__, __LINE__, Logger::ERROR).stream()
 #define LOG_FATAL Logger(__FILE__, __LINE__, Logger::FATAL).stream()
 
-/** 进程级 service 名，以及当前线程的 player/session/error_code。JSON 日志会带上这些字段。 */
+/** 进程级 service 名；JSON 日志带上这些上下文 */
 void SetLogService(const char *service);
 void SetLogPlayer(uint64_t player_id);
 void SetLogSession(const char *session_id);

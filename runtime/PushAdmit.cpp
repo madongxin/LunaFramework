@@ -1,7 +1,8 @@
 /**
- * PushAdmit.cpp — 运行时：推送相关。
- * 路径: runtime/PushAdmit.cpp
+ * @file PushAdmit.cpp
+ * @brief PushAdmit 实现：可靠/不可靠推送准入
  */
+
 #include "PushAdmit.h"
 
 namespace {

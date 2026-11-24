@@ -1,8 +1,10 @@
 #pragma once
 
 /**
- * GatewayPushServer.h — Gateway 侧 Push brpc 服务端。
- * 路径: runtime/brpc/GatewayPushServer.h
+ * @file GatewayPushServer.h
+ * @brief Gateway 侧 Push brpc Server：接收 Logic 的 PushBatch
+ *
+ * 口默认可内网；经 PushAdmit 校验 fence 后写入连接发送路径。
  */
 #include "gateway_push.pb.h"
 

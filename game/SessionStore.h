@@ -1,20 +1,8 @@
 #pragma once
 
-
 /**
- * SessionStore.h — 玩法/网关：数据访问/存储封装。会话相关。
- * 路径: game/SessionStore.h
- */
-#include "game.pb.h"
-
-#include <cstdint>
-#include <functional>
-#include <mutex>
-#include <string>
-#include <vector>
-
-/**
- * SessionStore — 玩家会话在 Redis 中的权威存储（连接池 + Lua CAS）。
+ * @file SessionStore.h
+ * @brief 玩家会话在 Redis 中的权威存储（连接池 + Lua CAS）
  *
  * 职责边界（与 Auth 分离）：
  * - AuthService：账号校验、access_token（另一套 Redis key）；**不**创建 Session。
@@ -29,14 +17,18 @@
  *   Online  →（Logout / Kick 清会话）→ Offline
  *   MarkDisconnected ≠ Logout：前者保留会话等重连；后者主动销会话。
  *
- * 关键字段：
- * - fence_token（存为 token）：绑定连接与业务写权限；DISCONNECTED 时 ValidateToken 拒业务写。
- * - generation：踢号/重登递增；旧连接迟到的 MarkDisconnected 因 gen/token 不匹配被忽略。
- * - gamelogic_instance_id / map_* / route_version：权威路由，进图与 transfer 用 fence CAS 更新。
- *
- * 配置：config/redis.cnf（InitFromConfig）；key_prefix 默认 lunaserver:dev:。
- * 权威并发靠 Redis Lua；cfg_mu_ 只保护进程内 logic_instance_ids_ 等本地配置。
+ * 关键字段：fence_token（业务写权限）、generation（踢号/旧连接忽略）、
+ * gamelogic_instance_id / map_* / route_version（权威路由，fence CAS 更新）。
+ * 配置：config/redis.cnf；权威并发靠 Redis Lua；cfg_mu_ 只保护进程内配置。
  */
+
+#include "game.pb.h"
+
+#include <cstdint>
+#include <functional>
+#include <mutex>
+#include <string>
+#include <vector>
 
 /** 会话状态（Redis 字段 state） */
 enum class SessionState {
@@ -126,33 +118,61 @@ struct AcquireSessionResult {
     int64_t previous_login_time_sec = 0;
 };
 
+/**
+ * 进程内单例：所有正式会话读写经此入口（Gateway/SessionService/Logic 共享语义）。
+ * Available()==false 时 Formal 应 fail-closed，禁止静默降级到无会话。
+ */
 class SessionStore {
 public:
     static SessionStore &Instance();
 
-    /** 读 redis.cnf，初始化连接池；失败则 Available()==false，正式路径应 fail-closed。 */
+    /**
+     * 读 config/redis.cnf，初始化 RedisPool 与 key_prefix/grace/ttl。
+     * 失败则 Available()==false；正式路径不得继续当会话权威。
+     */
     bool InitFromConfig();
+    /** Redis 池与配置是否就绪；false 时所有写路径应拒绝。 */
     bool Available() const { return available_; }
+    /** MarkDisconnected 后允许 Reconnect 的宽限秒数（来自配置）。 */
     int grace_sec() const { return grace_sec_; }
     /** PrepareReconnect 候选 fence 的 Redis TTL。超期未 Commit 视为 Abort。 */
     static constexpr int kReconnectPrepareTtlSec = 10;
+    /** BeginPlayerTransfer 后未 Commit/Abort 的最长存活秒数。 */
     static constexpr int kTransferTtlSec = 30;
+    /** Redis key 前缀（如 lunaserver:dev:）；Placement/PushReplay 与之对齐。 */
     const std::string &key_prefix() const { return key_prefix_; }
 
-    /** 配置可分配的 GameLogic instance_id 列表（勿写死端口）。空列表时 Acquire 失败。 */
+    /**
+     * 配置可分配的 GameLogic instance_id 列表（勿写死端口）。
+     * 空列表时 Acquire 失败；publish_snapshot 可推健康 Logic 快照。
+     */
     void SetLogicInstanceIds(std::vector<std::string> ids, bool publish_snapshot = true);
+    /** 当前可分配 Logic 实例列表的拷贝（受 cfg_mu_ 保护）。 */
     std::vector<std::string> LogicInstanceIds() const;
 
     // ----- 登录 / 重连 / 下线（核心会话生命周期）-----
 
-    /** 正式路径：创建或顶号会话，分配 fence + Logic 路由；支持 operation_id 幂等。 */
+    /**
+     * 正式路径：创建或顶号会话，分配 fence + Logic 路由。
+     * kick_other_device 时旧会话写入 previous_*；operation_id 非空则 Redis 幂等。
+     */
     bool AcquireSession(const AcquireSessionInput &in, AcquireSessionResult *out);
-    /** 旧 proto Login 封装（内部仍走会话写入；正式 Gateway 应走 Auth+Acquire）。 */
+    /**
+     * 旧 proto Login 封装（内部仍写 Session）。
+     * 正式 Gateway 应走 Auth.Login → AcquireSession，勿让客户端直达此路径。
+     */
     bool Login(const game::LoginReq &req, game::LoginRsp *rsp);
+    /**
+     * 断线宽限内重连：校验 session_id/ticket，恢复 ONLINE 并换新 fence。
+     * 宽限已过或校验失败时 out->ok=false。
+     */
     bool Reconnect(const game::ReconnectReq &req, game::ReconnectRsp *rsp);
-    /** Reconnect 并输出权威路由（logic/map/epoch/version） */
+    /** 同上，并额外写出权威路由字段到 *route_out（供 Gateway Bind / 粘性转发）。 */
     bool Reconnect(const game::ReconnectReq &req, game::ReconnectRsp *rsp, SessionRecord *route_out);
-    /** 带 operation_id 幂等的重连（Gateway ReconnectV2） */
+    /**
+     * Gateway ReconnectV2：带 operation_id 幂等的重连。
+     * 同 operation_id 重试返回同一 fence/generation，避免双绑。
+     */
     bool ReconnectSession(const ReconnectSessionInput &in, AcquireSessionResult *out,
                           SessionRecord *route_out);
     /**
@@ -169,7 +189,9 @@ public:
     /** 查询幂等操作结果（超时后结果未知） */
     bool GetSessionOperation(const std::string &operation_id, SessionOpStatus *status,
                              std::string *op_kind, AcquireSessionResult *out);
+    /** 校验 session_id/token 是否仍有效（调试/旧路径；业务写优先 ValidateToken）。 */
     bool Validate(const game::ValidateSessionReq &req, game::ValidateSessionRsp *rsp);
+    /** 查询玩家是否 ONLINE（不含 DISCONNECTED 宽限态）。 */
     bool CheckOnline(const game::CheckOnlineReq &req, game::CheckOnlineRsp *rsp);
     /** 主动下线：删 Session；与 MarkDisconnected（断线宽限）不同。 */
     bool Logout(const game::LogoutReq &req, game::LogoutRsp *rsp);
@@ -262,6 +284,10 @@ public:
         uint64_t route_version = 0;
         std::string route_state;
     };
+    /**
+     * 切线/跨 Logic 迁移第一步：CAS 校验 fence+route_version，写入转移记录（短 TTL）。
+     * 成功后会话进入迁移态；须在 kTransferTtlSec 内 Commit 或 Abort。
+     */
     bool BeginPlayerTransfer(const TransferBeginIn &in, TransferBeginOut *out);
 
     struct TransferCommitIn {
@@ -283,10 +309,22 @@ public:
         uint64_t map_owner_epoch = 0;
         std::string route_state;
     };
+    /**
+     * 迁移提交：把权威路由切到 to_logic/map/epoch，抬升 route_version，清转移记录。
+     * fence/transfer_id 不匹配则失败，避免半切。
+     */
     bool CommitPlayerTransfer(const TransferCommitIn &in, TransferCommitOut *out);
+    /**
+     * 迁移回滚：恢复转移前 ONLINE 路由；须仍持有同一 fence 与 transfer_id。
+     * *route_version_out 为回滚后的权威版本（可空）。
+     */
     bool AbortPlayerTransfer(uint64_t player_id, const std::string &fence_token,
                              const std::string &transfer_id, std::string *err,
                              uint64_t *route_version_out);
+    /**
+     * 带 fence 读权威路由与 route_state/transfer_id。
+     * fence 不匹配返回 false（防过期连接读到新路由后乱写）。
+     */
     bool GetPlayerRoute(uint64_t player_id, const std::string &fence_token, SessionRecord *out,
                         std::string *route_state, std::string *transfer_id, std::string *err);
 
@@ -319,17 +357,24 @@ public:
         /** 在线或重连宽限中：本次登录时间。离线为 0，最近在线另见 BatchLastSeen。 */
         int64_t last_online_unix = 0;
     };
+    /** 公网存在感：state + 地图/Logic 摘要 + last_online_unix（离线为 0）。 */
     bool QueryPublicPresence(uint64_t player_id, PublicPresence *out);
-    /** 内部读会话（含 fence）；不校验 fence。 */
+    /** 内部读会话（含 fence）；不校验 fence。勿把结果泄漏到公网客户端。 */
     bool PeekSession(uint64_t player_id, SessionRecord *out);
+    /** 单玩家 ONLINE 推送目标；离线或不存在返回 false。 */
     bool GetOnlinePushTarget(uint64_t player_id, OnlinePushTarget *out);
     /** Redis `online:players` 对账后的 ONLINE 人数（TTL/幽灵成员会被 SREM）。 */
     int64_t OnlinePlayerCount();
+    /** 聊天限流：窗口内超限返回 false（Redis 计数）。 */
     bool ConsumeChatQuota(uint64_t player_id, int limit, int window_sec);
+    /** 按名查询限流（搜人/简介等）。 */
     bool ConsumeNameQueryQuota(uint64_t player_id, int limit, int window_sec);
+    /** 好友申请限流（固定窗口，配置在实现内）。 */
     bool ConsumeFriendApplyQuota(uint64_t player_id);
+    /** 世界聊天消息单调 id（Redis INCR）。 */
     uint64_t NextWorldChatMessageId();
 
+    /** 批量公网存在感；out 与 player_ids 等长，缺席填 offline。 */
     bool BatchQueryPublicPresence(const std::vector<uint64_t> &player_ids,
                                   std::vector<PublicPresence> *out);
     /** 一次 HGETALL 取出仍在线、且带 gateway 的推送目标。presence 不逐个 PeekSession。 */
@@ -337,17 +382,23 @@ public:
                                 std::vector<OnlinePushTarget> *out);
     /** 失败时删除 key，避免半截集合被当成完整好友列表。 */
     bool ReplaceFriendIdCache(uint64_t player_id, const std::vector<uint64_t> &friend_ids);
+    /** 接受好友后增量写入旁路缓存。 */
     void AddFriendIdCache(uint64_t player_id, uint64_t friend_id);
+    /** 删友后从旁路缓存摘除。 */
     void RemoveFriendIdCache(uint64_t player_id, uint64_t friend_id);
+    /** 读旁路好友 id 列表；key 不存在返回 false（需回源 GameDB）。 */
     bool ListFriendIdsFromCache(uint64_t player_id, std::vector<uint64_t> *out);
     /** `friend:block:{id}`。未命中返回 false；已知空集返回 true 且 out 为空。 */
     bool ListBlockedIdsFromCache(uint64_t player_id, std::vector<uint64_t> *out);
+    /** 全量替换拉黑旁路缓存（含空集，避免误判未命中）。 */
     bool ReplaceBlockCache(uint64_t player_id, const std::vector<uint64_t> &blocked_ids);
+    /** 拉黑变更后删缓存，下次读强制回源。 */
     void InvalidateBlockCache(uint64_t player_id);
     /** 离线后好友列表用的最近在线时间，保留 30 天。 */
     void RememberLastSeen(uint64_t player_id, int64_t unix_sec);
     bool BatchLastSeen(const std::vector<uint64_t> &player_ids, std::vector<int64_t> *out);
 
+    /** 上线/下线时回调（FriendService 注册 presence 扇出）。 */
     using FriendPresenceFn = void (*)(uint64_t player_id, bool online);
     void SetFriendPresenceFn(FriendPresenceFn fn);
 

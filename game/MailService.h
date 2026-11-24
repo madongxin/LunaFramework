@@ -1,17 +1,13 @@
 #pragma once
 
-
-/**
- * MailService.h — 邮件业务服务。
- * 路径: game/MailService.h
- */
 /**
  * @file MailService.h
- * @brief 邮件业务：投递、列表、已读、领取、容量、过期
+ * @brief 邮件业务：投递、列表、已读、领取、容量与过期
  *
- * 玩家侧由 GameLogic 分发；投递可供本进程玩法直接调用。
+ * 玩家侧由 GameLogic / GlobalService 分发；投递可供本进程玩法直接调用。
  * 领取经 GameDB（AsyncMysqlGameDbRepository）异步事务 + 幂等 + outbox；
- * 提交成功后再改内存背包。
+ * 提交成功后再改内存背包（ApplyClaimMemory 须在 PlayerSerialQueue 上）。
+ * Formal 下公网 MailDeliver 受 CommandPolicy 拦截。
  */
 
 #include "MailTypes.h"
@@ -30,9 +26,13 @@ class MailService {
 public:
     static MailService &Instance();
 
+    /** 加载 MailConfig / 确保 MailStore 表就绪；失败则后续调用应拒绝。 */
     bool Init();
 
-    /** 系统投递（进程内 API）；幂等：同 source+business_key+receiver 只一封 */
+    /**
+     * 系统投递（进程内 API）；幂等：同 source+business_key+receiver 只一封。
+     * 成功写入 *mail_id；容量满等错误写入 *error_code/*message。
+     */
     bool Deliver(const mail::DeliverRequest &req, uint64_t *mail_id, std::string *error_code,
                  std::string *message);
 
@@ -40,6 +40,7 @@ public:
     bool HandleMailList(const game::MailListReq &req, game::GameResponse *rsp);
     bool HandleMailGet(const game::MailGetReq &req, game::GameResponse *rsp);
     bool HandleMailRead(const game::MailReadReq &req, game::GameResponse *rsp);
+    /** 同步领取单封（测试/降级路径）；正式路径优先 BeginHandleMailClaimAsync。 */
     bool HandleMailClaim(const game::MailClaimReq &req, game::GameResponse *rsp);
     /**
      * 真异步领取：启动 GameDB RPC 后立即返回；完成后调用 done（已在 PlayerSerialQueue 上）。
@@ -57,15 +58,21 @@ public:
     bool HandleMailFavorite(const game::MailFavoriteReq &req, game::GameResponse *rsp);
     bool HandleMailBatchRead(const game::MailBatchReadReq &req, game::GameResponse *rsp);
     bool HandleMailBatchDelete(const game::MailBatchDeleteReq &req, game::GameResponse *rsp);
+    /** 危险命令：系统投递入口（公网 Formal 应被策略拒绝）。 */
     bool HandleMailDeliver(const game::MailDeliverReq &req, game::GameResponse *rsp);
+    /** 玩家互寄邮件（限流 + 容量 + 文本校验）。 */
     bool HandlePlayerMailSend(const game::PlayerMailSendReq &req, game::GameResponse *rsp);
 
-    /** 定时/访问时：标记过期邮件 */
+    /** 定时/访问时：标记过期邮件；返回本批 affected 行数。 */
     int ScanExpire(int limit = 200);
 
+    /** 邮箱版本号（列表/摘要变更时递增，供客户端增量）。 */
     int64_t MailboxVersion(uint64_t player_id) const;
 
-    /** 供异步 callback 在 PlayerSerialQueue 上应用内存奖励；失败表示需 STATE_SYNC_REQUIRED */
+    /**
+     * 供异步 callback 在 PlayerSerialQueue 上应用内存奖励。
+     * 失败表示需 STATE_SYNC_REQUIRED（勿静默丢奖励）。
+     */
     bool ApplyClaimMemory(uint64_t player_id, const GameDbMailClaimResult &db_rsp);
 
 private:

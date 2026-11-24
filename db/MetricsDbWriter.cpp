@@ -1,7 +1,8 @@
 /**
- * MetricsDbWriter.cpp — MySQL/GameDB：指标。数据库。
- * 路径: db/MetricsDbWriter.cpp
+ * @file MetricsDbWriter.cpp
+ * @brief 指标采样入队与 MySQL 刷写
  */
+
 #include "MetricsDbWriter.h"
 
 #include "Connection.h"

@@ -2,8 +2,10 @@
 
 
 /**
- * GameLogicForwardServiceImpl.h — Gateway→Logic Forward 实现。
- * 路径: runtime/brpc/GameLogicForwardServiceImpl.h
+ * @file GameLogicForwardServiceImpl.h
+ * @brief GameLogic Forward：跨进程转发已鉴权游戏帧
+ *
+ * 不验密；依赖上游已绑定 SessionHandle。
  */
 #include "forward.pb.h"
 

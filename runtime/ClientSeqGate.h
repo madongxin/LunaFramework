@@ -2,18 +2,26 @@
 
 /**
  * @file ClientSeqGate.h
- * @brief 每玩家 client_seq：重复幂等、回退拒绝（与 BoundPlayer 状态解耦，便于单测）
+ * @brief 客户端移动/操作序号窗口门控：幂等重放或拒绝陈旧 seq
  *
- * GameRequest.seq 是连接级 RPC 序号。Hello / Heartbeat / PushAck 在 Gateway
- * 本地应答，不会 Dispatch 到 GameLogic，因此 Logic 侧看到的 seq 允许空洞
- * （例如 EnterMap=4、Heartbeat=5、Move=6）。只拒绝 client_seq < last（陈旧重放）。
+ * client_seq==0 视为无序号（兼容旧客户端）直接 Execute；等于 last 则 Idempotent
+ * 并回放 cached_frame；小于 last 则 Reject（ERR_STALE_SEQ）。供 MapRuntime Move 等使用。
  */
 
 #include <cstdint>
 #include <string>
 
+/** 序号窗口判定结果。 */
 enum class ClientSeqDecision { Execute, Idempotent, Reject };
 
+/**
+ * 根据上次已接受的 client_seq 判定本次请求。
+ * @param last_client_seq 连接/玩家上已接受的最大序号；0 表示尚无
+ * @param client_seq 本帧携带序号
+ * @param cached_frame 与 last 对应的已编码响应，供幂等重放
+ * @param out_cached 幂等时填入 cached_frame
+ * @param err Reject 时写入公开错误码
+ */
 inline ClientSeqDecision EvaluateClientSeq(uint64_t last_client_seq, uint64_t client_seq,
                                            const std::string &cached_frame,
                                            std::string *out_cached, std::string *err) {

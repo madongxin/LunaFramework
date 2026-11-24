@@ -1,8 +1,10 @@
 #pragma once
 
 /**
- * GameLogicServiceImpl.h — GameLogic 业务 RPC 实现。
- * 路径: runtime/brpc/GameLogicServiceImpl.h
+ * @file GameLogicServiceImpl.h
+ * @brief GameLogic 主业务 brpc：BindPlayer / EnterMap / 游戏请求处理
+ *
+ * 不接受密码/凭证；会话权威在 Session；地图写受 MapInstanceRegistry lease 栅栏。
  */
 #include "gamelogic_rpc.pb.h"
 

@@ -1,13 +1,15 @@
 /**
- * GatewayAuthPolicy.cpp — 玩法/网关：策略与门禁。网关相关。
- * 路径: game/GatewayAuthPolicy.cpp
+ * @file GatewayAuthPolicy.cpp
+ * @brief Gateway 预鉴权白名单与自有鉴权载荷判定
  */
+
 #include "GatewayAuthPolicy.h"
 
 #include "game.pb.h"
 
 namespace gameproto {
 
+/** Login/Logout/Reconnect/Register 由 Gateway 编排，勿当业务转发。 */
 bool IsGatewayOwnedAuthPayload(const std::string &payload) {
     game::GameRequest req;
     if (!req.ParseFromString(payload))
@@ -18,6 +20,7 @@ bool IsGatewayOwnedAuthPayload(const std::string &payload) {
            req.body_case() == game::GameRequest::kRegister;
 }
 
+/** 未绑定连接允许的帧（含 ClientHello/Heartbeat）。 */
 bool IsPreAuthWhitelistPayload(const std::string &payload) {
     game::GameRequest req;
     if (!req.ParseFromString(payload))

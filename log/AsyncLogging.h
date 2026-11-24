@@ -1,43 +1,50 @@
 #pragma once
 
-
 /**
- * AsyncLogging.h — 双缓冲异步日志后端，前台 Append、后台线程写文件。
- * 路径: log/AsyncLogging.h
+ * @file AsyncLogging.h
+ * @brief 双缓冲异步日志：前台 Append，后台线程批量写 LogFile
+ *
+ * current_/next_ 交换；满缓冲进 buffers_，ThreadFunc 唤醒后落盘。
+ * 与 Logger::setOutput 对接后，业务线程不阻塞在 fwrite。
  */
+
 #include <vector>
 #include <memory>
-
 #include <thread>
 #include "Latch.h"
 #include "Logging.h"
 
-static const double BufferWriteTimeout = 3.0; // 等待写入的时间
-static const int64_t FileMaximumSize = 1024 * 1024 * 1024; // 单个文件最大的容量
-class AsyncLogging{
-    public:
-        typedef FixedBuffer<FixedLargeBuffferSize> Buffer;
+static const double BufferWriteTimeout = 3.0;
+static const int64_t FileMaximumSize = 1024 * 1024 * 1024;
 
-        AsyncLogging(const char *filepath = nullptr);
-        ~AsyncLogging();
+class AsyncLogging {
+public:
+    typedef FixedBuffer<FixedLargeBuffferSize> Buffer;
 
-        void Stop();
-        void Start();
+    /** @param filepath 日志文件路径前缀；空则用默认命名 */
+    explicit AsyncLogging(const char *filepath = nullptr);
+    ~AsyncLogging();
 
-        void Append(const char* data, int len);
-        void Flush();
-        void ThreadFunc();
-    
-    private:
-        
-        bool running_;
-        const char *filepath_;
-        std::mutex mutex_;
-        std::condition_variable cv_;
-        Latch latch_;
-        std::thread thread_;
+    void Stop();
+    /** 启动后台线程；Latch 等待线程就绪 */
+    void Start();
 
-        std::unique_ptr<Buffer> current_; // 当前的缓存
-        std::unique_ptr<Buffer> next_; // 空闲的缓冲
-        std::vector<std::unique_ptr<Buffer>> buffers_;// 已满的缓冲区
+    /** 前台：把一行日志追加进 current_（可能交换缓冲并 notify） */
+    void Append(const char *data, int len);
+    /** 请求尽快刷盘（实现可能仅 notify） */
+    void Flush();
+    /** 后台循环：取满缓冲 → 写文件 → 滚动 */
+    void ThreadFunc();
+
+private:
+    bool running_;
+    const char *filepath_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
+    Latch latch_;
+    std::thread thread_;
+
+    std::unique_ptr<Buffer> current_;
+    std::unique_ptr<Buffer> next_;
+    std::vector<std::unique_ptr<Buffer>> buffers_;
 };

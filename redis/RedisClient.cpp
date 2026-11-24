@@ -1,7 +1,8 @@
 /**
- * RedisClient.cpp — Redis：客户端封装。Redis。
- * 路径: redis/RedisClient.cpp
+ * @file RedisClient.cpp
+ * @brief hiredis Connect 与命令封装实现
  */
+
 #include "RedisClient.h"
 
 #include "ServerStats.h"
@@ -37,6 +38,7 @@ RedisClient::~RedisClient() {
     Disconnect();
 }
 
+/** redisConnectWithTimeout + AUTH + PING */
 bool RedisClient::Connect(const std::string &host, int port, const std::string &password) {
     Disconnect();
     timeval tv{2, 0};
@@ -62,6 +64,7 @@ bool RedisClient::Connect(const std::string &host, int port, const std::string &
     return Ping();
 }
 
+/** redisFree；ctx_=nullptr */
 void RedisClient::Disconnect() {
     if (ctx_) {
         redisFree(static_cast<redisContext *>(ctx_));

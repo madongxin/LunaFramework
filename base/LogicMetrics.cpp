@@ -1,7 +1,8 @@
 /**
- * LogicMetrics.cpp — LogicMetrics 原子计数与导出文本。
- * 路径: base/LogicMetrics.cpp
+ * @file LogicMetrics.cpp
+ * @brief LogicMetrics 原子 last/peak 实现
  */
+
 #include "LogicMetrics.h"
 
 #include <atomic>

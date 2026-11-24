@@ -1,7 +1,8 @@
 /**
- * PublicError.cpp — 运行时：公网错误码/协议。
- * 路径: runtime/PublicError.cpp
+ * @file PublicError.cpp
+ * @brief PublicError 实现：内部错误到客户端公开码映射
  */
+
 #include "PublicError.h"
 
 #include "Logging.h"

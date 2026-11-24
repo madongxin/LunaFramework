@@ -2,8 +2,8 @@
 
 
 /**
- * GatewayConfigPath.h — 运行时：配置路径或读取。网关相关。
- * 路径: runtime/brpc/GatewayConfigPath.h
+ * @file GatewayConfigPath.h
+ * @brief Gateway 相关 *.cnf 路径解析辅助
  */
 #include "LunaServerPaths.h"
 

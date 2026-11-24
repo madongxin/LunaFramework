@@ -1,10 +1,13 @@
 #pragma once
 
-
 /**
- * RedisPool.h — Redis 连接池，供 SessionStore Lua/命令复用。
- * 路径: redis/RedisPool.h
+ * @file RedisPool.h
+ * @brief hiredis 连接池：Acquire/Lease RAII，供 SessionStore Lua 复用
+ *
+ * 每个 RedisClient 非线程安全；Lease 保证同时仅一个调用方持有。
+ * Shutdown 后旧 Lease 不得把连接放回新池（generation 校验）。
  */
+
 #include "RedisClient.h"
 
 #include <chrono>
@@ -15,13 +18,6 @@
 #include <string>
 #include <vector>
 
-/**
- * 有上限的 hiredis 连接池。每个 RedisClient 仍非线程安全；
- * 通过 Lease RAII 保证同一连接同一时刻只被一个调用方使用。
- *
- * CLOSING 后拒绝新 Acquire；Lease 持有 shared_ptr<PoolState>+generation，
- * Shutdown 后旧 Lease 不得把悬空指针放回新 Pool。
- */
 class RedisPool {
 public:
     struct PoolState {
@@ -38,17 +34,20 @@ public:
         int active = 0;
     };
 
+    /** 进程单例 */
     static RedisPool &Instance();
 
     bool Init(const std::string &host, int port, const std::string &password, int pool_size = 8);
     /** 测试注入已构造的客户端，不在 Init 里连真实 Redis。调用前应 Shutdown。 */
     bool InitWithClientsForTest(std::vector<std::unique_ptr<RedisClient>> clients);
+    /** 立即进入 CLOSING，等待租约归还并 Disconnect */
     void Shutdown();
     void Shutdown(std::chrono::milliseconds deadline);
     bool ready() const;
     int active_leases() const;
     uint64_t generation() const;
 
+    /** RAII 租约：析构时若 generation 匹配则还池 */
     class Lease {
     public:
         Lease() = default;
@@ -70,6 +69,7 @@ public:
         uint64_t generation_ = 0;
     };
 
+    /** 借出一条连接；超时返回空 Lease */
     Lease Acquire(int timeout_ms = 3000);
 
 private:

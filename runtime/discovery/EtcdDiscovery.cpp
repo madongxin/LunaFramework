@@ -1,6 +1,6 @@
 /**
- * EtcdDiscovery.cpp — 运行时：服务发现。etcd 发现。
- * 路径: runtime/discovery/EtcdDiscovery.cpp
+ * @file EtcdDiscovery.cpp
+ * @brief EtcdDiscovery 实现：HTTP 注册/发现与租约续约
  */
 #include "EtcdDiscovery.h"
 

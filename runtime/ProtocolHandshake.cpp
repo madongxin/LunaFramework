@@ -1,7 +1,8 @@
 /**
- * ProtocolHandshake.cpp — 运行时：协议编解码。握手。
- * 路径: runtime/ProtocolHandshake.cpp
+ * @file ProtocolHandshake.cpp
+ * @brief ProtocolHandshake 实现：ClientHello 校验与版本协商
  */
+
 #include "ProtocolHandshake.h"
 
 #include "FormalMode.h"

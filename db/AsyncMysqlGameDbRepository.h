@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * AsyncMysqlGameDbRepository.h — 异步 MySQL GameDB 仓储（工作线程）。
- * 路径: db/AsyncMysqlGameDbRepository.h
- */
 /**
  * @file AsyncMysqlGameDbRepository.h
  * @brief MySQL 实现的 GameDB：worker 池执行事务 + outbox 发布线程
@@ -21,12 +16,15 @@
 
 class AsyncMysqlGameDbRepository : public IGameDbRepository {
 public:
+    /** GameDB 进程内单例 */
     static AsyncMysqlGameDbRepository &Instance();
 
     void Start(int worker_count = 2) override;
+    /** 停止队列消费并 join 线程 */
     void Stop() override;
     bool started() const override { return started_; }
 
+    /** 投递到 worker 队列，完成后回调 done */
     void ClaimMailAttachmentsAsync(GameDbMailClaimRequest req, MailClaimDone done) override;
 
     /** 同步等待（供 MailService / 测试；勿在 Reactor IO 线程调用） */

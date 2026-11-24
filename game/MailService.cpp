@@ -1,7 +1,8 @@
 /**
- * MailService.cpp — 玩法/网关：业务服务逻辑。邮件相关。
- * 路径: game/MailService.cpp
+ * @file MailService.cpp
+ * @brief 邮件投递/列表/领取（含异步 GameDB claim）实现
  */
+
 #include "MailService.h"
 
 #include "AsyncMysqlGameDbRepository.h"
@@ -328,6 +329,7 @@ bool MailService::EnsureCapacityForDeliver(uint64_t receiver_id, std::string *er
     return true;
 }
 
+/** 系统投递；business_key 幂等；容量不足失败。 */
 bool MailService::Deliver(const mail::DeliverRequest &req, uint64_t *mail_id,
                           std::string *error_code, std::string *message) {
     if (!ready_ && !Init()) {
@@ -893,6 +895,7 @@ bool MailService::ClaimOne(uint64_t player_id, uint64_t mail_id, const std::stri
     return db_rsp.ok;
 }
 
+/** DB 提交后写内存奖励；失败需 STATE_SYNC_REQUIRED。 */
 bool MailService::ApplyClaimMemory(uint64_t player_id, const GameDbMailClaimResult &db_rsp) {
     if (!db_rsp.ok)
         return true;
@@ -919,6 +922,7 @@ bool MailService::ApplyClaimMemory(uint64_t player_id, const GameDbMailClaimResu
     return true;
 }
 
+/** 启动异步 GameDB claim；done 在玩家串行队列回调。 */
 bool MailService::BeginHandleMailClaimAsync(const game::MailClaimReq &req, game::GameResponse *rsp,
                                             std::function<void(game::GameResponse)> done) {
     if (!rsp || !done)

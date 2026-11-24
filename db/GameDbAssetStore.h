@@ -1,10 +1,10 @@
 #pragma once
 
-
 /**
- * GameDbAssetStore.h — 资产/版本等 GameDB 资产面。
- * 路径: db/GameDbAssetStore.h
+ * @file GameDbAssetStore.h
+ * @brief 资产类事务（金币/道具等）与 outbox 同提交
  */
+
 #include "Connection.h"
 
 #include <cstdint>
@@ -16,6 +16,7 @@ class GameDbAssetStore {
 public:
     static GameDbAssetStore &Instance();
 
+/** 建资产相关表 */
     bool EnsureTables();
     bool Available() const { return available_; }
 
@@ -33,7 +34,8 @@ public:
         uint64_t asset_version = 0;
         uint32_t remain_count = 0;
     };
-    bool ApplyMutation(uint64_t player_id, const std::string &idempotency_key,
+    /** 幂等资产变更 + outbox */
+bool ApplyMutation(uint64_t player_id, const std::string &idempotency_key,
                        uint64_t expected_version, const std::string &mutation_type, uint32_t item_id,
                        uint32_t count, MutationResult *out);
 

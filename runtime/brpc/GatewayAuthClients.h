@@ -2,8 +2,10 @@
 
 
 /**
- * GatewayAuthClients.h — Gateway 持有的 Auth/Session 客户端。
- * 路径: runtime/brpc/GatewayAuthClients.h
+ * @file GatewayAuthClients.h
+ * @brief Gateway 持有的 Auth/Session brpc 客户端集合
+ *
+ * 登录编排经本集合发 RPC；Channel 由 BrpcChannelManager 管理。
  */
 #include "RpcChannelSnapshot.h"
 #include "auth.pb.h"

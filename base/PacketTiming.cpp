@@ -1,7 +1,8 @@
 /**
- * PacketTiming.cpp — PacketTiming 实现。
- * 路径: base/PacketTiming.cpp
+ * @file PacketTiming.cpp
+ * @brief 包阶段耗时计数与慢包日志
  */
+
 #include "PacketTiming.h"
 
 #include "EventLoopMetrics.h"

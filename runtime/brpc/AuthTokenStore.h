@@ -2,8 +2,10 @@
 
 
 /**
- * AuthTokenStore.h — access_token 的 Redis 存储。
- * 路径: runtime/brpc/AuthTokenStore.h
+ * @file AuthTokenStore.h
+ * @brief Auth access token 的 Redis 存取（与 Session fence 分离）
+ *
+ * 仅 Auth 写 token；VerifyToken/Login 成功路径使用。
  */
 #include <cstdint>
 #include <mutex>

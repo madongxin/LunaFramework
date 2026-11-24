@@ -1,10 +1,13 @@
 #pragma once
 
-
 /**
- * AoiHoldGate.h — 出口 hold/背压门控。
- * 路径: runtime/AoiHoldGate.h
+ * @file AoiHoldGate.h
+ * @brief 按收件人 hold 的出口背压门：停放事件，Release 时先旧后新交给 emit
+ *
+ * Hold 期间 Admit 收下事件返回 true；未 hold 返回 false 由调用方直接入队。
+ * Release 在锁外调用 emit，期间新事件继续停住，保证顺序。模板参数 Event 通常为推送批。
  */
+
 #include <cstdint>
 #include <mutex>
 #include <unordered_map>
@@ -20,6 +23,7 @@
 template <typename Event>
 class AoiHoldGate {
 public:
+    /** 将收件人标记为 hold：后续 Admit 停放，直至 Release。 */
     void Hold(uint64_t id) {
         if (id == 0)
             return;
@@ -27,6 +31,7 @@ public:
         held_.insert(id);
     }
 
+    /** 该 id 当前是否处于 hold。 */
     bool Held(uint64_t id) const {
         std::lock_guard<std::mutex> lk(mu_);
         return held_.count(id) != 0;
@@ -41,6 +46,10 @@ public:
         return true;
     }
 
+    /**
+     * 解除 hold：循环取出已停放批次，在锁外调用 emit，再清 held。
+     * emit 期间新 Admit 仍停放，下一轮再交给 emit，保证旧事件在前。
+     */
     template <typename Emit>
     void Release(uint64_t id, Emit emit) {
         if (id == 0)

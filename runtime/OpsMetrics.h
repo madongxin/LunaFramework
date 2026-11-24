@@ -1,9 +1,14 @@
 #pragma once
 
 /**
- * OpsMetrics.h — 运维向计数（命令拒绝、过载等）。
- * 路径: runtime/OpsMetrics.h
+ * @file OpsMetrics.h
+ * @brief 进程内运维计数与 Prometheus 文本导出（不要求跨实例聚合）
+ *
+ * 覆盖 TCP/登录/fence/推送 ACK/AOI 积压/断线补偿/Logic Discover 等。
+ * Inc* 热路径用 memory_order_relaxed；Set* 为瞬时 gauge。
+ * 协作：GatewayConnGuard、PushAdmit、GatewayDisconnectAsync、HealthyLogicOwners。
  */
+
 #include <atomic>
 #include <cstdint>
 #include <string>

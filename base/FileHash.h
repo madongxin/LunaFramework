@@ -4,15 +4,9 @@
  * @file FileHash.h
  * @brief 流式文件/内存哈希（OpenSSL EVP：SHA-256 / SHA-1 / MD5）
  *
- * 用法（流式，适合大文件，不整文件读入内存）：
- *
  *   FileHasher h(FileHasher::Algo::Sha256);
- *   h.Update(buf, n);          // 可多次
+ *   h.Update(buf, n);
  *   std::string hex = h.FinalizeHex();
- *
- *   // 或一步到位：
- *   auto hex = FileHasher::HashFile("/path/to/file");
- *   auto hex2 = FileHasher::HashStream(istream);
  */
 
 #include <cstddef>

@@ -1,9 +1,11 @@
 /**
- * gamelogic_main.cpp — GameLogic 进程入口。
+ * @file gamelogic_main.cpp
+ * @brief GameLogic 进程入口。
+ *
  * 强制 role=gamelogic；第二个参数为 brpc listen 端口。
  * 玩法权威、AOI、地图租约；不接受密码/凭证。
- * 路径: apps/gamelogic_main.cpp
  */
+
 #include "ServerBootstrap.h"
 
 int main(int argc, char *argv[]) {

@@ -1,7 +1,8 @@
 /**
- * PlacementRecoveryScheduler.cpp — 运行时：占位/分线。恢复调度。
- * 路径: runtime/PlacementRecoveryScheduler.cpp
+ * @file PlacementRecoveryScheduler.cpp
+ * @brief PlacementRecoveryScheduler 实现：实验性占位恢复 Tick
  */
+
 #include "PlacementRecoveryScheduler.h"
 
 #include "Logging.h"

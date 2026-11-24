@@ -2,10 +2,9 @@
 
 /**
  * @file IGameDbRepository.h
- * @brief GameDB 异步仓储接口（阶段 4）
+ * @brief GameDB 异步仓储接口（阶段 4）：账号/角色等持久化抽象
  *
- * SQL 只在 GameDB worker / 连接池线程执行；业务线程通过回调或同步等待取结果。
- * 禁止在 Reactor IO 线程调用同步等待版本。
+ * Auth/Logic 经 brpc 或本接口访问；Formal 下非 gamedb 进程禁止直连 MySQL。
  */
 
 #include <cstdint>

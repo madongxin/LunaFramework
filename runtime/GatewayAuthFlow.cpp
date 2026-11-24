@@ -1,7 +1,11 @@
 /**
- * GatewayAuthFlow.cpp — 运行时：网关相关。鉴权相关。
- * 路径: runtime/GatewayAuthFlow.cpp
+ * @file GatewayAuthFlow.cpp
+ * @brief GatewayAuthFlow 实现：连接槽位、flow_gen 与 in-flight 互斥
+ *
+ * 全部公开方法经 mu_ 串行化；OnDisconnected 保留 slot 直至匹配的 End，
+ * 避免异步回调窗口内 AcceptCallback 误判。
  */
+
 #include "GatewayAuthFlow.h"
 
 GatewayAuthFlow &GatewayAuthFlow::Instance() {
@@ -9,6 +13,7 @@ GatewayAuthFlow &GatewayAuthFlow::Instance() {
     return g;
 }
 
+/** 连接建立：alive=true，清空 in_flight，flow_gen 从 0 起算。 */
 void GatewayAuthFlow::OnConnected(uint64_t connection_id) {
     std::lock_guard<std::mutex> lk(mu_);
     Slot &s = slots_[connection_id];
@@ -18,6 +23,7 @@ void GatewayAuthFlow::OnConnected(uint64_t connection_id) {
     s.flow_gen = 0;
 }
 
+/** 连接断开：标记非 alive；slot 可保留到 End 再 erase。 */
 void GatewayAuthFlow::OnDisconnected(uint64_t connection_id) {
     std::lock_guard<std::mutex> lk(mu_);
     auto it = slots_.find(connection_id);
@@ -28,6 +34,7 @@ void GatewayAuthFlow::OnDisconnected(uint64_t connection_id) {
     // 保留 slot 直至回调 End，避免 Accept 误判；也可 erase
 }
 
+/** 开编排：要求 alive 且无 in-flight；成功则 ++flow_gen。 */
 bool GatewayAuthFlow::TryBegin(uint64_t connection_id, uint64_t *flow_gen_out) {
     std::lock_guard<std::mutex> lk(mu_);
     Slot &s = slots_[connection_id];
@@ -42,6 +49,7 @@ bool GatewayAuthFlow::TryBegin(uint64_t connection_id, uint64_t *flow_gen_out) {
     return true;
 }
 
+/** 结束编排：代次匹配才清 in_flight；已死则擦除 slot。 */
 void GatewayAuthFlow::End(uint64_t connection_id, uint64_t flow_gen) {
     std::lock_guard<std::mutex> lk(mu_);
     auto it = slots_.find(connection_id);
@@ -54,6 +62,7 @@ void GatewayAuthFlow::End(uint64_t connection_id, uint64_t flow_gen) {
         slots_.erase(it);
 }
 
+/** 回调校验：alive 且 flow_gen 一致才可落地。 */
 bool GatewayAuthFlow::AcceptCallback(uint64_t connection_id, uint64_t flow_gen) const {
     std::lock_guard<std::mutex> lk(mu_);
     auto it = slots_.find(connection_id);

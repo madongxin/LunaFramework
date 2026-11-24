@@ -1,6 +1,9 @@
 /**
  * @file TcpServer.cpp
- * @brief TcpServer：accept 在主线，连接 IO 在子 EventLoop
+ * @brief TcpServer：accept 在主 reactor，连接 IO 在子 EventLoop
+ *
+ * 关闭路径必须「主线程删 map → 子线程 ConnectionDestructor」，
+ * 避免与 HandleNewConnection 并发改 connectionsMap_。
  */
 
 #include "TcpServer.h"
@@ -13,6 +16,7 @@
 
 TcpServer::TcpServer(EventLoop *loop, const char *ip, const int port)
     : main_reactor_(loop), next_conn_id_(1) {
+  // listen 挂在主 loop；新连接回调到 HandleNewConnection
   acceptor_ = std::make_unique<Acceptor>(main_reactor_, ip, port);
   acceptor_->set_newconnection_callback(
       std::bind(&TcpServer::HandleNewConnection, this, std::placeholders::_1));
@@ -21,11 +25,16 @@ TcpServer::TcpServer(EventLoop *loop, const char *ip, const int port)
 
 TcpServer::~TcpServer() {}
 
+/** 先起 IO 线程池，再阻塞进入主 Loop（只 accept） */
 void TcpServer::Start() {
   thread_pool_->start();
   main_reactor_->Loop();
 }
 
+/**
+ * accept 得到的新 fd：分配单调 conn_id，挂到某个子 reactor，
+ * 再在该线程 ConnectionEstablished（注册 epoll + on_connect_）。
+ */
 void TcpServer::HandleNewConnection(int fd) {
   assert(fd != -1);
 
@@ -44,11 +53,13 @@ void TcpServer::HandleNewConnection(int fd) {
   sub_reactor->RunOneFunc([conn]() { conn->ConnectionEstablished(); });
 }
 
+/** 子线程关闭回调入口：立刻转主线程删表，避免锁 map */
 void TcpServer::HandleClose(const std::shared_ptr<TcpConnection> &conn) {
   main_reactor_->RunOneFunc(
       std::bind(&TcpServer::HandleCloseInLoop, this, conn));
 }
 
+/** 主线程：业务 disconnect 回调 → erase map → 子线程析构 Channel */
 void TcpServer::HandleCloseInLoop(const std::shared_ptr<TcpConnection> &conn) {
   LOG_INFO << "TcpServer::HandleCloseInLoop - Remove connection [id#"
            << conn->id() << "-fd#" << conn->fd() << "]";
@@ -77,6 +88,7 @@ void TcpServer::set_disconnect_callback(
   on_disconnect_ = std::move(fn);
 }
 
+/** 优雅停服：不再 accept（已有连接仍由子 reactor 处理） */
 void TcpServer::StopAccepting() {
   if (acceptor_)
     acceptor_->PauseListening();

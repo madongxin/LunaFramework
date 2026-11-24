@@ -1,7 +1,8 @@
 /**
- * ProtoFraming.cpp — 编解码实现。
- * 路径: game/ProtoFraming.cpp
+ * @file ProtoFraming.cpp
+ * @brief 长度前缀帧编解码与 MaxFrameSize 环境覆盖
  */
+
 #include "ProtoFraming.h"
 
 #include <arpa/inet.h>
@@ -10,6 +11,7 @@
 
 namespace gameproto {
 
+/** 读 LUNASERVER_MAX_FRAME_BYTES，夹在 [1024, kAbsoluteMaxFrameSize]。 */
 uint32_t MaxFrameSize() {
     static const uint32_t kLimit = [] {
         const char *env = std::getenv("LUNASERVER_MAX_FRAME_BYTES");
@@ -25,6 +27,7 @@ uint32_t MaxFrameSize() {
     return kLimit;
 }
 
+/** 写入 4 字节大端长度 + payload；超限返回 false。 */
 bool EncodeFrame(const std::string &payload, std::string *out) {
     if (!out || payload.size() > MaxFrameSize())
         return false;
@@ -34,6 +37,7 @@ bool EncodeFrame(const std::string &payload, std::string *out) {
     return true;
 }
 
+/** 非破坏性解析：Complete 时 *consumed=4+len；半包 Incomplete；非法 Invalid。 */
 FrameDecodeResult DecodeOneFrameFrom(const std::string &buffer, size_t offset, std::string *payload,
                                      size_t *consumed) {
     if (!payload)
@@ -57,6 +61,7 @@ FrameDecodeResult DecodeOneFrameFrom(const std::string &buffer, size_t offset, s
     return FrameDecodeResult::Complete;
 }
 
+/** 调用 DecodeOneFrameFrom(0) 成功则 erase 消费字节。 */
 FrameDecodeResult DecodeOneFrame(std::string *buffer, std::string *payload) {
     if (!buffer)
         return FrameDecodeResult::Invalid;
@@ -67,6 +72,7 @@ FrameDecodeResult DecodeOneFrame(std::string *buffer, std::string *payload) {
     return dr;
 }
 
+/** 兼容旧接口：仅 Complete→true。 */
 bool TryDecodeOneFrame(std::string *buffer, std::string *payload) {
     return DecodeOneFrame(buffer, payload) == FrameDecodeResult::Complete;
 }

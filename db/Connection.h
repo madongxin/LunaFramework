@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * Connection.h — 单条 MySQL 连接封装：connect/update/query/预处理语句。
- * 路径: db/Connection.h
+ * @file Connection.h
+ * @brief 单条 MySQL 连接：connect / update / query / 预处理
+ *
+ * 由 ConnectionPool 创建与回收；业务勿长期持有裸指针，用完归还池。
  */
+
 #include <mysql/mysql.h>
 
 #include <chrono>
@@ -17,10 +19,13 @@ public:
     Connection();
     ~Connection();
 
+    /** TCP+认证建连；失败时 _conn 不可用 */
     bool connect(const std::string &ip, unsigned short port, const std::string &user,
                  const std::string &password, const std::string &dbname);
 
+    /** 执行写 SQL（INSERT/UPDATE/DELETE）；成功返回 true */
     bool update(const std::string &sql);
+    /** 执行读 SQL；调用方负责 mysql_free_result */
     MYSQL_RES *query(const std::string &sql);
 
     /** 注册/登录等带外部输入的语句走 MYSQL_STMT，参数不拼进 SQL。 */
@@ -36,6 +41,7 @@ public:
     bool commit();
     bool rollback();
 
+    /** 还池时刷新空闲起点，供回收线程判断 maxIdleTime */
     void refreshAliveTime();
     /** 自上次 refreshAliveTime 起的墙钟毫秒，不用 clock() 的进程 CPU 时间。 */
     int64_t getAlieTime() const;

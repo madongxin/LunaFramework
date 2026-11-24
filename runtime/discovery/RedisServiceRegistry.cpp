@@ -1,6 +1,6 @@
 /**
- * RedisServiceRegistry.cpp — 运行时：业务服务逻辑。注册表/发现。
- * 路径: runtime/discovery/RedisServiceRegistry.cpp
+ * @file RedisServiceRegistry.cpp
+ * @brief RedisServiceRegistry 实现
  */
 #include "RedisServiceRegistry.h"
 

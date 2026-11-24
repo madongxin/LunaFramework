@@ -1,7 +1,8 @@
 /**
- * GameTcpGateway.cpp — GameTcpGateway OnMessage/登录编排/推送接入。
- * 路径: game/GameTcpGateway.cpp
+ * @file GameTcpGateway.cpp
+ * @brief TCP 网关实现：拆帧、登录编排、转发与回包
  */
+
 #include "GameTcpGateway.h"
 
 #include "AoiEvidence.h"
@@ -1129,10 +1130,12 @@ GameTcpGateway::~GameTcpGateway() {
         thread_.join();
 }
 
+/** 启动后台线程跑 Run()；重复调用应避免（实现侧守护）。 */
 void GameTcpGateway::StartInBackground() {
     thread_ = std::thread([this]() { Run(); });
 }
 
+/** 投递到 gateway loop 停止 Acceptor。 */
 void GameTcpGateway::StopAccepting() {
     EventLoop *lp = loop_.load();
     TcpServer *srv = server_.load();
@@ -1141,6 +1144,7 @@ void GameTcpGateway::StopAccepting() {
     lp->QueueOneFunc([srv]() { srv->StopAccepting(); });
 }
 
+/** 退出 EventLoop，使后台线程可结束。 */
 void GameTcpGateway::RequestQuit() {
     EventLoop *lp = loop_.load();
     if (!lp)
@@ -1148,6 +1152,7 @@ void GameTcpGateway::RequestQuit() {
     lp->QueueOneFunc([lp]() { lp->Quit(); });
 }
 
+/** 建 TcpServer、注册回调、领取 Gateway claim、阻塞 Loop。 */
 void GameTcpGateway::Run() {
     InProcessTransport::Instance().EnsureStarted(0);
     RpcOffloadPool::Instance().Start(0);
@@ -1359,6 +1364,7 @@ void GameTcpGateway::Run() {
     RpcOffloadPool::Instance().Stop();
 }
 
+/** 流式拆帧：预鉴权/登录编排或投递串行队列；坏帧关连。 */
 void GameTcpGateway::OnMessage(const std::shared_ptr<TcpConnection> &conn) {
     const auto msg_t0 = std::chrono::steady_clock::now();
     struct MsgWatch {

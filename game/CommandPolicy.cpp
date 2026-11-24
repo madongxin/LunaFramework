@@ -1,7 +1,8 @@
 /**
- * CommandPolicy.cpp — 玩法/网关：策略与门禁。命令路由/策略。
- * 路径: game/CommandPolicy.cpp
+ * @file CommandPolicy.cpp
+ * @brief 公网命令 Allow/Forbid 策略实现
  */
+
 #include "CommandPolicy.h"
 
 #include "CommandSpec.h"
@@ -12,6 +13,7 @@
 
 namespace gameproto {
 
+/** Formal 恒 false；否则看 LUNASERVER_ALLOW_UNSAFE_DEBUG_COMMANDS。 */
 bool AllowUnsafeDebugCommands() {
     if (FormalModeEnabled())
         return false;
@@ -36,6 +38,7 @@ bool IsAuthenticatedClientAllowlisted(game::GameRequest::BodyCase body) {
 
 }  // namespace
 
+/** 查 CommandSpec + 信任级别；未登记对客户端拒绝。 */
 CommandDecision ValidateCommandPolicy(game::GameRequest::BodyCase body, CommandTrustLevel trust,
                                       bool formal_mode, std::string *err_code) {
     if (body == game::GameRequest::BODY_NOT_SET) {
@@ -75,6 +78,7 @@ CommandDecision ValidateCommandPolicy(game::GameRequest::BodyCase body, CommandT
     return CommandDecision::Allow;
 }
 
+/** 解析 payload 后按 bound 选 PreAuth/Authenticated 策略。 */
 bool AllowClientTcpPayload(const std::string &payload, bool bound, bool formal_mode,
                            std::string *err_code) {
     game::GameRequest req;

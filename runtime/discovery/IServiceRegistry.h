@@ -2,8 +2,10 @@
 
 
 /**
- * IServiceRegistry.h — 服务注册发现接口 + Static 实现。
- * 路径: runtime/discovery/IServiceRegistry.h
+ * @file IServiceRegistry.h
+ * @brief 服务注册发现接口 + Static 实现
+ *
+ * 业务禁止直接依赖硬编码地址列表；etcd 可选，静态 *_addrs 经本接口回落。
  */
 #include <cstdint>
 #include <mutex>
@@ -31,8 +33,11 @@ public:
         int64_t expire_at_ms = 0;
     };
 
+    /** 注册实例；ttl_sec>0 时设置绝对过期。 */
     virtual bool RegisterInstance(const ServiceInstance &inst, int ttl_sec = 30) = 0;
+    /** 注销实例。 */
     virtual bool UnregisterInstance(const std::string &service, const std::string &instance_id) = 0;
+    /** 更新状态：UP / DRAINING / DOWN。 */
     virtual bool SetInstanceStatus(const std::string &service, const std::string &instance_id,
                                    const std::string &status) = 0;
     /** 默认只返回 UP（不含 DRAINING/DOWN） */

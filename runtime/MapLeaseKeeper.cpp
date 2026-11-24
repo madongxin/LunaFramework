@@ -1,7 +1,8 @@
 /**
- * MapLeaseKeeper.cpp — 运行时：地图/场景相关。租约。
- * 路径: runtime/MapLeaseKeeper.cpp
+ * @file MapLeaseKeeper.cpp
+ * @brief MapLeaseKeeper 实现：Tick 内 HeartbeatOwner 续租，失败则 Release
  */
+
 #include "MapLeaseKeeper.h"
 
 #include "Logging.h"

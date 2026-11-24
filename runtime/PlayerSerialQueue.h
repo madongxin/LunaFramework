@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * PlayerSerialQueue.h — 按 player_id 串行化业务处理，避免同玩家并发改状态。
- * 路径: runtime/PlayerSerialQueue.h
+ * @file PlayerSerialQueue.h
+ * @brief 按 player_id 分片的串行队列：同玩家请求不并行
+ *
+ * InProcessTransport 投递目标；Start(shard_count) 后 Post 任务到对应分片线程。
  */
+
 #include <atomic>
 #include <chrono>
 #include <condition_variable>

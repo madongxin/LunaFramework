@@ -1,7 +1,8 @@
 /**
- * HttpResponse.cpp — HttpResponse 实现。
- * 路径: http/HttpResponse.cpp
+ * @file HttpResponse.cpp
+ * @brief HttpResponse 实现。
  */
+
 #include "HttpResponse.h"
 #include <string>
 

@@ -1,7 +1,8 @@
 /**
- * GameRequestPlayerId.cpp — 运行时：请求解析。玩家。
- * 路径: runtime/GameRequestPlayerId.cpp
+ * @file GameRequestPlayerId.cpp
+ * @brief GameRequestPlayerId 实现：从请求载荷解析 player_id
  */
+
 #include "GameRequestPlayerId.h"
 
 #include "game.pb.h"

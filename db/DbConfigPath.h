@@ -1,15 +1,17 @@
 #pragma once
 
 /**
- * DbConfigPath.h — mysql.cnf 路径解析。
- * 路径: db/DbConfigPath.h
+ * @file DbConfigPath.h
+ * @brief mysql.cnf 等 DB 配置路径（按 exe 解析项目 config/）
  */
+
 #include "LunaServerPaths.h"
 
 #include <string>
 
 namespace DbConfigPath {
 
+/** mysql.cnf 绝对或相对路径 */
 inline const std::string &MysqlCnf() {
     static std::string path = "../config/mysql.cnf";
     static bool once = false;

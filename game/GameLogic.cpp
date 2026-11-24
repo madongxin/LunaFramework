@@ -1,7 +1,8 @@
 /**
- * GameLogic.cpp — GameLogic::Handle 分发与各玩法实现。
- * 路径: game/GameLogic.cpp
+ * @file GameLogic.cpp
+ * @brief 玩法业务分发与内存态实现（Handle/Bind/AOI/资产同步）
  */
+
 #include "GameLogic.h"
 
 #include "AoiEvidence.h"
@@ -518,6 +519,7 @@ void GameLogic::SweepDisconnected() {
         LOG_INFO << "GameLogic expired disconnected entities n=" << n;
 }
 
+/** 锁外投递 AOI 发布队列；持 MapRuntime 锁时禁止调用。 */
 void GameLogic::EmitAoi(const AoiPushBatch &batch) {
 #ifdef WEBSERVER_ENABLE_BRPC
     EnqueueAoi(batch);
@@ -1942,6 +1944,7 @@ bool GameLogic::GetPlayerAttributes(uint64_t player_id, game::PlayerAttributes *
     return true;
 }
 
+/** 已认证加载：画像+背包；失败 fail-closed。不接收凭证。 */
 bool GameLogic::BindAuthenticatedPlayer(uint64_t player_id, std::string *err,
                                         game::PlayerAttributes *profile_out) {
     InvalidateSessionTokenCache(player_id);
@@ -3409,6 +3412,7 @@ bool GameLogic::HandleRespawn(const game::RespawnReq &req, game::GameResponse *r
  */
 void GameLogic::SetFriendCommandsEnabled(bool enabled) { friend_commands_enabled_ = enabled; }
 
+/** oneof 分发；需 token 的命令先 RequireSessionToken。 */
 bool GameLogic::Handle(const game::GameRequest &req, game::GameResponse *rsp) {
     struct LogicHandleTimer {
         std::chrono::steady_clock::time_point t0{std::chrono::steady_clock::now()};

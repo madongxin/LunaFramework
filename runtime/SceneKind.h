@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * SceneKind.h — 运行时：模块实现，见同名头文件与调用方。
- * 路径: runtime/SceneKind.h
+ * @file SceneKind.h
+ * @brief 场景类型与 MapScenePolicy / MapPortal 静态策略结构
+ *
+ * LINE/DUNGEON 等；MapCatalog manifest 使用。
  */
+
 #include "MapStaticData.h"
 
 #include <cstdint>

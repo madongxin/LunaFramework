@@ -1,7 +1,8 @@
 /**
- * GameService.cpp — HandleFrame 实现。
- * 路径: game/GameService.cpp
+ * @file GameService.cpp
+ * @brief 单帧 HandleFrame：反序列化、可信身份、调用 GameLogic、编码响应
  */
+
 #include "GameService.h"
 
 #include "ForwardMetaContext.h"
@@ -15,6 +16,7 @@
 
 namespace gameproto {
 
+/** 反序列化 → 可选可信 player_id → GameLogic::Handle → EncodeFrame。 */
 bool HandleFrame(const std::string &request_payload, std::string *response_frame) {
     if (!response_frame)
         return false;

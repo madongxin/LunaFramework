@@ -1,9 +1,17 @@
 #pragma once
 
 /**
- * MapRuntime.h — 本进程地图实例运行时：玩家进图、viewer 连接、分线/副本占位的内存态。
- * 路径: runtime/MapRuntime.h
+ * @file MapRuntime.h
+ * @brief 本进程地图实例运行时：进图/移动/AOI 兴趣与推送批
+ *
+ * 持有 map_instance_id → InstanceState（实体、格子、visible/watchers、ENTER/LEAVE 补发）。
+ * Enter/Move/Leave/Disconnect 产出 AoiPushBatch，由上层经 Gateway Push 下发；
+ * NoteAoiWrite 仅表示进了网关发送缓冲，不是内核写完或客户端 ACK。
+ *
+ * 协作：MapStaticData 只读网格；MapInstanceRegistry 管 Claim/lease；AOI 模块管发送序与门控。
+ * 约束：maps_/player_map_ 用 mu_；单图 AOI 扫描持 InstanceState::mu，不跨图持锁。
  */
+
 #include "AoiEvidence.h"
 #include "MapStaticData.h"
 
@@ -80,26 +88,42 @@ class MapRuntime {
 public:
     static MapRuntime &Instance();
 
+    /** 默认 AOI 视距（格）；新实例创建时采用，已存在实例不改。 */
     void SetViewRadiusCells(int n);
     int view_radius_cells() const { return view_radius_; }
-    // 新实例冻结的可见人数。已创建的实例不随后续调用改变。范围 1..200。
+    /** 新实例冻结的可见人数上限；已创建实例不随后续调用改变。范围 1..200。 */
     void SetMaxVisible(int n);
     int max_visible() const { return max_visible_; }
 
     /** EnterMap / 重连之后把移动序号窗口清零，下一个合法 seq 从 1 起。 */
     void ResetClientSeq(uint64_t player_id);
+    /**
+     * 玩家进入地图实例：登记实体、建格子索引、刷新周围兴趣并产出 ENTER 推送。
+     * view_radius_cells/max_visible <0 时用进程默认；失败时经 err 返回原因。
+     */
     bool Enter(uint64_t map_instance_id, std::shared_ptr<const MapStaticData> data,
                MapEntity entity, MapEntity *self_out, std::vector<MapEntity> *aoi_snapshot,
                AoiPushBatch *pushes, std::string *err, int view_radius_cells = -1,
                int max_visible = -1);
-    /** 关闭已回收实例（空线/空本 CLOSED） */
+    /** 关闭已回收实例（空线/空本 CLOSED）；有实体时拒绝。 */
     bool Unload(uint64_t map_instance_id);
+    /**
+     * 权威移动校验与 AOI 刷新。
+     * 校验可行走/速度/seq；成功写 confirmed 并往 pushes 填 MOVE/ENTER/LEAVE。
+     * ignore_speed 仅测试或传送路径使用。
+     */
     MapMoveReject Move(uint64_t map_instance_id, uint64_t player_id, float x, float y, float z,
                        float yaw, uint64_t client_seq, int64_t now_ms, MapEntity *confirmed,
                        AoiPushBatch *pushes, std::string *err_code, bool ignore_speed = false,
                        int64_t client_time_ms = 0);
+    /** 主动离图：删实体、通知观察者 LEAVE。 */
     bool Leave(uint64_t map_instance_id, uint64_t player_id, AoiPushBatch *pushes);
+    /** 玩家从所有本地图离开（切图/下线清理）。 */
     void LeaveAll(uint64_t player_id, AoiPushBatch *pushes);
+    /**
+     * 标记断线：实体暂留宽限窗口，connected=false；周围可收到状态变化。
+     * 与 Leave 不同——宽限内 Reconnect 可恢复。
+     */
     bool Disconnect(uint64_t player_id, AoiPushBatch *pushes);
     /** 宽限到期后删掉断线实体，并再给周围还在线的人发一次 LEAVE。 */
     size_t ExpireDisconnected(int64_t grace_ms, AoiPushBatch *pushes);

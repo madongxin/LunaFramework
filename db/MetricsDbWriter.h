@@ -1,9 +1,10 @@
 #pragma once
 
 /**
- * MetricsDbWriter.h — 指标周期性写入 MySQL（非 gamedb 角色可选）。
- * 路径: db/MetricsDbWriter.h
+ * @file MetricsDbWriter.h
+ * @brief 周期把进程指标写入 MySQL（非 gamedb 角色可选开启）
  */
+
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>
@@ -38,6 +39,7 @@ struct MetricsHistoryQuery {
 
 class MetricsDbWriter {
 public:
+    /** 进程单例 */
     static MetricsDbWriter &Instance();
 
     void StartPeriodic(EventLoop *loop, double interval_sec);

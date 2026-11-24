@@ -1,15 +1,17 @@
 #pragma once
 
 /**
- * RedisConfigPath.h — redis.cnf 路径。
- * 路径: redis/RedisConfigPath.h
+ * @file RedisConfigPath.h
+ * @brief redis.cnf 路径解析
  */
+
 #include "LunaServerPaths.h"
 
 #include <string>
 
 namespace RedisConfigPath {
 
+/** redis.cnf 路径 */
 inline const std::string &RedisCnf() {
     static std::string path = "../config/redis.cnf";
     static bool once = false;

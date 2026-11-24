@@ -2,8 +2,10 @@
 
 
 /**
- * GameLogicPush.h — Logic→Gateway PushBatch 封装。
- * 路径: runtime/brpc/GameLogicPush.h
+ * @file GameLogicPush.h
+ * @brief GameLogic 推送出口：按 gateway_instance_id 定向 PushBatch
+ *
+ * 禁止广播到所有 Gateway；与 GatewayPushClient / Aoi 发送路径协作。
  */
 #include "gateway_push.pb.h"
 

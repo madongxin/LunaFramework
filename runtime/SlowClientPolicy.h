@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @file SlowClientPolicy.h
+ * @brief 慢客户端降级：拉长远层 AOI 间隔、收紧发送配额等
+ */
+
 #include "MoveSendConfig.h"
 
 #include <cstdint>

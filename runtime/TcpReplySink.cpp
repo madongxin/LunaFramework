@@ -1,7 +1,8 @@
 /**
- * TcpReplySink.cpp — 运行时：回包。
- * 路径: runtime/TcpReplySink.cpp
+ * @file TcpReplySink.cpp
+ * @brief TcpReplySink 实现：经 TcpConnection 回写外网帧
  */
+
 #include "TcpReplySink.h"
 
 #include "Buffer.h"

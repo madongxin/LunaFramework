@@ -1,7 +1,8 @@
 /**
- * MapLineView.cpp — 运行时：地图/场景相关。
- * 路径: runtime/MapLineView.cpp
+ * @file MapLineView.cpp
+ * @brief MapLineView 实现：PlacementStore 分线组装、protobuf 填充与 Prometheus 导出
  */
+
 #include "MapLineView.h"
 
 #include "MapCatalog.h"

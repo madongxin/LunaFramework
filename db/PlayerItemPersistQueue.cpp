@@ -1,6 +1,6 @@
 /**
  * @file PlayerItemPersistQueue.cpp
- * @brief 道具落库队列：入队、定时刷在线玩家、登出即时刷
+ * @brief 道具变更队列批量刷库
  */
 
 #include "PlayerItemPersistQueue.h"

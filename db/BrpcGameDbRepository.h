@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * BrpcGameDbRepository.h — 经 brpc 访问远端 GameDB 的仓储客户端（Logic/Gateway 使用）。
- * 路径: db/BrpcGameDbRepository.h
+ * @file BrpcGameDbRepository.h
+ * @brief 经 brpc 访问远端 GameDB（Logic/Gateway 侧客户端）
+ *
+ * 多地址 Channel 快照 + ApplySnapshot 热更新；资产/档案/邮件/好友均走 RPC。
  */
+
 #include "IGameDbRepository.h"
 #include "game.pb.h"
 #include "gamedb.pb.h"
@@ -29,9 +31,11 @@ struct GameDbChannelSnapshot {
 /** World/Logic 侧：经 brpc 调用独立 GameDB；支持多地址 + ApplySnapshot */
 class BrpcGameDbRepository : public IGameDbRepository {
 public:
+    /** 进程单例 */
     static BrpcGameDbRepository &Instance();
 
     bool Init(const std::string &addr, int timeout_ms = 3000);
+    /** 多地址初始化；负载在 channels 间轮询/选取 */
     bool Init(const std::vector<std::string> &addrs, int timeout_ms = 3000);
     /** 热更新 Channel 快照；空列表保留现有（不 fail-open 清空） */
     bool ApplySnapshot(const std::vector<std::string> &addrs);
@@ -54,7 +58,9 @@ public:
         uint64_t asset_version = 0;
         uint32_t remain_count = 0;
     };
+    /** 加载玩家资产版本与是否存在 */
     bool LoadPlayer(uint64_t player_id, uint64_t *asset_version, bool *exists, std::string *err);
+    /** 加载背包 item_id→count */
     bool LoadInventory(uint64_t player_id, std::map<uint32_t, uint32_t> *bag, uint64_t *version,
                        std::string *err);
     bool LoadPlayerProfile(uint64_t player_id, bool ensure_default, game::PlayerAttributes *out,
@@ -75,6 +81,7 @@ public:
     bool LoadLastSafePosition(uint64_t player_id, LastSafePos *out, std::string *err);
     bool SaveLastSafePosition(const LastSafePos &pos, uint64_t expected_version,
                               uint64_t *out_version, bool *skipped, std::string *err);
+    /** 幂等资产变更（期望版本 + idempotency_key） */
     bool ApplyAssetMutation(uint64_t player_id, const std::string &idempotency_key,
                             uint64_t expected_version, const std::string &mutation_type,
                             uint32_t item_id, uint32_t count, const std::string &trace_id,
@@ -92,6 +99,7 @@ public:
     /** Formal World 邮件：把 GameRequest payload 交给 GameDB MailService */
     bool HandleGameFrame(uint64_t player_id, const std::string &request_payload,
                          std::string *response_frame, std::string *err);
+    /** 好友事务 RPC */
     bool FriendOp(const gdb::FriendOpReq &req, gdb::FriendOpRsp *rsp, std::string *err);
 
 private:

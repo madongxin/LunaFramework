@@ -1,6 +1,6 @@
 /**
- * GatewayPushServer.cpp — 运行时：服务端启动或 RPC 服务。网关相关。
- * 路径: runtime/brpc/GatewayPushServer.cpp
+ * @file GatewayPushServer.cpp
+ * @brief GatewayPushServer 实现
  */
 #include "GatewayPushServer.h"
 

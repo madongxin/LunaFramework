@@ -1,6 +1,6 @@
 /**
- * GlobalServiceBrpcServer.cpp — 运行时：业务服务逻辑。服务端启动或 RPC 服务。
- * 路径: runtime/brpc/GlobalServiceBrpcServer.cpp
+ * @file GlobalServiceBrpcServer.cpp
+ * @brief GlobalServiceBrpcServer 实现
  */
 #include "GlobalServiceBrpcServer.h"
 

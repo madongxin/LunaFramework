@@ -1,6 +1,6 @@
 /**
- * NatsThinClient.cpp — 运行时：客户端封装。NATS 薄客户端。
- * 路径: runtime/discovery/NatsThinClient.cpp
+ * @file NatsThinClient.cpp
+ * @brief NatsThinClient 实现
  */
 #include "NatsThinClient.h"
 

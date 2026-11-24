@@ -1,7 +1,8 @@
 /**
- * AoiEvidenceFrame.cpp — 运行时：AOI 相关。证据/审计。
- * 路径: runtime/AoiEvidenceFrame.cpp
+ * @file AoiEvidenceFrame.cpp
+ * @brief AoiEvidence 帧侧辅助：按帧类型记录写失败与阶段耗时
  */
+
 #include "AoiEvidence.h"
 
 #include "ProtoFraming.h"

@@ -1,6 +1,6 @@
 /**
- * GameDbBrpcServer.cpp — 运行时：服务端启动或 RPC 服务。brpc 相关。
- * 路径: runtime/brpc/GameDbBrpcServer.cpp
+ * @file GameDbBrpcServer.cpp
+ * @brief GameDbBrpcServer 实现
  */
 #include "GameDbBrpcServer.h"
 

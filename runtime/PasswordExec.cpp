@@ -1,7 +1,8 @@
 /**
- * PasswordExec.cpp — 运行时：密码哈希。
- * 路径: runtime/PasswordExec.cpp
+ * @file PasswordExec.cpp
+ * @brief PasswordExec 实现：worker 池 Post/Stop/Loop
  */
+
 #include "PasswordExec.h"
 
 PasswordExec &PasswordExec::Instance() {

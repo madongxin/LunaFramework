@@ -1,7 +1,8 @@
 /**
- * MapStaticData.cpp — 运行时：地图/场景相关。静态数据。
- * 路径: runtime/MapStaticData.cpp
+ * @file MapStaticData.cpp
+ * @brief MapStaticData 实现：JSON/SHA 解析、可行走查询与散布出生点
  */
+
 #include "MapStaticData.h"
 
 #include "FileHash.h"

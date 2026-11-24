@@ -1,7 +1,8 @@
 /**
- * OpsMetrics.cpp — 运行时：指标。
- * 路径: runtime/OpsMetrics.cpp
+ * @file OpsMetrics.cpp
+ * @brief OpsMetrics 实现：运维计数累加与文本导出
  */
+
 #include "AoiLeaveReason.h"
 #include "AoiEvidence.h"
 #include "OpsMetrics.h"

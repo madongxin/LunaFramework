@@ -1,6 +1,6 @@
 /**
- * GatewayAuthClients.cpp — 运行时：客户端封装。网关相关。
- * 路径: runtime/brpc/GatewayAuthClients.cpp
+ * @file GatewayAuthClients.cpp
+ * @brief GatewayAuthClients 实现
  */
 #include "GatewayAuthClients.h"
 

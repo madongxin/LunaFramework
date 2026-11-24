@@ -1,10 +1,14 @@
 #pragma once
 
-
 /**
- * AoiMoveCoalesceLedger.h — 纯 MOVE 合并账本。
- * 路径: runtime/AoiMoveCoalesceLedger.h
+ * @file AoiMoveCoalesceLedger.h
+ * @brief 每连接纯 MOVE 合并账本：Offer/Pick/字节预算与 near/far 配额
+ *
+ * 槽是唯一事实来源，发出去的帧只是可丢弃快照。ENTER/LEAVE 须 Forget。
+ * NoteControlWire 计入控制帧占用，位置额度相应减少；EGRESS_ENFORCE 时字节配额为硬上限。
+ * 协作：AoiOutboundOrder、Gateway 出口发送、MoveSendConfig。
  */
+
 #include "AoiEvidence.h"
 #include "MoveSendConfig.h"
 #include "ServerStats.h"

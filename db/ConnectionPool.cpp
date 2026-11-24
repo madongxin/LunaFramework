@@ -1,6 +1,6 @@
 /**
  * @file ConnectionPool.cpp
- * @brief MySQL 连接池实现：配置加载、预建、生产者扩容、空闲回收、RAII 借还
+ * @brief 连接池 Init/借还/生产与回收线程
  */
 
 #include "ConnectionPool.h"
@@ -33,6 +33,7 @@ std::string Trim(std::string s) {
 
 }  // namespace
 
+/** Formal 数据边界：禁止本进程建 MySQL 池 */
 void ConnectionPool::ForbidInit(const char *reason) {
     g_mysql_forbidden.store(true);
     LOG_WARN << "ConnectionPool ForbidInit: " << (reason ? reason : "forbidden");
@@ -40,6 +41,7 @@ void ConnectionPool::ForbidInit(const char *reason) {
 
 bool ConnectionPool::IsForbidden() { return g_mysql_forbidden.load(); }
 
+/** Meyers 单例；首次触发读配置与预建连 */
 ConnectionPool *ConnectionPool::getconnectionPool() {
     // C++11 起局部 static 初始化线程安全。堆分配且不 delete：后台 produce/recycle
     // 线程已 detach，进程退出时销毁 condvar 会与 pthread_cond_wait 死锁。
@@ -187,6 +189,7 @@ void ConnectionPool::recycleConnectionTask() {
     }
 }
 
+/** 借出空闲连接；超时返回 nullptr */
 std::shared_ptr<Connection> ConnectionPool::getConnection() {
     const auto wait_started = std::chrono::steady_clock::now();
     std::unique_lock<std::mutex> lock(_queueMutex);

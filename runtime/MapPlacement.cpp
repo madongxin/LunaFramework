@@ -1,7 +1,8 @@
 /**
- * MapPlacement.cpp — 运行时：地图/场景相关。占位/分线。
- * 路径: runtime/MapPlacement.cpp
+ * @file MapPlacement.cpp
+ * @brief MapPlacement 实现：RR 分配实例、查表、Migrate 升 epoch/route_version
  */
+
 #include "MapPlacement.h"
 
 MapPlacement &MapPlacement::Instance() {

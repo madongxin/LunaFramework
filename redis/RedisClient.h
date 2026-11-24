@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * RedisClient.h — hiredis 同步客户端封装（单连接，非线程安全）。
- * 路径: redis/RedisClient.h
- */
 /**
  * @file RedisClient.h
  * @brief Redis 同步客户端封装（基于 hiredis）

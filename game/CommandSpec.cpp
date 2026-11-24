@@ -1,7 +1,8 @@
 /**
- * CommandSpec.cpp — 玩法/网关：命令路由/策略。规格表。
- * 路径: game/CommandSpec.cpp
+ * @file CommandSpec.cpp
+ * @brief GameRequest 命令规格静态表
  */
+
 #include "CommandSpec.h"
 
 namespace gameproto {
@@ -62,6 +63,7 @@ const CommandSpec kTable[] = {
 
 }  // namespace
 
+/** 线性查找静态表；未登记返回 nullptr。 */
 const CommandSpec *FindCommandSpec(game::GameRequest::BodyCase body) {
     for (const CommandSpec &s : kTable) {
         if (s.body == body)
@@ -70,6 +72,7 @@ const CommandSpec *FindCommandSpec(game::GameRequest::BodyCase body) {
     return nullptr;
 }
 
+/** 供单测遍历全部规格行。 */
 const CommandSpec *CommandSpecTable(int *count) {
     if (count)
         *count = static_cast<int>(sizeof(kTable) / sizeof(kTable[0]));

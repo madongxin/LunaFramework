@@ -1,6 +1,6 @@
 /**
- * LogFile.cpp — LogFile 写盘与滚动。
- * 路径: log/LogFile.cpp
+ * @file LogFile.cpp
+ * @brief 日志文件 fopen/a+、fwrite_unlocked、按字节与时间滚动
  */
 #include "LogFile.h"
 #include "TimeStamp.h"
@@ -29,6 +29,7 @@ LogFile::~LogFile() {
     }
 }
 
+/** fwrite_unlocked；累计 written_bytes_，必要时 Flush */
 void LogFile::Write(const char* data, int len) {
     if (!fp_ || len <= 0)
         return;
@@ -53,6 +54,7 @@ void LogFile::Write(const char* data, int len) {
 
 int64_t LogFile::writtenbytes() const { return written_bytes_; }
 
+/** fflush；更新 lastflush_ */
 void LogFile::Flush() {
     if (fp_)
         fflush(fp_);

@@ -1,7 +1,10 @@
 /**
- * InProcessTransport.cpp — 运行时：传输层。
- * 路径: runtime/InProcessTransport.cpp
+ * @file InProcessTransport.cpp
+ * @brief InProcessTransport 实现：投递 PlayerSerialQueue 并在队列线程 HandleFrame
+ *
+ * PostPlayerRequest 捕获 payload/sink/player_id；失败仅打日志，成功则 sink->Reply。
  */
+
 #include "InProcessTransport.h"
 
 #include "GameService.h"

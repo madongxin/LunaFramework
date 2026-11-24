@@ -1,13 +1,20 @@
 #pragma once
 
+/**
+ * @file RecentSamples.h
+ * @brief 环形缓冲最近 256 个样本，支持分位数查询
+ *
+ * 无样本时 Percentile 返回 false，监控侧显示「无数据」。
+ */
+
 #include <algorithm>
 #include <cstdint>
 #include <mutex>
 #include <vector>
 
-/** 最近 256 个样本。没有样本时 Percentile 返回 false，监控侧显示无数据。 */
 class RecentSamples {
 public:
+    /** 写入一个样本（满 256 后环形覆盖） */
     void Add(int64_t v) {
         std::lock_guard<std::mutex> lk(mu_);
         if (buf_.size() < 256)
@@ -22,6 +29,7 @@ public:
         return buf_.empty();
     }
 
+    /** @param pct 0..100；成功时 *out 为分位值 */
     bool Percentile(double q, int64_t *out) const {
         std::lock_guard<std::mutex> lk(mu_);
         if (buf_.empty() || !out)

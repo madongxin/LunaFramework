@@ -1,6 +1,6 @@
 /**
  * @file RocksDbClient.cpp
- * @brief RocksDB 客户端：Open/Close、字节串 KV、protobuf Put/Get
+ * @brief RocksDB Open/Put/Get/Delete 与 Proto 助手
  */
 
 #include "RocksDbClient.h"
@@ -14,6 +14,7 @@ RocksDbClient::~RocksDbClient() {
     Close();
 }
 
+/** 打开/创建本地 DB */
 bool RocksDbClient::Open(const std::string &db_path, bool create_if_missing) {
     std::lock_guard<std::mutex> lk(mu_);
     if (db_) {

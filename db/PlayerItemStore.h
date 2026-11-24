@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * PlayerItemStore.h — 道具表访问。
- * 路径: db/PlayerItemStore.h
- */
 /**
  * @file PlayerItemStore.h
  * @brief 玩家道具 MySQL 持久化层（表 player_item）
@@ -21,6 +16,7 @@
 
 class PlayerItemStore {
 public:
+    /** 单例 */
     static PlayerItemStore &Instance();
 
     /** 连接池已初始化且至少成功建表过一次 */
@@ -35,7 +31,8 @@ public:
      * @param extra_data       JSON 字符串；空则使用 {"source":"grant_item"}
      * @param instance_id      输出自增主键 id（player_item.id）
      */
-    bool Insert(uint64_t player_id, uint64_t item_id, uint32_t count, int64_t expire_time_sec,
+    /** 插入一条道具行 */
+bool Insert(uint64_t player_id, uint64_t item_id, uint32_t count, int64_t expire_time_sec,
                 const std::string &extra_data, uint64_t *instance_id);
 
     /**

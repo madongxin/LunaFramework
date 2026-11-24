@@ -1,10 +1,13 @@
 #pragma once
 
-
 /**
- * AoiOutboundOrder.h — AOI 出站顺序约束。
- * 路径: runtime/AoiOutboundOrder.h
+ * @file AoiOutboundOrder.h
+ * @brief AOI 出站顺序：急送 ENTER/LEAVE 清合并槽、MOVE 墓碑与 resync 过滤
+ *
+ * 网关与测试共用，避免两套顺序。LEAVE 后 tombstone 窗口内拒收该实体 MOVE；
+ * ENTER 提前解除。ApplyUrgentAoi 统一清 coalesce 槽、账本与 books。
  */
+
 #include "AoiMoveCoalesceLedger.h"
 #include "MoveSendConfig.h"
 

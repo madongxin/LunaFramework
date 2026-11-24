@@ -1,7 +1,8 @@
 /**
- * PrometheusMetrics.cpp — BuildPrometheusMetricsText 等实现。
- * 路径: base/PrometheusMetrics.cpp
+ * @file PrometheusMetrics.cpp
+ * @brief 拼装 process / eventloop / packet / logic 等 exposition 行
  */
+
 #include "PrometheusMetrics.h"
 
 #include "OpsMetrics.h"
@@ -36,6 +37,7 @@ void EmitCounter(std::ostringstream &os, const char *name, const char *help, dou
 
 }  // namespace
 
+/** 拉取各模块计数拼成 Prometheus text */
 std::string BuildPrometheusMetricsText() {
     ProcessMetricsSnapshot m;
     if (!FillProcessMetricsSnapshot(&m))

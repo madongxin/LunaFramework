@@ -2,8 +2,8 @@
 
 
 /**
- * BrpcNamingUtil.h — brpc list:// 命名工具。
- * 路径: runtime/brpc/BrpcNamingUtil.h
+ * @file BrpcNamingUtil.h
+ * @brief brpc 命名/寻址字符串辅助
  */
 #include <sstream>
 #include <string>

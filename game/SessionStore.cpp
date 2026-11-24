@@ -1,17 +1,8 @@
 /**
- * SessionStore 实现：Redis Hash + Lua 脚本保证踢号/重连/切线的原子性。
- *
- * 主要 key（均带 key_prefix_，默认 lunaserver:dev:）：
- *   session:{player_id}     — Hash：token/state/generation/gateway/logic/map…
- *   online:players          — Set：当前 ONLINE 玩家（对账用）
- *   grace:deadline          — ZSET：DISCONNECTED 宽限到期扫描
- *   transfer:deadline       — ZSET：切线未 Commit 超时回滚
- *   op:{operation_id}       — 幂等 Acquire/Reconnect 结果
- *   reconnect:pending:{op}  — PrepareReconnect 候选 fence（短 TTL）
- *
- * 脚本区：kLuaAcquire / MarkDisconnected / Reconnect / Transfer / Kick 等。
- * 公开 API 语义见 SessionStore.h；MarkDisconnected ≠ Logout。
+ * @file SessionStore.cpp
+ * @brief SessionStore 实现：Redis Hash + Lua 脚本保证踢号/重连/切线的原子性。
  */
+
 #include "SessionStore.h"
 
 #include "ServerStats.h"
@@ -1240,6 +1231,7 @@ bool SessionStore::AcquireSessionUnlocked(const AcquireSessionInput &in, Acquire
     return true;
 }
 
+/** 正式创建/顶号；operation_id 幂等；分配 fence+Logic。 */
 bool SessionStore::AcquireSession(const AcquireSessionInput &in, AcquireSessionResult *out) {
     struct AcquireWatch {
         std::chrono::steady_clock::time_point t0{std::chrono::steady_clock::now()};
@@ -1623,6 +1615,7 @@ bool SessionStore::BindConnection(uint64_t player_id, const std::string &token,
     return true;
 }
 
+/** 断线宽限；≠ Logout。gen/token 不匹配则忽略旧连接。 */
 bool SessionStore::MarkDisconnected(uint64_t player_id, const std::string &token,
                                     uint64_t generation) {
     if (!available_ || player_id == 0)
@@ -1831,6 +1824,7 @@ bool SessionStore::IsPlayerOnline(uint64_t player_id) {
     return rec.state == SessionState::Online;
 }
 
+/** 主动销会话；与 MarkDisconnected 语义不同。 */
 bool SessionStore::Logout(const game::LogoutReq &req, game::LogoutRsp *rsp) {
     if (!rsp)
         return false;

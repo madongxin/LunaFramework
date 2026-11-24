@@ -1,6 +1,6 @@
 /**
- * GameDbServiceImpl.cpp — 运行时：业务服务逻辑。游戏逻辑。
- * 路径: runtime/brpc/GameDbServiceImpl.cpp
+ * @file GameDbServiceImpl.cpp
+ * @brief GameDbServiceImpl 实现
  */
 #include "GameDbServiceImpl.h"
 

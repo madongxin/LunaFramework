@@ -1,7 +1,10 @@
 /**
- * AuthLoginRateLimit.cpp — 运行时：鉴权相关。限流。
- * 路径: runtime/AuthLoginRateLimit.cpp
+ * @file AuthLoginRateLimit.cpp
+ * @brief AuthLoginRateLimit 实现：Redis 共享失败计数，不可用时进程内 g_local_fails 降级
+ *
+ * IsLimited/RecordFail/Clear 优先走 Redis INCR/GET/DEL；EnsureRedis 懒初始化连接池。
  */
+
 #include "AuthLoginRateLimit.h"
 
 #include "Logging.h"

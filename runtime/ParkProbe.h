@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @file ParkProbe.h
+ * @brief 出口停放探针：观测 hold/park 积压
+ */
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>

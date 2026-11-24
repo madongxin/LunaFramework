@@ -1,6 +1,6 @@
 /**
- * CurrentThread.cpp — CurrentThread 实现：惰性缓存 syscall(SYS_gettid)。
- * 路径: base/CurrentThread.cpp
+ * @file CurrentThread.cpp
+ * @brief CacheTid：syscall gettid 并格式化到 t_formattedTid
  */
 
 #include "CurrentThread.h"

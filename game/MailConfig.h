@@ -1,13 +1,11 @@
 #pragma once
 
-
-/**
- * MailConfig.h — 邮件配置。
- * 路径: game/MailConfig.h
- */
 /**
  * @file MailConfig.h
  * @brief 邮件服务端数值配置（config/mail.cnf）
+ *
+ * 容量、过期天数、分页、批量上限、收藏上限、过期扫描间隔、玩家互寄限流等。
+ * LoadFromConfig 失败时保留默认值并返回 false（可继续用默认跑通开发环境）。
  */
 
 #include <cstdint>
@@ -28,7 +26,7 @@ class MailConfig {
 public:
     static MailConfig &Instance();
 
-    /** 从 mail.cnf 加载；失败时保留默认值并返回 false */
+    /** 从 mail.cnf 加载；失败时保留默认值并返回 false。 */
     bool LoadFromConfig();
 
     const MailConfigValues &Values() const { return values_; }

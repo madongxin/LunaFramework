@@ -1,6 +1,6 @@
 /**
  * @file PlayerItemStore.cpp
- * @brief player_item 表的 DDL 与 INSERT 实现
+ * @brief player_item 插入与建表
  */
 
 #include "PlayerItemStore.h"

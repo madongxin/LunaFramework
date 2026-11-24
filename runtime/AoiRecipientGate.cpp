@@ -1,7 +1,8 @@
 /**
- * AoiRecipientGate.cpp — 运行时：AOI 相关。接收方门控。
- * 路径: runtime/AoiRecipientGate.cpp
+ * @file AoiRecipientGate.cpp
+ * @brief AoiRecipientGate 实现：suppressed_ 集合的 Suppress/Clear/Allowed
  */
+
 #include "AoiRecipientGate.h"
 
 AoiRecipientGate &AoiRecipientGate::Instance() {

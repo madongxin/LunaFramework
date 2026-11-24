@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * @file Utf8Text.h
+ * @brief UTF-8 合法性校验与 Unicode 码点计数
+ *
+ * 用于邮件标题/正文、玩家名长度限制（按码点而非字节）。
+ */
+
 #include <cstdint>
 #include <string>
 

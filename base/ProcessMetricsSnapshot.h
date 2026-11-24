@@ -1,10 +1,10 @@
 #pragma once
 
-
 /**
- * ProcessMetricsSnapshot.h — 进程级 CPU/RSS/FD 快照结构。
- * 路径: base/ProcessMetricsSnapshot.h
+ * @file ProcessMetricsSnapshot.h
+ * @brief 进程级 CPU/RSS/FD 快照结构体与采集入口
  */
+
 #include <cstdint>
 #include <string>
 
@@ -29,4 +29,5 @@ struct ProcessMetricsSnapshot {
     uint64_t tcp_recv_queue_bytes = 0;
 };
 
+/** 采集本进程指标并填入 out；供 Prometheus / 监控页 */
 bool FillProcessMetricsSnapshot(ProcessMetricsSnapshot *out);

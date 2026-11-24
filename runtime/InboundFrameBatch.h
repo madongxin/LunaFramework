@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @file InboundFrameBatch.h
+ * @brief 入站帧批处理辅助：一次可读多帧时的聚合结构
+ */
+
 #include "ProtoFraming.h"
 #include "game.pb.h"
 

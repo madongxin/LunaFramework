@@ -1,7 +1,8 @@
 /**
- * PlayerSerialQueue.cpp — 运行时：队列。串行队列。
- * 路径: runtime/PlayerSerialQueue.cpp
+ * @file PlayerSerialQueue.cpp
+ * @brief PlayerSerialQueue 实现：按 player_id 分片串行队列
  */
+
 #include "PlayerSerialQueue.h"
 
 #include "Logging.h"

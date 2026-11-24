@@ -1,7 +1,11 @@
 /**
- * GatewayDisconnectAsync.cpp — 运行时：网关相关。断线处理。
- * 路径: runtime/GatewayDisconnectAsync.cpp
+ * @file GatewayDisconnectAsync.cpp
+ * @brief GatewayDisconnectAsync 实现：有界队列、worker 生命周期与默认 SessionStore 执行
+ *
+ * Start/Stop 经 life_mu_ 管理 thread 交换与 join；Enqueue 仅推任务。
+ * RunDefault 在 WEBSERVER_ENABLE_REDIS 下调用 SessionStore::MarkDisconnected。
  */
+
 #include "GatewayDisconnectAsync.h"
 
 #include "Logging.h"

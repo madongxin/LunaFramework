@@ -1,7 +1,8 @@
 /**
- * AoiEvidenceVisible.cpp — 运行时：AOI 相关。证据/审计。
- * 路径: runtime/AoiEvidenceVisible.cpp
+ * @file AoiEvidenceVisible.cpp
+ * @brief AoiEvidence 可见集采样：兴趣/通知集合快照导出
  */
+
 #include "AoiEvidence.h"
 
 #include "MapRuntime.h"

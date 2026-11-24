@@ -1,9 +1,12 @@
 #pragma once
 
 /**
- * PublicError.h — 对客户端公开的错误码映射。
- * 路径: runtime/PublicError.h
+ * @file PublicError.h
+ * @brief 对客户端公开的稳定错误码字符串与填充辅助
+ *
+ * 内部异常不得原样回传；映射到 ERR_* 常量。与 game.GameResponse.error 字段配合。
  */
+
 #include "game.pb.h"
 
 #include <cstdint>

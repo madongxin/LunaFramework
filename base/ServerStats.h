@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * @file ServerStats.h
+ * @brief 进程内原子计数器（移动钳制、会话替换、DB 池耗尽等）
+ *
+ * 头文件内联 static atomic，网关单测无需再链指标对象。
+ */
+
 #include <atomic>
 #include <cstdint>
 

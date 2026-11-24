@@ -1,9 +1,14 @@
 #pragma once
 
 /**
- * AoiFanoutV2.h — AOI 扇出 v2 策略。
- * 路径: runtime/AoiFanoutV2.h
+ * @file AoiFanoutV2.h
+ * @brief AOI 可见集合选择 v2：按距离排序 + cap/slack 滞回
+ *
+ * SelectVisible 不依赖 socket；距离近优先，同距 id 小优先。
+ * 已 notified 且仍 in_leave 的优先保留；不足 N-slack 时按名次补到 N。
+ * 协作：MapRuntime DesiredVisible / RefreshViewers。
  */
+
 #include <algorithm>
 #include <cstdint>
 #include <vector>

@@ -1,6 +1,6 @@
 /**
- * LogStream.cpp — LogStream 数字/字符串格式化。
- * 路径: log/LogStream.cpp
+ * @file LogStream.cpp
+ * @brief LogStream::operator<< 数值与字符串写入 FixedBuffer
  */
 #include <stdio.h>
 #include "LogStream.h"

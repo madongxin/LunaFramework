@@ -1,7 +1,8 @@
 /**
- * ProcessMetricsSnapshot.cpp — ProcessMetricsSnapshot 填充与格式化。
- * 路径: base/ProcessMetricsSnapshot.cpp
+ * @file ProcessMetricsSnapshot.cpp
+ * @brief FillProcessMetricsSnapshot：聚合 /proc 与 EventLoop/Logic 指标
  */
+
 #include "ProcessMetricsSnapshot.h"
 
 #include "EventLoopMetrics.h"
@@ -145,6 +146,7 @@ void ReadIoBytes(int64_t *read_bytes, int64_t *write_bytes) {
 
 }  // namespace
 
+/** 聚合 /proc + EventLoopMetrics + LogicMetrics */
 bool FillProcessMetricsSnapshot(ProcessMetricsSnapshot *out) {
     if (!out)
         return false;

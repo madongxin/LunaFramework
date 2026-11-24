@@ -1,6 +1,11 @@
+#pragma once
+
 /**
- * LogStream.h — 定长缓冲日志流，避免临时 string。
- * 路径: log/LogStream.h
+ * @file LogStream.h
+ * @brief 定长缓冲日志流：operator<< 写入 FixedBuffer，避免临时 string
+ *
+ * FixedBuffer<SIZE>：前端 FixedBufferSize，AsyncLogging 后端 FixedLargeBuffferSize。
+ * Fmt：snprintf 风格格式化后写入 LogStream。
  */
 
 #include "common.h"

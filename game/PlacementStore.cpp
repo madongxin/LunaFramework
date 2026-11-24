@@ -1,7 +1,8 @@
 /**
- * PlacementStore.cpp — 玩法/网关：数据访问/存储封装。占位/分线。
- * 路径: game/PlacementStore.cpp
+ * @file PlacementStore.cpp
+ * @brief 地图占位 Redis Lua/CAS 实现（LINE/DUNGEON/对账）
  */
+
 #include "PlacementStore.h"
 
 #include "HealthyLogicSnapshot.h"
@@ -1840,6 +1841,7 @@ PlacementState PlacementStore::StateFromString(const std::string &s) {
     return PlacementState::Closed;
 }
 
+/** 对齐 Session key_prefix 与默认 lease；依赖已 Init 的 RedisPool。 */
 bool PlacementStore::InitFromSessionPrefix(const std::string &key_prefix, int default_lease_sec) {
     if (!key_prefix.empty())
         key_prefix_ = key_prefix;
@@ -2104,6 +2106,7 @@ bool PlacementStore::ReleaseByPlayer(uint64_t player_id) {
     return ok;
 }
 
+/** 断线宽限：SREM occ 释 softcap，保留 pres。 */
 bool PlacementStore::ParkForGrace(uint64_t player_id) {
     if (!available_ || player_id == 0)
         return false;
@@ -2126,6 +2129,7 @@ bool PlacementStore::ParkForGrace(uint64_t player_id) {
     return ok;
 }
 
+/** 重连成功：把 parked pres 加回 occ。 */
 bool PlacementStore::ResumeParked(uint64_t player_id) {
     if (!available_ || player_id == 0)
         return false;
@@ -2902,6 +2906,7 @@ bool PlacementStore::CloseIdleInstances(int64_t now_unix, size_t limit,
     return true;
 }
 
+/** 按 kind 分派公共池/LINE/DUNGEON 或旧 Resolve；Lua 原子。 */
 bool PlacementStore::ResolveOrCreate(const ResolveOrCreateInput &in, ResolveOrCreateResult *out) {
     if (in.player_id != 0) {
         if (IsDungeonKind(in.kind)) {

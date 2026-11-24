@@ -1,7 +1,8 @@
 /**
- * MapInstanceRegistry.cpp — 运行时：注册表/发现。地图/场景相关。
- * 路径: runtime/MapInstanceRegistry.cpp
+ * @file MapInstanceRegistry.cpp
+ * @brief MapInstanceRegistry 实现：Claim/lease 写栅栏与玩家在场集合
  */
+
 #include "MapInstanceRegistry.h"
 
 #include <chrono>

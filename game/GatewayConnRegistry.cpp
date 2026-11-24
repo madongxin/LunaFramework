@@ -1,7 +1,8 @@
 /**
- * GatewayConnRegistry.cpp — 玩法/网关：注册表/发现。网关相关。
- * 路径: game/GatewayConnRegistry.cpp
+ * @file GatewayConnRegistry.cpp
+ * @brief 本机 conn↔session 绑定表与顶号关闭实现
  */
+
 #include "GatewayConnRegistry.h"
 
 #include "Logging.h"
@@ -14,6 +15,7 @@ GatewayConnRegistry &GatewayConnRegistry::Instance() {
     return g;
 }
 
+/** 覆盖绑定并维护 session/player 索引；同 player 旧连接触发 close。 */
 void GatewayConnRegistry::Remember(uint64_t connection_id, Bind bind) {
     std::lock_guard<std::mutex> lk(mu_);
     auto it = by_conn_.find(connection_id);

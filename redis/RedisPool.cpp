@@ -1,7 +1,8 @@
 /**
- * RedisPool.cpp — Redis：连接/对象池。Redis。
- * 路径: redis/RedisPool.cpp
+ * @file RedisPool.cpp
+ * @brief 连接池 Init/Acquire/Lease/Shutdown
  */
+
 #include "RedisPool.h"
 
 #include "Logging.h"
@@ -9,6 +10,7 @@
 
 #include <chrono>
 
+/** 进程单例 */
 RedisPool &RedisPool::Instance() {
     static RedisPool g;
     return g;
@@ -66,6 +68,7 @@ bool RedisPool::InitWithClientsForTest(std::vector<std::unique_ptr<RedisClient>>
     return true;
 }
 
+/** 立即 Shutdown（无额外截止） */
 void RedisPool::Shutdown() {
     Shutdown(std::chrono::milliseconds(3000));
 }
@@ -170,6 +173,7 @@ RedisPool::Lease &RedisPool::Lease::operator=(Lease &&o) noexcept {
     return *this;
 }
 
+/** 从 free 列表取连接；超时空 Lease */
 RedisPool::Lease RedisPool::Acquire(int timeout_ms) {
     std::shared_ptr<PoolState> st;
     {

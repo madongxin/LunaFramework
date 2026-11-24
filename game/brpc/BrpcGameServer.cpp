@@ -1,6 +1,6 @@
 /**
  * @file BrpcGameServer.cpp
- * @brief brpc Server 启动 / 停止
+ * @brief 进程内 brpc Server：读 brpc.cnf、绑定策略校验、注册 Mail 服务
  */
 
 #include "BrpcGameServer.h"

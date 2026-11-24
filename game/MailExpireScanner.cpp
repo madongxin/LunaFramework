@@ -1,7 +1,8 @@
 /**
- * MailExpireScanner.cpp — 玩法/网关：邮件相关。过期扫描。
- * 路径: game/MailExpireScanner.cpp
+ * @file MailExpireScanner.cpp
+ * @brief 邮件过期定时扫描（EventLoop::RunEvery）
  */
+
 #include "MailExpireScanner.h"
 
 #include "EventLoop.h"
@@ -14,6 +15,7 @@ MailExpireScanner &MailExpireScanner::Instance() {
     return g;
 }
 
+/** 注册 RunEvery；interval<=0 时用 mail.cnf / 60s。 */
 void MailExpireScanner::StartPeriodic(EventLoop *loop, double interval_sec) {
     if (!loop)
         return;

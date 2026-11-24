@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * PlacementRecoveryScheduler.h — 占位异常后的实验性自动恢复调度。
- * 路径: runtime/PlacementRecoveryScheduler.h
+ * @file PlacementRecoveryScheduler.h
+ * @brief 占位异常后的实验性自动恢复调度（非 Formal 默认路径）
+ *
+ * Tick 尝试恢复 MarkRecovering 的 Placement；失败记 OpsMetrics。
  */
+
 #include <cstddef>
 #include <string>
 

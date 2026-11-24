@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * @file ReplySink.h
+ * @brief 业务回包抽象：Handler 不直接握 TcpConnection*
+ *
+ * SendFrame 接收已含 4 字节长度前缀的完整外网帧；Push 须用 tcp_connection()。
+ */
+
 #include <memory>
 #include <string>
 

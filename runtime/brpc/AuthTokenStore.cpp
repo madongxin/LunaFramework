@@ -1,6 +1,6 @@
 /**
- * AuthTokenStore.cpp — 运行时：数据访问/存储封装。鉴权相关。
- * 路径: runtime/brpc/AuthTokenStore.cpp
+ * @file AuthTokenStore.cpp
+ * @brief AuthTokenStore 实现：token 写入/校验/失效
  */
 #include "AuthTokenStore.h"
 

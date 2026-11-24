@@ -1,7 +1,8 @@
 /**
- * MapCatalog.cpp — 运行时：地图/场景相关。目录/静态表。
- * 路径: runtime/MapCatalog.cpp
+ * @file MapCatalog.cpp
+ * @brief MapCatalog 实现：目录扫描、SHA 校验加载与 manifest/策略缓存
  */
+
 #include "MapCatalog.h"
 
 #include "LunaServerPaths.h"

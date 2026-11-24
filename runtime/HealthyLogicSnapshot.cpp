@@ -1,7 +1,8 @@
 /**
- * HealthyLogicSnapshot.cpp — 运行时：健康检查。健康快照/Owner。
- * 路径: runtime/HealthyLogicSnapshot.cpp
+ * @file HealthyLogicSnapshot.cpp
+ * @brief HealthyLogicSnapshotStore 实现：版本单调 Publish 与读取
  */
+
 #include "HealthyLogicSnapshot.h"
 
 #include <atomic>

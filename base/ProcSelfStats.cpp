@@ -1,7 +1,8 @@
 /**
- * ProcSelfStats.cpp — ProcSelfStats 实现。
- * 路径: base/ProcSelfStats.cpp
+ * @file ProcSelfStats.cpp
+ * @brief 解析 /proc/[pid]/status、fd、smaps 与 TCP 队列 ioctl
  */
+
 #include "ProcSelfStats.h"
 
 #include <cstdio>
@@ -157,6 +158,7 @@ void SumSocketQueues(pid_t pid, uint64_t *send_sum, uint64_t *recv_sum) {
 
 }  // namespace
 
+/** 读 status/fd/smaps 与各 socket 队列 */
 bool FillProcResourceSnapshot(ProcResourceSnapshot *out, pid_t pid) {
     if (!out)
         return false;

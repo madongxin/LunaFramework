@@ -1,6 +1,6 @@
 /**
- * GatewayEnterMapOrchestrator.cpp — 运行时：网关相关。地图/场景相关。
- * 路径: runtime/brpc/GatewayEnterMapOrchestrator.cpp
+ * @file GatewayEnterMapOrchestrator.cpp
+ * @brief GatewayEnterMapOrchestrator 实现
  */
 #include "GatewayEnterMapOrchestrator.h"
 

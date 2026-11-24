@@ -2,8 +2,10 @@
 
 
 /**
- * NatsThinClient.h — NATS 薄客户端（可选）。
- * 路径: runtime/discovery/NatsThinClient.h
+ * @file NatsThinClient.h
+ * @brief 轻量 NATS 客户端（可选消息总线）
+ *
+ * 未配置时调用失败/空操作；不阻塞主登录路径。
  */
 #include <mutex>
 #include <string>

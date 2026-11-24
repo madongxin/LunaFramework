@@ -1,7 +1,8 @@
 /**
- * FriendService.cpp — 玩法/网关：业务服务逻辑。好友相关。
- * 路径: game/FriendService.cpp
+ * @file FriendService.cpp
+ * @brief 好友业务与 presence 扇出实现
  */
+
 #include "FriendService.h"
 
 #include "FriendPresenceBatch.h"
@@ -1058,6 +1059,7 @@ void StopPresenceWorker() {
 
 void FriendService::StopPresenceFanout() { StopPresenceWorker(); }
 
+/** 查在线好友 gateway，分批 Push presence；停服后 no-op。 */
 void FriendService::FanoutPresence(uint64_t player_id, bool online) {
 #ifdef WEBSERVER_ENABLE_REDIS
     if (player_id == 0)

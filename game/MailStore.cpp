@@ -1,7 +1,8 @@
 /**
- * MailStore.cpp — 玩法/网关：数据访问/存储封装。邮件相关。
- * 路径: game/MailStore.cpp
+ * @file MailStore.cpp
+ * @brief 邮件 MySQL 表访问与幂等运维日志
  */
+
 #include "MailStore.h"
 
 #include "Connection.h"

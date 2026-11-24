@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * PushReplayCache.h — 推送重放缓存。
- * 路径: runtime/PushReplayCache.h
+ * @file PushReplayCache.h
+ * @brief 每玩家有界可靠 Push 回放缓存；重连按 last_acked_seq 回放
+ *
+ * 缺口过大返回 need_snapshot，由上层发全量同步。NextSeq/Store 在分配序号后调用。
  */
+
 #include <cstdint>
 #include <deque>
 #include <mutex>

@@ -1,6 +1,6 @@
 /**
- * IServiceRegistry.cpp — 运行时：业务服务逻辑。注册表/发现。
- * 路径: runtime/discovery/IServiceRegistry.cpp
+ * @file IServiceRegistry.cpp
+ * @brief StaticServiceRegistry 实现：进程内静态实例表
  */
 #include "IServiceRegistry.h"
 

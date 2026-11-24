@@ -1,7 +1,11 @@
 /**
- * LoginAdmission.cpp — 运行时：准入控制。登录。
- * 路径: runtime/LoginAdmission.cpp
+ * @file LoginAdmission.cpp
+ * @brief LoginAdmission 实现：外层 inflight 与分阶段 StagePermit 预算
+ *
+ * 容量来自环境变量；AdmissionMu 串行化 TryAcquire/Release 与 StagePermit::Try。
+ * 重连可占用 reconnect_reserve 尾部，新登录不可。
  */
+
 #include "LoginAdmission.h"
 
 #include "ServerStats.h"

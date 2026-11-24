@@ -1,7 +1,11 @@
 /**
- * GatewayIdentity.cpp — 运行时：网关相关。实例身份。
- * 路径: runtime/GatewayIdentity.cpp
+ * @file GatewayIdentity.cpp
+ * @brief GatewayIdentity 实现：配置/环境解析与 Redis claim（SET NX + TTL 续约）
+ *
+ * Resolve 优先级：已 Set > LUNASERVER_INSTANCE_ID > gateway.cnf。
+ * ClaimOrFail/RenewClaim 在无 Redis 时降级为非空校验。
  */
+
 #include "GatewayIdentity.h"
 
 #include "FormalMode.h"

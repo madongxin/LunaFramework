@@ -1,7 +1,8 @@
 /**
- * PlayerAccountStore.cpp — MySQL/GameDB：数据访问/存储封装。账号。
- * 路径: db/PlayerAccountStore.cpp
+ * @file PlayerAccountStore.cpp
+ * @brief player_account 表读写
  */
+
 #include "PlayerAccountStore.h"
 
 #include "Connection.h"

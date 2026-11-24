@@ -1,6 +1,6 @@
 /**
- * SessionBrpcServer.cpp — 运行时：服务端启动或 RPC 服务。会话相关。
- * 路径: runtime/brpc/SessionBrpcServer.cpp
+ * @file SessionBrpcServer.cpp
+ * @brief SessionBrpcServer 实现：注册 SessionServiceImpl 并 Start
  */
 #include "SessionBrpcServer.h"
 

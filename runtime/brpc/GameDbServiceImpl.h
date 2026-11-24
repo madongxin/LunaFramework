@@ -1,8 +1,10 @@
 #pragma once
 
 /**
- * GameDbServiceImpl.h — GameDB RPC 实现（账号/资产）。
- * 路径: runtime/brpc/GameDbServiceImpl.h
+ * @file GameDbServiceImpl.h
+ * @brief GameDB brpc：账号/角色/邮件等持久化
+ *
+ * Formal 下唯一允许直连 MySQL 的业务角色（及紧急 role=all）。
  */
 #include "gamedb.pb.h"
 

@@ -2,8 +2,10 @@
 
 
 /**
- * SessionBrpcServer.h — Session(+Auth) brpc Server 启动。
- * 路径: runtime/brpc/SessionBrpcServer.h
+ * @file SessionBrpcServer.h
+ * @brief Session 进程 brpc Server 启动封装
+ *
+ * 默认 127.0.0.1；Formal 下 EvaluateListenBind；注册 SessionServiceImpl。
  */
 #include <memory>
 #include <string>

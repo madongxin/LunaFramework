@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @file RpcChannelSnapshot.h
+ * @brief brpc Channel 状态快照结构，供监控导出
+ */
+
 #include <cstdint>
 #include <memory>
 #include <string>

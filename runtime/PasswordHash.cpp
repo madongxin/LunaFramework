@@ -1,7 +1,8 @@
 /**
- * PasswordHash.cpp — 运行时：密码哈希。
- * 路径: runtime/PasswordHash.cpp
+ * @file PasswordHash.cpp
+ * @brief PasswordHash 实现：PBKDF2/SHA256 与脱敏
  */
+
 #include "PasswordHash.h"
 
 #include <openssl/evp.h>

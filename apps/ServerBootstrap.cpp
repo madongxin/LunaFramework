@@ -1,7 +1,8 @@
 /**
- * ServerBootstrap.cpp — 进程入口/启动：服务端启动或 RPC 服务。进程启动编排。
- * 路径: apps/ServerBootstrap.cpp
+ * @file ServerBootstrap.cpp
+ * @brief RunServer：日志、依赖、角色启动、管理 HTTP、信号与优雅退出
  */
+
 #include "ServerBootstrap.h"
 
 #include "bootstrap/AdminHttpRouter.h"
@@ -72,6 +73,7 @@ EventLoop *g_main_loop = nullptr;
 
 }  // namespace
 
+/** 解析 argv 到 opts；见 ServerBootstrap.h 约定 */
 bool ParseLaunchArgs(int argc, char *argv[], LaunchOpts *opts) {
     if (!opts)
         return false;
@@ -116,6 +118,7 @@ bool ParseLaunchArgs(int argc, char *argv[], LaunchOpts *opts) {
     return true;
 }
 
+/** 完整启动：AsyncLogging → Formal/依赖 → 角色服务 → HTTP → loop → 信号退出 */
 int RunServer(const LaunchOpts &launch) {
     LaunchOpts opts = launch;
 

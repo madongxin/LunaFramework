@@ -1,3 +1,8 @@
+/**
+ * @file MapLineSync.cpp
+ * @brief MapLineSync 实现：分线变更通知与 map.lines.v1 推送安装
+ */
+
 #include "MapLineSync.h"
 
 #include "Logging.h"

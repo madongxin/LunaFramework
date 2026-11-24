@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * PlayerProfileStore.h — 玩家档案表。
- * 路径: db/PlayerProfileStore.h
- */
 /**
  * @file PlayerProfileStore.h
  * @brief 玩家资料表 player_profile（仅 GameDB/World 写；GameLogic 经 RPC 读）
@@ -36,9 +31,11 @@ struct PlayerProfileRow {
 
 class PlayerProfileStore {
 public:
+    /** 单例 */
     static PlayerProfileStore &Instance();
 
     /** 结构存在性检查。生产建表走 scripts/migrate_db.sh；仅 LUNASERVER_BOOTSTRAP_DDL=1 时才 CREATE。 */
+/** 建 player_profile */
     bool EnsureTable();
     bool Available() const { return available_; }
 
@@ -49,7 +46,8 @@ public:
     /** 老账号缺档：独立连接 INSERT IGNORE 默认档。 */
     bool EnsureDefault(uint64_t player_id, const std::string &player_name, std::string *err);
 
-    bool Load(uint64_t player_id, PlayerProfileRow *out, std::string *err);
+    /** 加载档案；不存在时 exists=false */
+bool Load(uint64_t player_id, PlayerProfileRow *out, std::string *err);
 
     /**
      * 精确名字（调用方已规范化）。0 行 exists=false；1 行成功；≥2 行失败 ERR_NAME_AMBIGUOUS。

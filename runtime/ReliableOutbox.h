@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * ReliableOutbox.h — 可靠推送发件箱。
- * 路径: runtime/ReliableOutbox.h
+ * @file ReliableOutbox.h
+ * @brief 每连接可靠推送发件箱：序号顺序入队，队头失败时禁止后续抢先写 socket
+ *
+ * 有界（帧数/字节）；Overflow 时记指标。与 PushReplayCache / PushAdmit 协作。
  */
+
 #include <cstddef>
 #include <cstdint>
 #include <deque>

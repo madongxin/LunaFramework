@@ -1,6 +1,6 @@
 /**
  * @file DemoKvStore.cpp
- * @brief DemoKvStore：配置加载与 PlayerSnapshot 的 Save/Load/Remove
+ * @brief Demo PlayerSnapshot KV 读写
  */
 
 #include "DemoKvStore.h"

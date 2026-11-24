@@ -1,7 +1,8 @@
 /**
- * MapRuntime.cpp — 运行时：地图/场景相关。运行时状态。
- * 路径: runtime/MapRuntime.cpp
+ * @file MapRuntime.cpp
+ * @brief MapRuntime 实现：进图/移动/AOI 兴趣刷新与 ENTER/LEAVE 补发
  */
+
 #include "MapRuntime.h"
 
 #include "AoiEvidence.h"

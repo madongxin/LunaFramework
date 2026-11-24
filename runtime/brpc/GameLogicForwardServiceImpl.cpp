@@ -1,6 +1,6 @@
 /**
- * GameLogicForwardServiceImpl.cpp — 运行时：业务服务逻辑。转发。
- * 路径: runtime/brpc/GameLogicForwardServiceImpl.cpp
+ * @file GameLogicForwardServiceImpl.cpp
+ * @brief GameLogicForwardServiceImpl 实现
  */
 #include "GameLogicForwardServiceImpl.h"
 

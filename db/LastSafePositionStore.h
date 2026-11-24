@@ -1,13 +1,8 @@
 #pragma once
 
-
-/**
- * LastSafePositionStore.h — 上次安全坐标持久化。
- * 路径: db/LastSafePositionStore.h
- */
 /**
  * @file LastSafePositionStore.h
- * @brief 最后安全位置表（仅 GameDB 写 MySQL；GameLogic 经 brpc）
+ * @brief 玩家上次安全坐标持久化（传送失败回退）
  */
 
 #include <cstdint>
@@ -31,9 +26,11 @@ class LastSafePositionStore {
 public:
     static LastSafePositionStore &Instance();
 
-    bool EnsureTable();
+    /** 建表 */
+bool EnsureTable();
     bool Available() const { return available_; }
 
+/** 读上次安全坐标 */
     bool Load(uint64_t player_id, LastSafePositionRow *out, std::string *err);
 
     /**

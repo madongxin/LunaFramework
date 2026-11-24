@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * SafePath.h — 路径拼接安全检查，防止 .. 穿越出根目录。
- * 路径: base/SafePath.h
+ * @file SafePath.h
+ * @brief 路径安全拼接：拒绝绝对路径、盘符与 ".." 穿越
+ *
+ * Http 静态文件、上传落盘前用 SafeJoinUnderRoot 限制在 root 下。
  */
+
 #include <cctype>
 #include <string>
 

@@ -1,7 +1,8 @@
 /**
- * AoiEvidence.cpp — 运行时：AOI 相关。证据/审计。
- * 路径: runtime/AoiEvidence.cpp
+ * @file AoiEvidence.cpp
+ * @brief AoiEvidence 实现：计数器、采样缓冲与 Prometheus/JSON 导出
  */
+
 #include "AoiEvidence.h"
 #include "ServerStats.h"
 

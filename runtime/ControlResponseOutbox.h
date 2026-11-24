@@ -1,10 +1,10 @@
 #pragma once
 
-
 /**
- * ControlResponseOutbox.h — 控制类响应出站缓冲。
- * 路径: runtime/ControlResponseOutbox.h
+ * @file ControlResponseOutbox.h
+ * @brief 控制类响应出站缓冲：与业务推送分队列，避免控制帧被 MOVE 堵住
  */
+
 #include <cstddef>
 #include <cstdint>
 #include <functional>

@@ -1,7 +1,11 @@
 /**
- * GatewayConnGuard.cpp — 运行时：网关相关。连接守卫。
- * 路径: runtime/GatewayConnGuard.cpp
+ * @file GatewayConnGuard.cpp
+ * @brief GatewayConnGuard 实现：连接状态表、IP 建连桶与各 Check* 滑动窗口
+ *
+ * 状态存于匿名命名空间的 g_conns/g_ips；所有公开方法经 g_mu 保护。
+ * 限流阈值常量与 OpsMetrics 计数在各 Check* 路径更新。
  */
+
 #include "GatewayConnGuard.h"
 
 #include "OpsMetrics.h"

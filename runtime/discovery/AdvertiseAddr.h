@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * @file AdvertiseAddr.h
+ * @brief advertise 地址规范化：禁止把 0.0.0.0 登记为对外地址
+ *
+ * Registry 注册的 address 必须对等方可路由。
+ */
+
 #include <cstdlib>
 #include <string>
 

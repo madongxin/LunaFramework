@@ -1,7 +1,8 @@
 /**
- * Buffer.cpp — Buffer 实现。
- * 路径: tcp/Buffer.cpp
+ * @file Buffer.cpp
+ * @brief Buffer 实现。
  */
+
 #include "Buffer.h"
 #include <string>
 #include <assert.h>

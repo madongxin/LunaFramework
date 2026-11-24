@@ -1,7 +1,8 @@
 /**
- * PushReplayStore.cpp — 玩法/网关：数据访问/存储封装。推送相关。
- * 路径: game/PushReplayStore.cpp
+ * @file PushReplayStore.cpp
+ * @brief 可靠 Push 回放 Redis 实现（Append/Ack/Replay/Snapshot）
  */
+
 #include "PushReplayStore.h"
 
 #include "Logging.h"
@@ -257,6 +258,7 @@ std::string PushReplayStore::MetaKey(uint64_t player_id, const std::string &sess
     return key_prefix_ + "push:meta:" + std::to_string(player_id) + ":" + session_id;
 }
 
+/** INCR seq 并 RPUSH 编码条目；刷新 TTL。失败返回 0。 */
 uint64_t PushReplayStore::AppendReliable(uint64_t player_id, const std::string &session_id,
                                          const std::string &message_type,
                                          const std::string &payload) {
@@ -305,6 +307,7 @@ bool PushReplayStore::AppendReserved(uint64_t player_id, const std::string &sess
     return reply[0] == "1";
 }
 
+/** 回放 ack 之后条目；缺口则 *need_snapshot。 */
 bool PushReplayStore::ReplayAfter(uint64_t player_id, const std::string &session_id,
                                   uint64_t last_acked_seq, std::vector<PushReplayEntry> *out,
                                   bool *need_snapshot) {
@@ -336,6 +339,7 @@ bool PushReplayStore::ReplayAfter(uint64_t player_id, const std::string &session
     return true;
 }
 
+/** CAS 裁剪已确认回放；Gap/Unavailable 不得当成功。 */
 PushReplayStore::AckResult PushReplayStore::Ack(uint64_t player_id, const std::string &session_id,
                                                 uint64_t ack_seq) {
     AckResult r;

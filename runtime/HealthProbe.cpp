@@ -1,7 +1,8 @@
 /**
- * HealthProbe.cpp — 运行时：健康检查。
- * 路径: runtime/HealthProbe.cpp
+ * @file HealthProbe.cpp
+ * @brief HealthProbeStore 实现：周期 Refresh 与快照/Fresh 判定
  */
+
 #include "HealthProbe.h"
 
 #include "FormalMode.h"

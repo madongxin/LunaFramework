@@ -1,10 +1,12 @@
 #pragma once
 
-
 /**
- * RpcOffloadPool.h — GameLogic 上将阻塞 RPC 卸到工作线程池。
- * 路径: runtime/RpcOffloadPool.h
+ * @file RpcOffloadPool.h
+ * @brief RPC/慢调用卸载线程池（slow/fast 队列）
+ *
+ * 避免在 brpc/reactor 线程跑阻塞 IO；Stop 须 join。
  */
+
 #include <functional>
 
 /**

@@ -1,10 +1,13 @@
 #pragma once
 
-
 /**
- * AoiPublishQueue.h — AOI 发布队列。
- * 路径: runtime/AoiPublishQueue.h
+ * @file AoiPublishQueue.h
+ * @brief AOI 发布队列辅助：满载时优先丢弃纯 MOVE 批；按静默挑选 MOVE 实体
+ *
+ * ShedAoiMoveBatches 超过 cap 时从最旧纯 MOVE 批开始丢，ENTER/LEAVE 批保留（可暂超 cap）。
+ * PickAoiMoveEntities 优先最久未写出的实体。
  */
+
 #include "MapRuntime.h"
 
 #include <algorithm>

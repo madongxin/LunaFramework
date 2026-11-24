@@ -1,10 +1,5 @@
 #pragma once
 
-
-/**
- * DemoKvStore.h — RocksDB KV 演示存储。
- * 路径: rocksdb/DemoKvStore.h
- */
 /**
  * @file DemoKvStore.h
  * @brief RocksDB Demo：用 protobuf PlayerSnapshot 做本地 KV 读写示例
@@ -30,7 +25,8 @@ public:
 
     bool Available() const { return available_; }
 
-    bool Save(const kvdemo::PlayerSnapshot &snap);
+    /** PutProto PlayerSnapshot */
+bool Save(const kvdemo::PlayerSnapshot &snap);
     bool Load(uint64_t player_id, kvdemo::PlayerSnapshot *out);
     bool Remove(uint64_t player_id);
 

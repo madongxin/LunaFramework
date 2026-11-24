@@ -1,13 +1,11 @@
 #pragma once
 
-
-/**
- * MailStore.h — 邮件持久化。
- * 路径: game/MailStore.h
- */
 /**
  * @file MailStore.h
  * @brief 邮件表 MySQL 访问（raw SQL，与 PlayerItemStore 风格一致）
+ *
+ * 投递/领取在同一 Connection 事务内完成；幂等靠 business_key 与 op_log。
+ * Lookup 区分 kMiss/kHit/kError——查询失败不得当成未命中后继续执行。
  */
 
 #include "MailTypes.h"
@@ -67,6 +65,7 @@ class MailStore {
 public:
     static MailStore &Instance();
 
+    /** 建表/迁移检查；失败则 Available 语义上不可用。 */
     bool EnsureTables();
     bool Available() const { return available_; }
 
@@ -74,7 +73,7 @@ public:
     bool Commit(Connection *conn);
     bool Rollback(Connection *conn);
 
-    /** 投递插入；冲突时返回 false 且 *duplicate=true */
+    /** 投递插入；冲突时返回 false 且 *duplicate=true（幂等命中）。 */
     bool InsertMail(Connection *conn, const mail::MailInstanceRow &row, uint64_t *mail_id,
                     bool *duplicate);
     bool InsertAttachment(Connection *conn, const mail::MailAttachmentRow &row);
@@ -115,13 +114,14 @@ public:
                                         MailClaimReceiptData *out);
     bool InsertOpLog(Connection *conn, const MailOpLogRow &row);
 
-    /** 自动清理候选：按规则排序的 mail_id 列表 */
+    /** 自动清理候选：按规则排序的 mail_id 列表（保护期内收藏等跳过）。 */
     bool SelectAutoCleanupCandidates(uint64_t receiver_id, int64_t now_utc, int protect_hours,
                                      int limit, std::vector<uint64_t> *mail_ids);
 
+    /** 批量把到期 ACTIVE 标为 EXPIRED；*affected 为本批行数。 */
     bool MarkExpiredBatch(int64_t now_utc, int limit, int *affected);
 
-    /** 按幂等键查已存在投递 */
+    /** 按幂等键查已存在投递（source_system+business_key+receiver）。 */
     MailLookup FindByBusinessKey(const std::string &source_system, const std::string &business_key,
                                  uint64_t receiver_id, mail::MailInstanceRow *out);
 

@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @file SendBufV2.h
+ * @brief 发送缓冲 v2：应用层发送队列与写出策略
+ */
+
 #include <cstdlib>
 #include <cstdint>
 #include <functional>

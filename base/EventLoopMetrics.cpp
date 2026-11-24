@@ -1,7 +1,8 @@
 /**
- * EventLoopMetrics.cpp — EventLoopMetrics 计数实现。
- * 路径: base/EventLoopMetrics.cpp
+ * @file EventLoopMetrics.cpp
+ * @brief tick / todo 队列 / 批处理指标与分位桶
  */
+
 #include "EventLoopMetrics.h"
 
 #include <atomic>

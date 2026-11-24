@@ -1,6 +1,8 @@
 /**
- * AsyncLogging.cpp — AsyncLogging 线程循环。
- * 路径: log/AsyncLogging.cpp
+ * @file AsyncLogging.cpp
+ * @brief 异步日志后端：前端 Append 入 current_，后端 ThreadFunc 刷盘
+ *
+ * 双缓冲：写满 current_ 则与 next_ 交换并 notify；Stop 时 join 刷尽余量。
  */
 #include "AsyncLogging.h"
 #include "LogFile.h"
@@ -25,6 +27,7 @@ AsyncLogging::~AsyncLogging(){
     }
 }
 
+/** 起后端线程并 latch_ 等到 ThreadFunc 就绪 */
 void AsyncLogging::Start(){
     running_ = true;
     thread_ = std::thread(std::bind(&AsyncLogging::ThreadFunc, this));
@@ -33,6 +36,7 @@ void AsyncLogging::Start(){
     latch_.wait();
 }
 
+/** 置 running_=false、notify、join */
 void AsyncLogging::Stop(){
     running_ = false;
     // 唤醒后端线程
@@ -46,6 +50,7 @@ void AsyncLogging::Flush(){
     fflush(stderr);
 }
 
+/** 前端线程调用：写入 current_；满则交换并唤醒后端 */
 void AsyncLogging::Append(const char *data, int len){
     if (data && len > 0) {
         fwrite(data, 1, static_cast<size_t>(len), stderr);
@@ -69,6 +74,7 @@ void AsyncLogging::Append(const char *data, int len){
     cv_.notify_one();
 }
 
+/** 后端：等缓冲、写 LogFile、回收 Buffer 到空闲池 */
 void AsyncLogging::ThreadFunc(){
     // 创建成功，提醒主线程
     latch_.notify();

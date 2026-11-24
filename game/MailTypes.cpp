@@ -1,11 +1,13 @@
 /**
- * MailTypes.cpp — 玩法/网关：邮件相关。类型定义。
- * 路径: game/MailTypes.cpp
+ * @file MailTypes.cpp
+ * @brief 邮件可见态/附件态合法转换
  */
+
 #include "MailTypes.h"
 
 namespace mail {
 
+/** 仅 ACTIVE 可转到 SOFT_DELETED/EXPIRED/REVOKED；同态幂等。 */
 bool CanTransitVisible(VisibleState from, VisibleState to) {
     if (from == to)
         return true;
@@ -15,6 +17,7 @@ bool CanTransitVisible(VisibleState from, VisibleState to) {
            to == VisibleState::kRevoked;
 }
 
+/** 主路径 NONE→UNCLAIMED→CLAIMING→CLAIMED；同态幂等。 */
 bool CanTransitAttachment(AttachmentState from, AttachmentState to) {
     if (from == to)
         return true;

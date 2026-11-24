@@ -1,19 +1,21 @@
 #pragma once
 
-
 /**
- * FriendStore.h — 好友关系表。
- * 路径: db/FriendStore.h
+ * @file FriendStore.h
+ * @brief 好友关系 MySQL 仓储（仅 GameDB 进程访问）
+ *
+ * Execute 按 FriendOpReq 分发 List/Request/Accept/Reject 等事务。
  */
+
 #include "gamedb.pb.h"
 
 #include <string>
 
-/** GameDB 侧好友事务仓储。仅 GameDB 进程访问 MySQL。 */
 class FriendStore {
 public:
     static FriendStore &Instance();
 
+    /** 建表（若不存在） */
     bool EnsureTables();
     void Execute(const gdb::FriendOpReq &req, gdb::FriendOpRsp *rsp);
     /** 把已过期的 PENDING 标成 EXPIRED，单轮最多 limit 行。 */

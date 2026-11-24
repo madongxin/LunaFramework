@@ -1,34 +1,43 @@
 #pragma once
 
-
 /**
- * MapStaticData.h — 地图静态配置数据表。
- * 路径: runtime/MapStaticData.h
+ * @file MapStaticData.h
+ * @brief 地图静态网格与出生点：JSON/SHA 加载、可行走查询与散布落点
+ *
+ * V1 约定：Unity X/Z 水平面，Y 为高度；walkable 为按格的 uint8 网格。
+ * 实例间共享 immutable shared_ptr；副本用 CloneWithTemplateId 仅改模板 ID。
+ * LoadFromFile 校验 SHA-256，防止脏图进权威移动。
+ *
+ * 协作：MapCatalog 加载目录；MapRuntime Move/Enter 调 IsWalkable/Find*Spawn。
  */
+
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-/** MapStaticData V1：Unity X/Z 水平面，Y 为高度。walkable_rle = [value, count, ...] */
+/** 三维坐标（与客户端 Unity 一致：Y 高度）。 */
 struct MapVec3 {
     float x = 0;
     float y = 0;
     float z = 0;
 };
 
+/** 命名出生点。 */
 struct MapSpawnPoint {
     std::string id;
     MapVec3 position;
     float yaw = 0;
 };
 
+/** MapStaticData V1：不可变静态图数据。 */
 class MapStaticData {
 public:
+    /** 从 JSON 字符串解析；成功时 *out 指向不可变实例。 */
     static bool LoadFromJson(const std::string &json, std::shared_ptr<const MapStaticData> *out,
                              std::string *err);
-    /** 读文件并校验 SHA-256（与独立 .sha256 或 expected_hex 比较，小写十六进制） */
+    /** 读文件并校验 SHA-256（与独立 .sha256 或 expected_hex 比较，小写十六进制）。 */
     static bool LoadFromFile(const std::string &path, const std::string &expected_sha256_hex,
                              std::shared_ptr<const MapStaticData> *out, std::string *err);
 
@@ -50,7 +59,7 @@ public:
     const MapSpawnPoint &default_spawn() const { return default_spawn_; }
     const std::vector<MapSpawnPoint> &spawns() const { return spawns_; }
 
-    /** col = floor((x-min_x)/step)，row = floor((z-min_z)/step) */
+    /** col = floor((x-min_x)/step)，row = floor((z-min_z)/step)。 */
     bool WorldToWalkableCell(float x, float z, int *col, int *row) const;
     bool IsWalkable(float x, float z) const;
     /**
@@ -88,7 +97,7 @@ public:
     /** 副本复用同一份网格 JSON，仅改模板 ID（load 时一次性拷贝）。 */
     std::shared_ptr<const MapStaticData> CloneWithTemplateId(uint64_t map_template_id) const;
 
-    /** 共享不可变 grid，实例不得拷贝整表 */
+    /** 共享不可变 grid，实例不得拷贝整表。 */
     const std::vector<uint8_t> &walkable() const { return walkable_; }
 
 private:

@@ -2,8 +2,10 @@
 
 
 /**
- * RedisServiceRegistry.h — 基于 Redis 的服务注册发现。
- * 路径: runtime/discovery/RedisServiceRegistry.h
+ * @file RedisServiceRegistry.h
+ * @brief 基于 Redis 的服务注册发现实现
+ *
+ * Register/Discover + TTL；可作为 etcd 替代，经 IServiceRegistry 抽象。
  */
 #include "IServiceRegistry.h"
 

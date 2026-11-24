@@ -1,9 +1,11 @@
 /**
- * gamedb_main.cpp — GameDB 进程入口。
+ * @file gamedb_main.cpp
+ * @brief GameDB 进程入口。
+ *
  * 强制 role=gamedb；Formal 下唯一直连 MySQL 的业务角色。
  * 默认可对公网开 HTTP 观察页（MONITOR_OPEN）。
- * 路径: apps/gamedb_main.cpp
  */
+
 #include "ServerBootstrap.h"
 
 int main(int argc, char *argv[]) {

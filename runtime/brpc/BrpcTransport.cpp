@@ -1,6 +1,6 @@
 /**
- * BrpcTransport.cpp — 运行时：传输层。brpc 相关。
- * 路径: runtime/brpc/BrpcTransport.cpp
+ * @file BrpcTransport.cpp
+ * @brief BrpcTransport 实现
  */
 #include "BrpcTransport.h"
 

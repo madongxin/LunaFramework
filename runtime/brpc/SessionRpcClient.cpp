@@ -1,6 +1,6 @@
 /**
- * SessionRpcClient.cpp — 运行时：客户端封装。会话相关。
- * 路径: runtime/brpc/SessionRpcClient.cpp
+ * @file SessionRpcClient.cpp
+ * @brief SessionRpcClient 实现：同步/异步 RPC 调用与错误映射
  */
 #include "SessionRpcClient.h"
 

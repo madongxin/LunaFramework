@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * @file ServerBootstrap.h
+ * @brief 多角色进程启动：LaunchOpts、ParseLaunchArgs、RunServer
+ *
+ * gateway/gamelogic/session/gamedb/globalservice 各 main 填 force_role 后调 RunServer。
+ */
+
 #include <string>
 
 /**

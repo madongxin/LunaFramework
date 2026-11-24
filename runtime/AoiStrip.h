@@ -1,10 +1,13 @@
 #pragma once
 
-
 /**
- * AoiStrip.h — AOI 条带划分。
- * 路径: runtime/AoiStrip.h
+ * @file AoiStrip.h
+ * @brief AOI 帧剥离：从 delta 帧提取 ENTER/LEAVE 实体，或按 id 重写丢掉事件
+ *
+ * AoiStripEntityIds 供「尚未写出首字节」的在途帧过滤；RewriteAoiFrameDroppingEntities
+ * 重编码后若无事件则 empty=true。已写出半帧不得交给本函数。
  */
+
 #include "ProtoFraming.h"
 #include "game.pb.h"
 

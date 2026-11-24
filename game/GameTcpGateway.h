@@ -1,32 +1,19 @@
 #pragma once
 
-
-/**
- * GameTcpGateway.h — 玩家 TCP 网关：独立线程 Reactor + ProtoFraming + 登录/转发。
- * 路径: game/GameTcpGateway.h
- */
 /**
  * @file GameTcpGateway.h
- * @brief 游戏 TCP 网关：独立线程 + EventLoop，接收客户端 length-prefix protobuf 消息
+ * @brief 游戏 TCP 网关：独立线程 + EventLoop，接收客户端 length-prefix protobuf
  *
- * 接收客户端消息的整体链路（自底向上）：
+ * 接收链路（自底向上）：
+ *   Acceptor accept → TcpServer 绑子 EventLoop → epoll 可读
+ *   → TcpConnection::HandleMessage → OnMessage 追加流式缓冲
+ *   → ProtoFraming 拆帧 → 按 player 投递串行队列
+ *   → GameService::HandleFrame / 登录编排 → ReplySink 回投 IO 线程 Send
  *
- *   1. Acceptor 在新连接上 accept
- *   2. TcpServer::HandleNewConnection 将连接绑到子线程 EventLoop，注册读回调
- *   3. epoll 可读 -> TcpConnection::HandleMessage
- *        -> ReadNonBlocking 把内核数据写入 read_buf_
- *        -> 调用 message_callback（即本类的 OnMessage）
- *   4. OnMessage：把本次 read_buf_ 追加到「按连接 id 的流式缓冲」g_stream_buf
- *   5. 循环 ProtoFraming::TryDecodeOneFrame，拆出完整一帧 payload
- *   6. 按 player_id 投递 PlayerSerialQueue（InProcessTransport）
- *   7. 业务线程：GameService::HandleFrame -> ReplySink 回投连接所属 EventLoop -> Send
- *
- * 协议：4 字节大端长度 + protobuf 序列化的 GameRequest / GameResponse（见 ProtoFraming）
- *
- * 注意：网关运行在独立 std::thread 中（StartInBackground），与 HTTP 主 EventLoop 分离。
- * 阶段 1：IO 线程不再同步跑 GameLogic。
- * 阶段 3：Login/Reconnect 绑定 conn↔player；断线 MarkDisconnected（宽限重连）。
- * 阶段 7：StopAccepting / RequestQuit 配合 SIGTERM 摘流。
+ * 协议：4 字节大端长度 + GameRequest/GameResponse（见 ProtoFraming）。
+ * 独立 std::thread（StartInBackground），与 HTTP 主 EventLoop 分离；
+ * IO 线程不跑 GameLogic；Login/Reconnect 绑 conn↔player；
+ * 断线 MarkDisconnected（宽限重连）；StopAccepting/RequestQuit 配合 SIGTERM 摘流。
  */
 
 #include <atomic>
@@ -40,24 +27,33 @@ class TcpServer;
 
 class GameTcpGateway {
 public:
-    /** instance_id：稳定 Gateway 身份（如 gw-0），不得用 listen 地址拼接 */
+    /**
+     * @param ip/port 公网或 VIP 后监听地址（正式拓扑多为 VIP:8081 后端）
+     * @param instance_id 稳定 Gateway 身份（如 gw-0），不得用 listen 地址拼接
+     */
     GameTcpGateway(const std::string &ip, int port, const std::string &instance_id);
     ~GameTcpGateway();
 
-    /** 在后台线程启动 Run()，内部阻塞在 EventLoop::Loop */
+    /** 在后台线程启动 Run()，内部阻塞在 EventLoop::Loop 直至 RequestQuit。 */
     void StartInBackground();
 
-    /** 停止 accept（跨线程安全，投递到 gateway loop） */
+    /** 停止 accept（跨线程安全：投递到 gateway loop，摘流前调用）。 */
     void StopAccepting();
-    /** 退出 gateway EventLoop（随后线程可 join） */
+    /** 退出 gateway EventLoop；随后可 join 后台线程。 */
     void RequestQuit();
 
+    /** 本实例稳定身份，供 Session Bind / Push 定向。 */
     const std::string &gateway_instance_id() const { return instance_id_; }
+    /** 进程内是否已有 Gateway 在监听（健康检查 / 单测）。 */
     static bool TcpListening();
 
 private:
+    /** 线程入口：建 EventLoop + TcpServer，注册 OnMessage/关闭回调后 Loop。 */
     void Run();
-    /** TcpServer::set_message_callback 注册的入口：粘包处理 + 业务 + 回包 */
+    /**
+     * TcpServer message_callback：粘包拆帧、预鉴权/登录编排或业务转发、回包。
+     * 不得在此同步跑重 GameLogic；已登录帧投递串行队列。
+     */
     void OnMessage(const std::shared_ptr<TcpConnection> &conn);
 
     std::string ip_;

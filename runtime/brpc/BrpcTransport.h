@@ -2,8 +2,10 @@
 
 
 /**
- * BrpcTransport.h — brpc 传输辅助。
- * 路径: runtime/brpc/BrpcTransport.h
+ * @file BrpcTransport.h
+ * @brief 跨进程 ITransport：经 brpc 将玩家请求投递到 GameLogic
+ *
+ * 与 InProcessTransport 二选一由 GameRequestTransport 注入；须带 SessionHandle。
  */
 #include "ITransport.h"
 

@@ -1,18 +1,18 @@
 #pragma once
 
-
 /**
- * TrustedPlayerId.h — 网关填入的可信 player_id 约定。
- * 路径: game/TrustedPlayerId.h
+ * @file TrustedPlayerId.h
+ * @brief Gateway/GameLogic 可信身份：覆盖客户端自报 player_id
+ *
+ * 含 player_id 的 oneof 必须全部在此登记；新增字段时 trusted_player_id_test 会失败。
+ * 登录前白名单通常不走 ApplyTrustedPlayerId；Dispatch 业务命令必须覆盖后再处理。
  */
+
 #include "game.pb.h"
 
 #include <cstdint>
 
-/**
- * Gateway/GameLogic 可信身份：覆盖客户端自报 player_id。
- * 含 player_id 的 oneof 必须全部在此登记；新增字段时 trusted_player_id_test 会失败。
- */
+/** ApplyTrustedPlayerId 的结果：无字段 / 已覆盖 / 自报不一致（已覆盖，调用方应拒绝）。 */
 enum class TrustedPlayerIdResult {
     NoPlayerField = 0,  // 该 body 无 player_id（或空 body）
     Applied = 1,        // 已覆盖为可信 id

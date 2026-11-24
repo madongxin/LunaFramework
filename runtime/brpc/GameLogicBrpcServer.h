@@ -2,8 +2,10 @@
 
 
 /**
- * GameLogicBrpcServer.h — GameLogic brpc Server。
- * 路径: runtime/brpc/GameLogicBrpcServer.h
+ * @file GameLogicBrpcServer.h
+ * @brief GameLogic brpc Server 启动封装
+ *
+ * 注册 GameLogicServiceImpl / Forward；绑定策略同 BindAddressPolicy。
  */
 #include <memory>
 #include <string>
