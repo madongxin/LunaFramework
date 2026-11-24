@@ -1,3 +1,7 @@
+/**
+ * NatsThinClient.cpp — 运行时：客户端封装。NATS 薄客户端。
+ * 路径: runtime/discovery/NatsThinClient.cpp
+ */
 #include "NatsThinClient.h"
 
 #include "Logging.h"

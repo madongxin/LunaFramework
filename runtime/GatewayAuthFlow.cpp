@@ -1,3 +1,7 @@
+/**
+ * GatewayAuthFlow.cpp — 运行时：网关相关。鉴权相关。
+ * 路径: runtime/GatewayAuthFlow.cpp
+ */
 #include "GatewayAuthFlow.h"
 
 GatewayAuthFlow &GatewayAuthFlow::Instance() {

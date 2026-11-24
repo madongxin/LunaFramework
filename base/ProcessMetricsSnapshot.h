@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * ProcessMetricsSnapshot.h — 进程级 CPU/RSS/FD 快照结构。
+ * 路径: base/ProcessMetricsSnapshot.h
+ */
 #include <cstdint>
 #include <string>
 

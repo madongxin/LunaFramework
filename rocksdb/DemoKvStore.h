@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * DemoKvStore.h — RocksDB KV 演示存储。
+ * 路径: rocksdb/DemoKvStore.h
+ */
 /**
  * @file DemoKvStore.h
  * @brief RocksDB Demo：用 protobuf PlayerSnapshot 做本地 KV 读写示例

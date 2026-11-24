@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PasswordHash.h — 口令哈希（PBKDF 等）接口。
+ * 路径: runtime/PasswordHash.h
+ */
 #include <string>
 
 /** PBKDF2-HMAC-SHA256 密码哈希（OpenSSL）；日志中禁止打印明文或完整 hash。 */

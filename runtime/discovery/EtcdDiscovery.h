@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * EtcdDiscovery.h — 可选 etcd 发现。
+ * 路径: runtime/discovery/EtcdDiscovery.h
+ */
 #include <string>
 #include <vector>
 

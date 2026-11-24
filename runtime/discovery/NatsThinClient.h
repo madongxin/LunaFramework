@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * NatsThinClient.h — NATS 薄客户端（可选）。
+ * 路径: runtime/discovery/NatsThinClient.h
+ */
 #include <mutex>
 #include <string>
 

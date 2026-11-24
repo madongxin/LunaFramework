@@ -1,3 +1,7 @@
+/**
+ * RedisPool.cpp — Redis：连接/对象池。Redis。
+ * 路径: redis/RedisPool.cpp
+ */
 #include "RedisPool.h"
 
 #include "Logging.h"

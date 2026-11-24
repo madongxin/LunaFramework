@@ -1,3 +1,7 @@
+/**
+ * InProcessTransport.cpp — 运行时：传输层。
+ * 路径: runtime/InProcessTransport.cpp
+ */
 #include "InProcessTransport.h"
 
 #include "GameService.h"

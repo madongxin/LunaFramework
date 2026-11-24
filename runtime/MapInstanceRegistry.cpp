@@ -1,3 +1,7 @@
+/**
+ * MapInstanceRegistry.cpp — 运行时：注册表/发现。地图/场景相关。
+ * 路径: runtime/MapInstanceRegistry.cpp
+ */
 #include "MapInstanceRegistry.h"
 
 #include <chrono>

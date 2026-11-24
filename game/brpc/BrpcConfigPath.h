@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * BrpcConfigPath.h — brpc.cnf 路径。
+ * 路径: game/brpc/BrpcConfigPath.h
+ */
 #include "LunaServerPaths.h"
 
 #include <string>

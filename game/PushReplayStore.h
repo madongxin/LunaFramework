@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PushReplayStore.h — 断线重连推送重放存储。
+ * 路径: game/PushReplayStore.h
+ */
 #include "PushReplayCache.h"
 
 #include <cstdint>

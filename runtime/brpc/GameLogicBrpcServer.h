@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GameLogicBrpcServer.h — GameLogic brpc Server。
+ * 路径: runtime/brpc/GameLogicBrpcServer.h
+ */
 #include <memory>
 #include <string>
 

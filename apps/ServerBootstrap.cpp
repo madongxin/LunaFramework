@@ -1,3 +1,7 @@
+/**
+ * ServerBootstrap.cpp — 进程入口/启动：服务端启动或 RPC 服务。进程启动编排。
+ * 路径: apps/ServerBootstrap.cpp
+ */
 #include "ServerBootstrap.h"
 
 #include "bootstrap/AdminHttpRouter.h"

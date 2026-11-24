@@ -1,3 +1,7 @@
+/**
+ * LoginAdmission.cpp — 运行时：准入控制。登录。
+ * 路径: runtime/LoginAdmission.cpp
+ */
 #include "LoginAdmission.h"
 
 #include "ServerStats.h"

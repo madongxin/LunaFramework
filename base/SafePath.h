@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * SafePath.h — 路径拼接安全检查，防止 .. 穿越出根目录。
+ * 路径: base/SafePath.h
+ */
 #include <cctype>
 #include <string>
 

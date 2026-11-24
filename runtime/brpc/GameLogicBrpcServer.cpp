@@ -1,3 +1,7 @@
+/**
+ * GameLogicBrpcServer.cpp — 运行时：服务端启动或 RPC 服务。brpc 相关。
+ * 路径: runtime/brpc/GameLogicBrpcServer.cpp
+ */
 #include "GameLogicBrpcServer.h"
 
 #include "BindAddressPolicy.h"

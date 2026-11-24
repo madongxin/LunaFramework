@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * TrustedPlayerId.h — 网关填入的可信 player_id 约定。
+ * 路径: game/TrustedPlayerId.h
+ */
 #include "game.pb.h"
 
 #include <cstdint>

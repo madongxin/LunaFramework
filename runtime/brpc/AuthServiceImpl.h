@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * AuthServiceImpl.h — AuthService brpc：Login/VerifyToken；不创建 Session。
+ * 路径: runtime/brpc/AuthServiceImpl.h
+ */
 #include "auth.pb.h"
 
 class AuthServiceImpl : public auth::AuthService {

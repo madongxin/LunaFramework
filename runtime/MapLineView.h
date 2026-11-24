@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MapLineView.h — 分线视图（Redis/内存协作）。
+ * 路径: runtime/MapLineView.h
+ */
 #include "PlacementStore.h"
 
 #include <cstdint>

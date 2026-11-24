@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayAuthClients.h — Gateway 持有的 Auth/Session 客户端。
+ * 路径: runtime/brpc/GatewayAuthClients.h
+ */
 #include "RpcChannelSnapshot.h"
 #include "auth.pb.h"
 #include "gamelogic_rpc.pb.h"

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PlayerItemPersistQueue.h — 道具异步落库队列。
+ * 路径: db/PlayerItemPersistQueue.h
+ */
 /**
  * @file PlayerItemPersistQueue.h
  * @brief 在线玩家道具发放异步落库队列

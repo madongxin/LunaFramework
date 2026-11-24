@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GameService.h — 单帧入口：反序列化 GameRequest → GameLogic → 编码响应帧。
+ * 路径: game/GameService.h
+ */
 /**
  * @file GameService.h
  * @brief 单帧业务入口：protobuf 反序列化 -> GameLogic -> 编码响应帧

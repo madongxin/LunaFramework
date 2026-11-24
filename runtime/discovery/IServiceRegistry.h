@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * IServiceRegistry.h — 服务注册发现接口 + Static 实现。
+ * 路径: runtime/discovery/IServiceRegistry.h
+ */
 #include <cstdint>
 #include <mutex>
 #include <string>

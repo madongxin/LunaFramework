@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * SceneKind.h — 运行时：模块实现，见同名头文件与调用方。
+ * 路径: runtime/SceneKind.h
+ */
 #include "MapStaticData.h"
 
 #include <cstdint>

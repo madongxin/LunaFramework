@@ -1,3 +1,7 @@
+/**
+ * Connection.cpp — MySQL/GameDB：连接。
+ * 路径: db/Connection.cpp
+ */
 #include "Connection.h"
 
 #include "Logging.h"

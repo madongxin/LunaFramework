@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * Connection.h — 单条 MySQL 连接封装：connect/update/query/预处理语句。
+ * 路径: db/Connection.h
+ */
 #include <mysql/mysql.h>
 
 #include <chrono>

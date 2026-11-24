@@ -1,3 +1,7 @@
+/**
+ * MapCatalog.cpp — 运行时：地图/场景相关。目录/静态表。
+ * 路径: runtime/MapCatalog.cpp
+ */
 #include "MapCatalog.h"
 
 #include "LunaServerPaths.h"

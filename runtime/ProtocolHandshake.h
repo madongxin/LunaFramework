@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * ProtocolHandshake.h — ClientHello 等协议握手策略。
+ * 路径: runtime/ProtocolHandshake.h
+ */
 #include "game.pb.h"
 
 #include <cstdint>

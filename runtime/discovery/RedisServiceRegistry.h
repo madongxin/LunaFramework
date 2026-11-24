@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * RedisServiceRegistry.h — 基于 Redis 的服务注册发现。
+ * 路径: runtime/discovery/RedisServiceRegistry.h
+ */
 #include "IServiceRegistry.h"
 
 #include <atomic>

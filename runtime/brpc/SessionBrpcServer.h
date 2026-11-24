@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * SessionBrpcServer.h — Session(+Auth) brpc Server 启动。
+ * 路径: runtime/brpc/SessionBrpcServer.h
+ */
 #include <memory>
 #include <string>
 

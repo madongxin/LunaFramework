@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * AoiFanoutV2.h — AOI 扇出 v2 策略。
+ * 路径: runtime/AoiFanoutV2.h
+ */
 #include <algorithm>
 #include <cstdint>
 #include <vector>

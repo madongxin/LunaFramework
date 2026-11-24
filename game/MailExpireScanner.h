@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MailExpireScanner.h — 邮件过期扫描。
+ * 路径: game/MailExpireScanner.h
+ */
 /**
  * @file MailExpireScanner.h
  * @brief 邮件过期定时扫描（挂到主 EventLoop::RunEvery）

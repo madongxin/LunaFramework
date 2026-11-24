@@ -1,3 +1,7 @@
+/**
+ * MapLineView.cpp — 运行时：地图/场景相关。
+ * 路径: runtime/MapLineView.cpp
+ */
 #include "MapLineView.h"
 
 #include "MapCatalog.h"

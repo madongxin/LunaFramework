@@ -1,3 +1,7 @@
+/**
+ * IServiceRegistry.cpp — 运行时：业务服务逻辑。注册表/发现。
+ * 路径: runtime/discovery/IServiceRegistry.cpp
+ */
 #include "IServiceRegistry.h"
 
 #include "AdvertiseAddr.h"

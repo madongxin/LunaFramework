@@ -1,3 +1,7 @@
+/**
+ * GatewayIdentity.cpp — 运行时：网关相关。实例身份。
+ * 路径: runtime/GatewayIdentity.cpp
+ */
 #include "GatewayIdentity.h"
 
 #include "FormalMode.h"

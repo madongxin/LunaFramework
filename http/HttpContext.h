@@ -1,4 +1,9 @@
 #pragma once
+
+/**
+ * HttpContext.h — HTTP 请求解析状态机（挂在 TcpConnection context）。
+ * 路径: http/HttpContext.h
+ */
 #include <string>
 #include <memory>
 class HttpRequest;

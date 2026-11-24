@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * LogFile.h — 按大小/日期滚动的日志文件。
+ * 路径: log/LogFile.h
+ */
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/time.h>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PushReplayCache.h — 推送重放缓存。
+ * 路径: runtime/PushReplayCache.h
+ */
 #include <cstdint>
 #include <deque>
 #include <mutex>

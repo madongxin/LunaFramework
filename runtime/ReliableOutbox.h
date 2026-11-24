@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * ReliableOutbox.h — 可靠推送发件箱。
+ * 路径: runtime/ReliableOutbox.h
+ */
 #include <cstddef>
 #include <cstdint>
 #include <deque>

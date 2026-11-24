@@ -1,3 +1,7 @@
+/**
+ * GameLogic.cpp — GameLogic::Handle 分发与各玩法实现。
+ * 路径: game/GameLogic.cpp
+ */
 #include "GameLogic.h"
 
 #include "AoiEvidence.h"

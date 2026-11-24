@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayLoginOrchestrator.h — 登录编排：Auth→AcquireSession→Bind。
+ * 路径: runtime/brpc/GatewayLoginOrchestrator.h
+ */
 #include "GatewayAuthPolicy.h"
 #include "GatewayLoginRoute.h"
 #include "GatewayLogoutPolicy.h"

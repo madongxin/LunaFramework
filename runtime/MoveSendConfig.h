@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MoveSendConfig.h — 运行时：配置路径或读取。移动相关。
+ * 路径: runtime/MoveSendConfig.h
+ */
 #include "ControlResponseOutbox.h"
 
 #include <cstdlib>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * CommandPolicy.h — 客户端命令是否允许（Formal 禁危险命令）。
+ * 路径: game/CommandPolicy.h
+ */
 #include "game.pb.h"
 
 #include <string>

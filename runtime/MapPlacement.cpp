@@ -1,3 +1,7 @@
+/**
+ * MapPlacement.cpp — 运行时：地图/场景相关。占位/分线。
+ * 路径: runtime/MapPlacement.cpp
+ */
 #include "MapPlacement.h"
 
 MapPlacement &MapPlacement::Instance() {

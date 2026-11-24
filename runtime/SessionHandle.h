@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * SessionHandle.h — 运行时：会话相关。
+ * 路径: runtime/SessionHandle.h
+ */
 #include <cstdint>
 #include <string>
 

@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * MailConfigPath.h — mail.cnf 路径。
+ * 路径: game/MailConfigPath.h
+ */
 #include "LunaServerPaths.h"
 
 #include <string>

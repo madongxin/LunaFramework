@@ -1,3 +1,7 @@
+/**
+ * FriendStore.cpp — MySQL/GameDB：数据访问/存储封装。好友相关。
+ * 路径: db/FriendStore.cpp
+ */
 #include "FriendStore.h"
 
 #include "Connection.h"

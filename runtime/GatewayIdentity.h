@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayIdentity.h — 本 Gateway 的 instance_id 解析与缓存。
+ * 路径: runtime/GatewayIdentity.h
+ */
 #include <string>
 
 /**

@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * AuthLoginRateLimit.h — 登录限流（Redis）。
+ * 路径: runtime/AuthLoginRateLimit.h
+ */
 #include <cstdint>
 #include <string>
 

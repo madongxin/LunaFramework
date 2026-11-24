@@ -1,3 +1,7 @@
+/**
+ * ControlResponseOutbox.cpp — 运行时：发件箱/可靠发送。控制面出站。
+ * 路径: runtime/ControlResponseOutbox.cpp
+ */
 #include "ControlResponseOutbox.h"
 
 #include "Logging.h"

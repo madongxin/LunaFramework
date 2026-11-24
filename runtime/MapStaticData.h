@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MapStaticData.h — 地图静态配置数据表。
+ * 路径: runtime/MapStaticData.h
+ */
 #include <cstdint>
 #include <memory>
 #include <string>

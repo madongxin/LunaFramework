@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * BrpcGameDbRepository.h — 经 brpc 访问远端 GameDB 的仓储客户端（Logic/Gateway 使用）。
+ * 路径: db/BrpcGameDbRepository.h
+ */
 #include "IGameDbRepository.h"
 #include "game.pb.h"
 #include "gamedb.pb.h"

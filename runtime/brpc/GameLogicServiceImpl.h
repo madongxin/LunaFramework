@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * GameLogicServiceImpl.h — GameLogic 业务 RPC 实现。
+ * 路径: runtime/brpc/GameLogicServiceImpl.h
+ */
 #include "gamelogic_rpc.pb.h"
 
 #include <cstdint>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayConnRegistry.h — conn_id ↔ player/session/fence 本机绑定表。
+ * 路径: game/GatewayConnRegistry.h
+ */
 #include <cstdint>
 #include <functional>
 #include <mutex>

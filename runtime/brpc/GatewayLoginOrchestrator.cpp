@@ -1,3 +1,7 @@
+/**
+ * GatewayLoginOrchestrator.cpp — 运行时：网关相关。编排流程。
+ * 路径: runtime/brpc/GatewayLoginOrchestrator.cpp
+ */
 #include "GatewayLoginOrchestrator.h"
 #include "GatewayLogoutPolicy.h"
 

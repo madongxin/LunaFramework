@@ -1,5 +1,11 @@
 #pragma once
 
+
+/**
+ * FormalMode.h — 正式模式与危险能力开关（全头文件内联）。
+ * LUNASERVER_FORMAL=1 时 fail-closed；见 FormalModeEnabled 等。
+ * 路径: runtime/FormalMode.h
+ */
 #include <cstdlib>
 #include <cstring>
 #include <string>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * CurrentThread.h — 当前线程 tid / 线程名缓存，供 EventLoop 断言「必须在 loop 线程」使用。
+ * 路径: base/CurrentThread.h
+ */
 #include <stdint.h>
 #include <pthread.h>
 #include <stdio.h>

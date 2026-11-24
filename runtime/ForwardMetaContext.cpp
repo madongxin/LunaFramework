@@ -1,3 +1,7 @@
+/**
+ * ForwardMetaContext.cpp — 运行时：转发。元数据上下文。
+ * 路径: runtime/ForwardMetaContext.cpp
+ */
 #include "ForwardMetaContext.h"
 
 namespace {

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GameRequestPlayerId.h — 从 GameRequest 提取可信 player_id 的辅助。
+ * 路径: runtime/GameRequestPlayerId.h
+ */
 #include <cstdint>
 #include <string>
 

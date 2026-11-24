@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * ControlResponseOutbox.h — 控制类响应出站缓冲。
+ * 路径: runtime/ControlResponseOutbox.h
+ */
 #include <cstddef>
 #include <cstdint>
 #include <functional>

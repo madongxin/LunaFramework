@@ -1,3 +1,7 @@
+/**
+ * MessageRoute.cpp — 运行时：路由。
+ * 路径: runtime/MessageRoute.cpp
+ */
 #include "MessageRoute.h"
 
 #include "CommandSpec.h"

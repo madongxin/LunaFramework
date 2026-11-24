@@ -1,3 +1,7 @@
+/**
+ * MapLeaseKeeper.cpp — 运行时：地图/场景相关。租约。
+ * 路径: runtime/MapLeaseKeeper.cpp
+ */
 #include "MapLeaseKeeper.h"
 
 #include "Logging.h"

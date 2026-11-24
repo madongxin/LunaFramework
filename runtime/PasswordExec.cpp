@@ -1,3 +1,7 @@
+/**
+ * PasswordExec.cpp — 运行时：密码哈希。
+ * 路径: runtime/PasswordExec.cpp
+ */
 #include "PasswordExec.h"
 
 PasswordExec &PasswordExec::Instance() {

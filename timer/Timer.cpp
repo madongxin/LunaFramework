@@ -1,3 +1,7 @@
+/**
+ * Timer.cpp — Timer 实现。
+ * 路径: timer/Timer.cpp
+ */
 #include "Timer.h"
 #include <functional>
 #include "TimeStamp.h"

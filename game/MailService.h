@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MailService.h — 邮件业务服务。
+ * 路径: game/MailService.h
+ */
 /**
  * @file MailService.h
  * @brief 邮件业务：投递、列表、已读、领取、容量、过期

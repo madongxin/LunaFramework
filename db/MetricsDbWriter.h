@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * MetricsDbWriter.h — 指标周期性写入 MySQL（非 gamedb 角色可选）。
+ * 路径: db/MetricsDbWriter.h
+ */
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>

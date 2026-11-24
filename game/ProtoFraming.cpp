@@ -1,8 +1,7 @@
 /**
- * @file ProtoFraming.cpp
- * @brief length-prefix 编解码，与客户端 game_client 帧格式一致
+ * ProtoFraming.cpp — 编解码实现。
+ * 路径: game/ProtoFraming.cpp
  */
-
 #include "ProtoFraming.h"
 
 #include <arpa/inet.h>

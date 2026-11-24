@@ -1,3 +1,7 @@
+/**
+ * ProcSelfStats.cpp — ProcSelfStats 实现。
+ * 路径: base/ProcSelfStats.cpp
+ */
 #include "ProcSelfStats.h"
 
 #include <cstdio>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiOutboundOrder.h — AOI 出站顺序约束。
+ * 路径: runtime/AoiOutboundOrder.h
+ */
 #include "AoiMoveCoalesceLedger.h"
 #include "MoveSendConfig.h"
 

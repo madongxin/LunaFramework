@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiRecipientGate.h — AOI 推送接收方门控。
+ * 路径: runtime/AoiRecipientGate.h
+ */
 #include <cstdint>
 #include <mutex>
 #include <unordered_set>

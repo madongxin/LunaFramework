@@ -1,3 +1,7 @@
+/**
+ * MailStore.cpp — 玩法/网关：数据访问/存储封装。邮件相关。
+ * 路径: game/MailStore.cpp
+ */
 #include "MailStore.h"
 
 #include "Connection.h"

@@ -1,3 +1,7 @@
+/**
+ * PushReplayStore.cpp — 玩法/网关：数据访问/存储封装。推送相关。
+ * 路径: game/PushReplayStore.cpp
+ */
 #include "PushReplayStore.h"
 
 #include "Logging.h"

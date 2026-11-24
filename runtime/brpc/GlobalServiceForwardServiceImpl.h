@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GlobalServiceForwardServiceImpl.h — GlobalService Forward 实现。
+ * 路径: runtime/brpc/GlobalServiceForwardServiceImpl.h
+ */
 #include "forward.pb.h"
 
 /** GlobalService Forward：邮件/全局业务入队 HandleFrame；无地图 epoch 栅栏、无战斗 Tick */

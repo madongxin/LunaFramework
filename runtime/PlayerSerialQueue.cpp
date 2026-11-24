@@ -1,3 +1,7 @@
+/**
+ * PlayerSerialQueue.cpp — 运行时：队列。串行队列。
+ * 路径: runtime/PlayerSerialQueue.cpp
+ */
 #include "PlayerSerialQueue.h"
 
 #include "Logging.h"

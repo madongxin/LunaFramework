@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PlayerProfileDefaults.h — 新建角色默认档案。
+ * 路径: db/PlayerProfileDefaults.h
+ */
 #include <cstdint>
 #include <string>
 

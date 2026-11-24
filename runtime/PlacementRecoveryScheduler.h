@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PlacementRecoveryScheduler.h — 占位异常后的实验性自动恢复调度。
+ * 路径: runtime/PlacementRecoveryScheduler.h
+ */
 #include <cstddef>
 #include <string>
 

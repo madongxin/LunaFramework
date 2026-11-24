@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * LunaServerPaths.h — 根据 /proc/self/exe 解析项目 static/files 等路径，避免 cwd 不同导致空白页。
+ * 路径: base/LunaServerPaths.h
+ */
 #include <cstdlib>
 #include <string>
 #include <unistd.h>

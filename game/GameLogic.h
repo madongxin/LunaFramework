@@ -1,5 +1,11 @@
 #pragma once
 
+
+/**
+ * GameLogic.h — 玩法业务单例：处理已鉴权的 GameRequest（移动/AOI/邮件领取等）。
+ * Formal 下不接受密码；好友命令可关；资产经 GameDB。
+ * 路径: game/GameLogic.h
+ */
 #include "game.pb.h"
 #include "IGameDbRepository.h"
 #include "MapRuntime.h"

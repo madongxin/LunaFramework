@@ -1,3 +1,7 @@
+/**
+ * SecureRandom.cpp — 运行时：安全随机。
+ * 路径: runtime/SecureRandom.cpp
+ */
 #include "SecureRandom.h"
 
 #include <openssl/rand.h>

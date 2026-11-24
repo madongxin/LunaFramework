@@ -1,3 +1,7 @@
+/**
+ * TimerQueue.cpp — TimerQueue 插入、触发与重复定时器重置。
+ * 路径: timer/TimerQueue.cpp
+ */
 
 #include "Timer.h"
 #include "TimeStamp.h"

@@ -1,3 +1,7 @@
+/**
+ * AuthTokenStore.cpp — 运行时：数据访问/存储封装。鉴权相关。
+ * 路径: runtime/brpc/AuthTokenStore.cpp
+ */
 #include "AuthTokenStore.h"
 
 #include "Logging.h"

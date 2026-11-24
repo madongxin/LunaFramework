@@ -1,3 +1,7 @@
+/**
+ * LogicMetrics.cpp — LogicMetrics 原子计数与导出文本。
+ * 路径: base/LogicMetrics.cpp
+ */
 #include "LogicMetrics.h"
 
 #include <atomic>

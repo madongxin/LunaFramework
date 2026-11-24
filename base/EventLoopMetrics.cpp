@@ -1,3 +1,7 @@
+/**
+ * EventLoopMetrics.cpp — EventLoopMetrics 计数实现。
+ * 路径: base/EventLoopMetrics.cpp
+ */
 #include "EventLoopMetrics.h"
 
 #include <atomic>

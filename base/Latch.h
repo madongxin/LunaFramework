@@ -1,4 +1,9 @@
 #pragma once
+
+/**
+ * Latch.h — 可复用倒计时门闩，测试与启动同步用。
+ * 路径: base/Latch.h
+ */
 #include "common.h"
 #include <thread>
 #include <condition_variable>

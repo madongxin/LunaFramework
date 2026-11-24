@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * HealthyLogicSnapshot.h — 健康 GameLogic 列表快照。
+ * 路径: runtime/HealthyLogicSnapshot.h
+ */
 #include <cstdint>
 #include <memory>
 #include <string>

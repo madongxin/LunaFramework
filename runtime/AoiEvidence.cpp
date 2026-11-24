@@ -1,3 +1,7 @@
+/**
+ * AoiEvidence.cpp — 运行时：AOI 相关。证据/审计。
+ * 路径: runtime/AoiEvidence.cpp
+ */
 #include "AoiEvidence.h"
 #include "ServerStats.h"
 

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * FriendService.h — 好友业务（多在 GlobalService/World 侧启用）。
+ * 路径: game/FriendService.h
+ */
 #include "game.pb.h"
 
 #include <cstdint>

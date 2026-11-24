@@ -1,3 +1,7 @@
+/**
+ * EtcdDiscovery.cpp — 运行时：服务发现。etcd 发现。
+ * 路径: runtime/discovery/EtcdDiscovery.cpp
+ */
 #include "EtcdDiscovery.h"
 
 #include "Logging.h"

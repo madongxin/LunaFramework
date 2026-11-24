@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PushAdmit.h — 推送准入（可靠/不可靠）。
+ * 路径: runtime/PushAdmit.h
+ */
 #include <cstdint>
 #include <functional>
 #include <string>

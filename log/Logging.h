@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * Logging.h — 日志门面：级别、宏 LOG_*、可替换 output/flush。
+ * 路径: log/Logging.h
+ */
 #include <string.h>
 #include "common.h"
 #include "TimeStamp.h"

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PrometheusClient.h — 本机 Prometheus HTTP 客户端（监控页 query 转发）。
+ * 路径: base/PrometheusClient.h
+ */
 #include <string>
 
 struct PrometheusClientResult {

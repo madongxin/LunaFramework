@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MapCatalog.h — 地图模板/静态目录加载（EnsureDefault）。
+ * 路径: runtime/MapCatalog.h
+ */
 #include "MapStaticData.h"
 #include "SceneKind.h"
 

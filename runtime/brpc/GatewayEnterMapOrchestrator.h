@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayEnterMapOrchestrator.h — 进图编排。
+ * 路径: runtime/brpc/GatewayEnterMapOrchestrator.h
+ */
 #include "SessionHandle.h"
 
 #include <functional>

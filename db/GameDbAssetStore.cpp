@@ -1,3 +1,7 @@
+/**
+ * GameDbAssetStore.cpp — MySQL/GameDB：数据访问/存储封装。资产。
+ * 路径: db/GameDbAssetStore.cpp
+ */
 #include "GameDbAssetStore.h"
 
 #include "ConnectionPool.h"

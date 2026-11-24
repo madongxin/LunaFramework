@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * ProtoFraming.h — Game TCP 帧：4 字节大端长度 + protobuf payload。
+ * 路径: game/ProtoFraming.h
+ */
 /**
  * @file ProtoFraming.h
  * @brief 游戏 TCP 帧格式：长度前缀 + payload

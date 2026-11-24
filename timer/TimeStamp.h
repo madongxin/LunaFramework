@@ -1,4 +1,9 @@
 #pragma once
+
+/**
+ * TimeStamp.h — 微秒时间戳与加减、格式化；定时器键值。
+ * 路径: timer/TimeStamp.h
+ */
 #include <stdio.h>
 #include <sys/time.h>
 #include <ctime>

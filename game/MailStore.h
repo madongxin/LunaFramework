@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MailStore.h — 邮件持久化。
+ * 路径: game/MailStore.h
+ */
 /**
  * @file MailStore.h
  * @brief 邮件表 MySQL 访问（raw SQL，与 PlayerItemStore 风格一致）

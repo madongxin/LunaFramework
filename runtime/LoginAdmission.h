@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * LoginAdmission.h — 登录/重连并发准入（inflight 限额）。
+ * 路径: runtime/LoginAdmission.h
+ */
 // Process-local login/reconnect inflight budget. Sits in front of the existing
 // auth-flow slot and offload queue. Does not replace per-IP connect limits.
 // Stage budgets are separate from the outer login slot and default to the same cap.

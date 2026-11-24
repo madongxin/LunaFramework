@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * BrpcGameServer.h — 旧单进程 Mail brpc 服务（role=all）。
+ * 路径: game/brpc/BrpcGameServer.h
+ */
 /**
  * @file BrpcGameServer.h
  * @brief 进程内 brpc Server：注册 MailBrpcService，与 GameTcpGateway 双栈并存

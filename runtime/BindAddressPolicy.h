@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * BindAddressPolicy.h — 监听地址策略：Formal 下拒绝 0.0.0.0/公网，除非 allow_public_bind。
+ * 路径: runtime/BindAddressPolicy.h
+ */
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>

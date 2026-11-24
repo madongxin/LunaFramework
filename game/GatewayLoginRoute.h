@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayLoginRoute.h — 登录粘性路由到 Logic 实例。
+ * 路径: game/GatewayLoginRoute.h
+ */
 #include <cstdint>
 #include <string>
 #include <vector>

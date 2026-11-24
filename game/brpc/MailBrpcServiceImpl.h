@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MailBrpcServiceImpl.h — 邮件 brpc 实现。
+ * 路径: game/brpc/MailBrpcServiceImpl.h
+ */
 /**
  * @file MailBrpcServiceImpl.h
  * @brief brpc MailBrpcService 实现：鉴权后转发到 MailService / SessionStore

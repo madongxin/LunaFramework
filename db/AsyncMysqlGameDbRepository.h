@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AsyncMysqlGameDbRepository.h — 异步 MySQL GameDB 仓储（工作线程）。
+ * 路径: db/AsyncMysqlGameDbRepository.h
+ */
 /**
  * @file AsyncMysqlGameDbRepository.h
  * @brief MySQL 实现的 GameDB：worker 池执行事务 + outbox 发布线程

@@ -1,8 +1,7 @@
 /**
- * @file GameService.cpp
- * @brief 游戏 RPC 适配层：GameRequest <-> GameLogic <-> GameResponse
+ * GameService.cpp — HandleFrame 实现。
+ * 路径: game/GameService.cpp
  */
-
 #include "GameService.h"
 
 #include "ForwardMetaContext.h"

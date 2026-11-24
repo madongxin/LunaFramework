@@ -1,3 +1,7 @@
+/**
+ * GameLogicPush.cpp — 运行时：推送相关。游戏逻辑。
+ * 路径: runtime/brpc/GameLogicPush.cpp
+ */
 #include "AoiEvidence.h"
 #include "GameLogicPush.h"
 

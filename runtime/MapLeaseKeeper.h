@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MapLeaseKeeper.h — 周期续租本机拥有的地图 lease，防止被其它 Logic 抢走。
+ * 路径: runtime/MapLeaseKeeper.h
+ */
 #include <cstdint>
 
 /**

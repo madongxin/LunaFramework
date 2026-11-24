@@ -1,3 +1,7 @@
+/**
+ * LogStream.h — 定长缓冲日志流，避免临时 string。
+ * 路径: log/LogStream.h
+ */
 
 #include "common.h"
 #include <string>

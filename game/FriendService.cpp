@@ -1,3 +1,7 @@
+/**
+ * FriendService.cpp — 玩法/网关：业务服务逻辑。好友相关。
+ * 路径: game/FriendService.cpp
+ */
 #include "FriendService.h"
 
 #include "FriendPresenceBatch.h"

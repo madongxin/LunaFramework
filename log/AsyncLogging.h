@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AsyncLogging.h — 双缓冲异步日志后端，前台 Append、后台线程写文件。
+ * 路径: log/AsyncLogging.h
+ */
 #include <vector>
 #include <memory>
 

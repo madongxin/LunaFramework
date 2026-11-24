@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MapInstanceRegistry.h — 地图实例 Owner 注册与 lease（哪台 GameLogic 拥有哪张图）。
+ * 路径: runtime/MapInstanceRegistry.h
+ */
 /**
  * @file MapInstanceRegistry.h
  * @brief GameLogic 本地地图实例：Claim + epoch + owner lease 写栅栏

@@ -1,4 +1,9 @@
 #pragma once
+
+/**
+ * HttpRequest.h — 已解析的 HTTP 请求（方法、URL、头、body、query params）。
+ * 路径: http/HttpRequest.h
+ */
 #include <string>
 #include <map>
 

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayConfigPath.h — 运行时：配置路径或读取。网关相关。
+ * 路径: runtime/brpc/GatewayConfigPath.h
+ */
 #include "LunaServerPaths.h"
 
 #include <cstdlib>

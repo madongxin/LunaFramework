@@ -1,3 +1,7 @@
+/**
+ * PasswordHash.cpp — 运行时：密码哈希。
+ * 路径: runtime/PasswordHash.cpp
+ */
 #include "PasswordHash.h"
 
 #include <openssl/evp.h>

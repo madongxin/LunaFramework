@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiHoldGate.h — 出口 hold/背压门控。
+ * 路径: runtime/AoiHoldGate.h
+ */
 #include <cstdint>
 #include <mutex>
 #include <unordered_map>

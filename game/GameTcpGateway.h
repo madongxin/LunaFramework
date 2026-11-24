@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GameTcpGateway.h — 玩家 TCP 网关：独立线程 Reactor + ProtoFraming + 登录/转发。
+ * 路径: game/GameTcpGateway.h
+ */
 /**
  * @file GameTcpGateway.h
  * @brief 游戏 TCP 网关：独立线程 + EventLoop，接收客户端 length-prefix protobuf 消息

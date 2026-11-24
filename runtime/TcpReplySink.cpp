@@ -1,3 +1,7 @@
+/**
+ * TcpReplySink.cpp — 运行时：回包。
+ * 路径: runtime/TcpReplySink.cpp
+ */
 #include "TcpReplySink.h"
 
 #include "Buffer.h"

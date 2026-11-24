@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayConnGuard.h — Gateway 连接守卫（过载/超时等）。
+ * 路径: runtime/GatewayConnGuard.h
+ */
 #include <cstdint>
 #include <string>
 

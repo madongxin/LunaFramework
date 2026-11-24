@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MailTypes.h — 邮件类型/结构。
+ * 路径: game/MailTypes.h
+ */
 /**
  * @file MailTypes.h
  * @brief 邮件枚举、错误码与状态机校验（无外部框架依赖）

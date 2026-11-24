@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * FriendPresenceBatch.h — 好友在线态批量。
+ * 路径: game/FriendPresenceBatch.h
+ */
 #include <cstddef>
 #include <cstdint>
 #include <map>

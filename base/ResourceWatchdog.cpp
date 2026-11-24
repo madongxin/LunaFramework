@@ -1,3 +1,7 @@
+/**
+ * ResourceWatchdog.cpp — ResourceWatchdog：挂 EventLoop RunEvery。
+ * 路径: base/ResourceWatchdog.cpp
+ */
 #include "ResourceWatchdog.h"
 
 #include <algorithm>

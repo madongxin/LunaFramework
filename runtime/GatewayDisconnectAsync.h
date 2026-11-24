@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayDisconnectAsync.h — 断线后异步 MarkDisconnected，避免堵 IO 线程。
+ * 路径: runtime/GatewayDisconnectAsync.h
+ */
 #include <atomic>
 #include <chrono>
 #include <condition_variable>

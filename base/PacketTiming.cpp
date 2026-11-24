@@ -1,3 +1,7 @@
+/**
+ * PacketTiming.cpp — PacketTiming 实现。
+ * 路径: base/PacketTiming.cpp
+ */
 #include "PacketTiming.h"
 
 #include "EventLoopMetrics.h"

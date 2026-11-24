@@ -1,3 +1,7 @@
+/**
+ * PlacementStore.cpp — 玩法/网关：数据访问/存储封装。占位/分线。
+ * 路径: game/PlacementStore.cpp
+ */
 #include "PlacementStore.h"
 
 #include "HealthyLogicSnapshot.h"

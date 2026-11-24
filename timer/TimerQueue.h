@@ -1,4 +1,9 @@
 #pragma once
+
+/**
+ * TimerQueue.h — 基于 timerfd + 红黑树的定时器队列（属某个 EventLoop）。
+ * 路径: timer/TimerQueue.h
+ */
 #include <unistd.h>
 #include <sys/timerfd.h>
 

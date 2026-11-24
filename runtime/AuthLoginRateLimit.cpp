@@ -1,3 +1,7 @@
+/**
+ * AuthLoginRateLimit.cpp — 运行时：鉴权相关。限流。
+ * 路径: runtime/AuthLoginRateLimit.cpp
+ */
 #include "AuthLoginRateLimit.h"
 
 #include "Logging.h"

@@ -1,3 +1,7 @@
+/**
+ * GatewayAuthPolicy.cpp — 玩法/网关：策略与门禁。网关相关。
+ * 路径: game/GatewayAuthPolicy.cpp
+ */
 #include "GatewayAuthPolicy.h"
 
 #include "game.pb.h"

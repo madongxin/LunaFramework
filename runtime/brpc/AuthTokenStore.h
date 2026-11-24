@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AuthTokenStore.h — access_token 的 Redis 存储。
+ * 路径: runtime/brpc/AuthTokenStore.h
+ */
 #include <cstdint>
 #include <mutex>
 #include <string>

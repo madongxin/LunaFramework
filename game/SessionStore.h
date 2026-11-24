@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * SessionStore.h — 玩法/网关：数据访问/存储封装。会话相关。
+ * 路径: game/SessionStore.h
+ */
 #include "game.pb.h"
 
 #include <cstdint>

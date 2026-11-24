@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PlayerProfileStore.h — 玩家档案表。
+ * 路径: db/PlayerProfileStore.h
+ */
 /**
  * @file PlayerProfileStore.h
  * @brief 玩家资料表 player_profile（仅 GameDB/World 写；GameLogic 经 RPC 读）

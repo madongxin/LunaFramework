@@ -1,3 +1,7 @@
+/**
+ * GameLogicServiceImpl.cpp — 运行时：业务服务逻辑。游戏逻辑。
+ * 路径: runtime/brpc/GameLogicServiceImpl.cpp
+ */
 #include "GameLogicServiceImpl.h"
 
 #include "AoiEvidence.h"

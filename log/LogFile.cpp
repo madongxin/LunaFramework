@@ -1,3 +1,7 @@
+/**
+ * LogFile.cpp — LogFile 写盘与滚动。
+ * 路径: log/LogFile.cpp
+ */
 #include "LogFile.h"
 #include "TimeStamp.h"
 #include <string>

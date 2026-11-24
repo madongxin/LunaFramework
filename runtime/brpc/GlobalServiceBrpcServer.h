@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GlobalServiceBrpcServer.h — GlobalService brpc Server。
+ * 路径: runtime/brpc/GlobalServiceBrpcServer.h
+ */
 #include <memory>
 #include <string>
 

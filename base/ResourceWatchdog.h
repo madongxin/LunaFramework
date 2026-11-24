@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * ResourceWatchdog.h — 周期性采样进程资源并写入指标/历史。
+ * 路径: base/ResourceWatchdog.h
+ */
 #include <json/json.h>
 #include <mutex>
 #include <vector>

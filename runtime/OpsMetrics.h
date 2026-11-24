@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * OpsMetrics.h — 运维向计数（命令拒绝、过载等）。
+ * 路径: runtime/OpsMetrics.h
+ */
 #include <atomic>
 #include <cstdint>
 #include <string>

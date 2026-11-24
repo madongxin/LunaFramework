@@ -1,3 +1,7 @@
+/**
+ * MailExpireScanner.cpp — 玩法/网关：邮件相关。过期扫描。
+ * 路径: game/MailExpireScanner.cpp
+ */
 #include "MailExpireScanner.h"
 
 #include "EventLoop.h"

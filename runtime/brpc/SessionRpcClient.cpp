@@ -1,3 +1,7 @@
+/**
+ * SessionRpcClient.cpp — 运行时：客户端封装。会话相关。
+ * 路径: runtime/brpc/SessionRpcClient.cpp
+ */
 #include "SessionRpcClient.h"
 
 #include "BrpcNamingUtil.h"

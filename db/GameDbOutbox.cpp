@@ -1,3 +1,7 @@
+/**
+ * GameDbOutbox.cpp — MySQL/GameDB：发件箱/可靠发送。游戏逻辑。
+ * 路径: db/GameDbOutbox.cpp
+ */
 #include "GameDbOutbox.h"
 
 #include "Connection.h"

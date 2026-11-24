@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * SecureRandom.h — 密码学安全随机（token/fence）。
+ * 路径: runtime/SecureRandom.h
+ */
 #include <cstddef>
 #include <cstdint>
 #include <string>

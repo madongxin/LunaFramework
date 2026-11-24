@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * PlacementStore.h — 地图/分线占位 Redis 存储。
+ * 路径: game/PlacementStore.h
+ */
 #include "SceneKind.h"
 
 #include <cstdint>

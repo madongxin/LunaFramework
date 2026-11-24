@@ -1,3 +1,7 @@
+/**
+ * MailTypes.cpp — 玩法/网关：邮件相关。类型定义。
+ * 路径: game/MailTypes.cpp
+ */
 #include "MailTypes.h"
 
 namespace mail {

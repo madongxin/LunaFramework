@@ -1,3 +1,7 @@
+/**
+ * MailService.cpp — 玩法/网关：业务服务逻辑。邮件相关。
+ * 路径: game/MailService.cpp
+ */
 #include "MailService.h"
 
 #include "AsyncMysqlGameDbRepository.h"

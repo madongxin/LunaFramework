@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * GatewayPushServer.h — Gateway 侧 Push brpc 服务端。
+ * 路径: runtime/brpc/GatewayPushServer.h
+ */
 #include "gateway_push.pb.h"
 
 #include <memory>

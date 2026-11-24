@@ -1,4 +1,9 @@
 #pragma once
+
+/**
+ * Timer.h — 单次/周期性定时任务描述。
+ * 路径: timer/Timer.h
+ */
 #include <functional>
 #include "common.h"
 #include "TimeStamp.h"

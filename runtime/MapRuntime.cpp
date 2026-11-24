@@ -1,3 +1,7 @@
+/**
+ * MapRuntime.cpp — 运行时：地图/场景相关。运行时状态。
+ * 路径: runtime/MapRuntime.cpp
+ */
 #include "MapRuntime.h"
 
 #include "AoiEvidence.h"

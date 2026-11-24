@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * ProcSelfStats.h — /proc/self 资源采样（GM/stat 用）。
+ * 路径: base/ProcSelfStats.h
+ */
 #include <cstdint>
 #include <string>
 #include <sys/types.h>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * BotLoginWave.h — 压测登录波次工具。
+ * 路径: runtime/BotLoginWave.h
+ */
 #include <cstdint>
 #include <string>
 

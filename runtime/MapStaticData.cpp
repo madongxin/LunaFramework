@@ -1,3 +1,7 @@
+/**
+ * MapStaticData.cpp — 运行时：地图/场景相关。静态数据。
+ * 路径: runtime/MapStaticData.cpp
+ */
 #include "MapStaticData.h"
 
 #include "FileHash.h"

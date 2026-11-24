@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * GameDbServiceImpl.h — GameDB RPC 实现（账号/资产）。
+ * 路径: runtime/brpc/GameDbServiceImpl.h
+ */
 #include "gamedb.pb.h"
 
 class GameDbServiceImpl : public gdb::GameDbService {

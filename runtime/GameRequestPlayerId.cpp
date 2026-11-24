@@ -1,3 +1,7 @@
+/**
+ * GameRequestPlayerId.cpp — 运行时：请求解析。玩家。
+ * 路径: runtime/GameRequestPlayerId.cpp
+ */
 #include "GameRequestPlayerId.h"
 
 #include "game.pb.h"

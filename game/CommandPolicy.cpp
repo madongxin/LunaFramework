@@ -1,3 +1,7 @@
+/**
+ * CommandPolicy.cpp — 玩法/网关：策略与门禁。命令路由/策略。
+ * 路径: game/CommandPolicy.cpp
+ */
 #include "CommandPolicy.h"
 
 #include "CommandSpec.h"

@@ -1,3 +1,7 @@
+/**
+ * LogStream.cpp — LogStream 数字/字符串格式化。
+ * 路径: log/LogStream.cpp
+ */
 #include <stdio.h>
 #include "LogStream.h"
 

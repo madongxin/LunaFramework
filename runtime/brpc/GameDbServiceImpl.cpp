@@ -1,3 +1,7 @@
+/**
+ * GameDbServiceImpl.cpp — 运行时：业务服务逻辑。游戏逻辑。
+ * 路径: runtime/brpc/GameDbServiceImpl.cpp
+ */
 #include "GameDbServiceImpl.h"
 
 #include "AsyncMysqlGameDbRepository.h"

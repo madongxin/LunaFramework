@@ -1,3 +1,7 @@
+/**
+ * AsyncMysqlGameDbRepository.cpp — MySQL/GameDB：异步封装。游戏逻辑。
+ * 路径: db/AsyncMysqlGameDbRepository.cpp
+ */
 #include "AsyncMysqlGameDbRepository.h"
 
 #include "Connection.h"

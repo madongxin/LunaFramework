@@ -1,3 +1,7 @@
+/**
+ * AoiRecipientGate.cpp — 运行时：AOI 相关。接收方门控。
+ * 路径: runtime/AoiRecipientGate.cpp
+ */
 #include "AoiRecipientGate.h"
 
 AoiRecipientGate &AoiRecipientGate::Instance() {

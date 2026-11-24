@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PlayerAccountStore.h — 账号表读写（注册/登录校验数据面）。
+ * 路径: db/PlayerAccountStore.h
+ */
 /**
  * @file PlayerAccountStore.h
  * @brief 玩家账号注册表 player_account（仅 GameDB 进程应写入；Auth 经 GameDB RPC）

@@ -1,3 +1,7 @@
+/**
+ * PrometheusClient.cpp — PrometheusClient：限流并发的 instant/range 查询。
+ * 路径: base/PrometheusClient.cpp
+ */
 #include "PrometheusClient.h"
 
 #include <arpa/inet.h>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * LastSafePositionStore.h — 上次安全坐标持久化。
+ * 路径: db/LastSafePositionStore.h
+ */
 /**
  * @file LastSafePositionStore.h
  * @brief 最后安全位置表（仅 GameDB 写 MySQL；GameLogic 经 brpc）

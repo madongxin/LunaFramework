@@ -1,3 +1,7 @@
+/**
+ * OpsMetrics.cpp — 运行时：指标。
+ * 路径: runtime/OpsMetrics.cpp
+ */
 #include "AoiLeaveReason.h"
 #include "AoiEvidence.h"
 #include "OpsMetrics.h"

@@ -1,3 +1,7 @@
+/**
+ * SessionServiceImpl.cpp — 运行时：业务服务逻辑。会话相关。
+ * 路径: runtime/brpc/SessionServiceImpl.cpp
+ */
 #include "SessionServiceImpl.h"
 
 #include "GatewayPushClient.h"

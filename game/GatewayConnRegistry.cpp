@@ -1,3 +1,7 @@
+/**
+ * GatewayConnRegistry.cpp — 玩法/网关：注册表/发现。网关相关。
+ * 路径: game/GatewayConnRegistry.cpp
+ */
 #include "GatewayConnRegistry.h"
 
 #include "Logging.h"

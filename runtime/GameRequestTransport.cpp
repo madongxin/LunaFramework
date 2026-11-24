@@ -1,3 +1,7 @@
+/**
+ * GameRequestTransport.cpp — 运行时：传输层。请求解析。
+ * 路径: runtime/GameRequestTransport.cpp
+ */
 #include "GameRequestTransport.h"
 
 #include "InProcessTransport.h"

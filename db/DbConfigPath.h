@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * DbConfigPath.h — mysql.cnf 路径解析。
+ * 路径: db/DbConfigPath.h
+ */
 #include "LunaServerPaths.h"
 
 #include <string>

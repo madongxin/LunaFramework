@@ -1,3 +1,7 @@
+/**
+ * Logging.cpp — Logger 实现与默认 stderr 输出。
+ * 路径: log/Logging.cpp
+ */
 #include "Logging.h"
 #include "CurrentThread.h"
 

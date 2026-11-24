@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * PublicError.h — 对客户端公开的错误码映射。
+ * 路径: runtime/PublicError.h
+ */
 #include "game.pb.h"
 
 #include <cstdint>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiPublishQueue.h — AOI 发布队列。
+ * 路径: runtime/AoiPublishQueue.h
+ */
 #include "MapRuntime.h"
 
 #include <algorithm>

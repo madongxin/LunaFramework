@@ -1,3 +1,7 @@
+/**
+ * PlayerProfileDefaults.cpp — MySQL/GameDB：默认配置。角色档案。
+ * 路径: db/PlayerProfileDefaults.cpp
+ */
 #include "PlayerProfileDefaults.h"
 
 #include "LunaServerPaths.h"

@@ -1,3 +1,7 @@
+/**
+ * LastSafePositionStore.cpp — MySQL/GameDB：数据访问/存储封装。
+ * 路径: db/LastSafePositionStore.cpp
+ */
 #include "LastSafePositionStore.h"
 
 #include "Connection.h"

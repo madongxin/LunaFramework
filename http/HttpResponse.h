@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * HttpResponse.h — HTTP 响应拼装（状态码、头、body/文件）。
+ * 路径: http/HttpResponse.h
+ */
 #include<string>
 #include<utility>
 #include <map>

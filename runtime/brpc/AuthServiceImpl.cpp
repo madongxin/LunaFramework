@@ -1,3 +1,7 @@
+/**
+ * AuthServiceImpl.cpp — 运行时：业务服务逻辑。鉴权相关。
+ * 路径: runtime/brpc/AuthServiceImpl.cpp
+ */
 #include "AuthServiceImpl.h"
 
 #include "AuthTokenStore.h"

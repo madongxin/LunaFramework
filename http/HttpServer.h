@@ -1,4 +1,9 @@
 #pragma once
+
+/**
+ * HttpServer.h — 基于 TcpServer 的 HTTP 服务；管理口鉴权在 onRequest。
+ * 路径: http/HttpServer.h
+ */
 #include <functional>
 #include <memory>
 #include <stdio.h>

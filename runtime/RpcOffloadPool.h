@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * RpcOffloadPool.h — GameLogic 上将阻塞 RPC 卸到工作线程池。
+ * 路径: runtime/RpcOffloadPool.h
+ */
 #include <functional>
 
 /**

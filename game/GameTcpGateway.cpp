@@ -1,8 +1,7 @@
 /**
- * @file GameTcpGateway.cpp
- * @brief 网关：拆帧投递 + Login/Reconnect 本地绑定 + 断线 MarkDisconnected
+ * GameTcpGateway.cpp — GameTcpGateway OnMessage/登录编排/推送接入。
+ * 路径: game/GameTcpGateway.cpp
  */
-
 #include "GameTcpGateway.h"
 
 #include "AoiEvidence.h"

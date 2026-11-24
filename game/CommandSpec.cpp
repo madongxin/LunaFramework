@@ -1,3 +1,7 @@
+/**
+ * CommandSpec.cpp — 玩法/网关：命令路由/策略。规格表。
+ * 路径: game/CommandSpec.cpp
+ */
 #include "CommandSpec.h"
 
 namespace gameproto {

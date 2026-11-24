@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GameDbOutbox.h — GameDB 本地 outbox 表。
+ * 路径: db/GameDbOutbox.h
+ */
 /**
  * @file GameDbOutbox.h
  * @brief 本地 outbox 表：与资产事务同提交，后台发布（阶段 4 先落库+标记，不上 NATS）

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayAuthPolicy.h — Gateway 预鉴权白名单与策略。
+ * 路径: game/GatewayAuthPolicy.h
+ */
 #include <string>
 
 namespace gameproto {

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MailConfig.h — 邮件配置。
+ * 路径: game/MailConfig.h
+ */
 /**
  * @file MailConfig.h
  * @brief 邮件服务端数值配置（config/mail.cnf）

@@ -1,3 +1,7 @@
+/**
+ * GlobalServiceForwardServiceImpl.cpp — 运行时：业务服务逻辑。转发。
+ * 路径: runtime/brpc/GlobalServiceForwardServiceImpl.cpp
+ */
 #include "GlobalServiceForwardServiceImpl.h"
 
 #include "BrpcGameDbRepository.h"

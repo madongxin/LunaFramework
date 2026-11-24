@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GameLogicPush.h — Logic→Gateway PushBatch 封装。
+ * 路径: runtime/brpc/GameLogicPush.h
+ */
 #include "gateway_push.pb.h"
 
 #include <string>

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PlacementAuthority.h — 占位权威辅助。
+ * 路径: game/PlacementAuthority.h
+ */
 #include "PlacementStore.h"
 
 #include <chrono>

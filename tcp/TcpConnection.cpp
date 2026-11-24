@@ -1,3 +1,7 @@
+/**
+ * TcpConnection.cpp — TcpConnection 读写与关闭路径。
+ * 路径: tcp/TcpConnection.cpp
+ */
 #include "TcpConnection.h"
 #include "Buffer.h"
 #include "Channel.h"

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * ServiceHealth.h — /live /ready draining 状态机。
+ * 路径: runtime/ServiceHealth.h
+ */
 #include <atomic>
 #include <cstdint>
 #include <string>

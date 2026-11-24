@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * BrpcSslUtil.h — brpc SSL 辅助。
+ * 路径: runtime/brpc/BrpcSslUtil.h
+ */
 /**
  * @file BrpcSslUtil.h
  * @brief 可选 mTLS：从 *.cnf 读 ssl_enable/ssl_cert/ssl_key/ssl_ca，写入 brpc options

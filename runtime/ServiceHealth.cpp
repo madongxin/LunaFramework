@@ -1,3 +1,7 @@
+/**
+ * ServiceHealth.cpp — 运行时：业务服务逻辑。健康检查。
+ * 路径: runtime/ServiceHealth.cpp
+ */
 #include "ServiceHealth.h"
 
 #include <chrono>

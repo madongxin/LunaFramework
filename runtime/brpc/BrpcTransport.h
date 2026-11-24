@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * BrpcTransport.h — brpc 传输辅助。
+ * 路径: runtime/brpc/BrpcTransport.h
+ */
 #include "ITransport.h"
 
 #include <memory>

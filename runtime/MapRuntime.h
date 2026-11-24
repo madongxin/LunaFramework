@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * MapRuntime.h — 本进程地图实例运行时：玩家进图、viewer 连接、分线/副本占位的内存态。
+ * 路径: runtime/MapRuntime.h
+ */
 #include "AoiEvidence.h"
 #include "MapStaticData.h"
 

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * RedisPool.h — Redis 连接池，供 SessionStore Lua/命令复用。
+ * 路径: redis/RedisPool.h
+ */
 #include "RedisClient.h"
 
 #include <chrono>

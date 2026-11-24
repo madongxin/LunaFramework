@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiMembership.h — 兴趣集成员关系。
+ * 路径: runtime/AoiMembership.h
+ */
 #include <cstdlib>
 
 /**

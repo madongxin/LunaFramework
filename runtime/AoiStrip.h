@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiStrip.h — AOI 条带划分。
+ * 路径: runtime/AoiStrip.h
+ */
 #include "ProtoFraming.h"
 #include "game.pb.h"
 

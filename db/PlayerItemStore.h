@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PlayerItemStore.h — 道具表访问。
+ * 路径: db/PlayerItemStore.h
+ */
 /**
  * @file PlayerItemStore.h
  * @brief 玩家道具 MySQL 持久化层（表 player_item）

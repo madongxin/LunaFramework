@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * BrpcNamingUtil.h — brpc list:// 命名工具。
+ * 路径: runtime/brpc/BrpcNamingUtil.h
+ */
 #include <sstream>
 #include <string>
 #include <vector>

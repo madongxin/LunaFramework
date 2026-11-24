@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * HealthDeps.h — 就绪依赖检查（Redis/MySQL/下游）。
+ * 路径: runtime/HealthDeps.h
+ */
 #include <string>
 
 struct HealthDepsResult {

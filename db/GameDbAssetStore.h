@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GameDbAssetStore.h — 资产/版本等 GameDB 资产面。
+ * 路径: db/GameDbAssetStore.h
+ */
 #include "Connection.h"
 
 #include <cstdint>

@@ -1,3 +1,7 @@
+/**
+ * ReplyStage.cpp — 运行时：回包。
+ * 路径: runtime/ReplyStage.cpp
+ */
 #include "ReplyStage.h"
 
 #include "OpsMetrics.h"

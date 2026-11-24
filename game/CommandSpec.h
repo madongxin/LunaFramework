@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * CommandSpec.h — 命令规格表。
+ * 路径: game/CommandSpec.h
+ */
 #include "game.pb.h"
 
 namespace gameproto {

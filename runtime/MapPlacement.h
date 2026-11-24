@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MapPlacement.h — 玩家应落到哪条线/哪个 Owner 的放置算法配置。
+ * 路径: runtime/MapPlacement.h
+ */
 /**
  * @file MapPlacement.h
  * @brief 地图 Placement 表（阶段 5 骨架）：map_instance → owner + epoch + route_version

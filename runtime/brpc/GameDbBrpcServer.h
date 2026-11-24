@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * GameDbBrpcServer.h — GameDB brpc Server。
+ * 路径: runtime/brpc/GameDbBrpcServer.h
+ */
 #include <memory>
 #include <string>
 

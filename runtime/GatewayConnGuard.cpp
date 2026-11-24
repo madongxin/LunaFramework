@@ -1,3 +1,7 @@
+/**
+ * GatewayConnGuard.cpp — 运行时：网关相关。连接守卫。
+ * 路径: runtime/GatewayConnGuard.cpp
+ */
 #include "GatewayConnGuard.h"
 
 #include "OpsMetrics.h"

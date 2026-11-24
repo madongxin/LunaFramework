@@ -1,3 +1,7 @@
+/**
+ * GameDbRepository.cpp — MySQL/GameDB：游戏逻辑。数据库。
+ * 路径: db/GameDbRepository.cpp
+ */
 #include "GameDbRepository.h"
 
 namespace {

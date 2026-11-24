@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * PasswordExec.h — 口令哈希执行/卸载。
+ * 路径: runtime/PasswordExec.h
+ */
 #include <condition_variable>
 #include <deque>
 #include <functional>

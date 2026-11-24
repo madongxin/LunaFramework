@@ -1,3 +1,7 @@
+/**
+ * AsyncLogging.cpp — AsyncLogging 线程循环。
+ * 路径: log/AsyncLogging.cpp
+ */
 #include "AsyncLogging.h"
 #include "LogFile.h"
 

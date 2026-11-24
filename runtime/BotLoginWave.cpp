@@ -1,3 +1,7 @@
+/**
+ * BotLoginWave.cpp — 运行时：压测机器人。登录。
+ * 路径: runtime/BotLoginWave.cpp
+ */
 #include "BotLoginWave.h"
 
 #include "Logging.h"

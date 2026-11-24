@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * SessionServiceImpl.h — SessionService brpc 实现：AcquireSession/MarkDisconnected/Reconnect 等。
+ * 路径: runtime/brpc/SessionServiceImpl.h
+ */
 #include "session.pb.h"
 
 class SessionServiceImpl : public sess::SessionService {

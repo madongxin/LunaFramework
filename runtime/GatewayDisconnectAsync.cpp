@@ -1,3 +1,7 @@
+/**
+ * GatewayDisconnectAsync.cpp — 运行时：网关相关。断线处理。
+ * 路径: runtime/GatewayDisconnectAsync.cpp
+ */
 #include "GatewayDisconnectAsync.h"
 
 #include "Logging.h"

@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * FriendStore.h — 好友关系表。
+ * 路径: db/FriendStore.h
+ */
 #include "gamedb.pb.h"
 
 #include <string>

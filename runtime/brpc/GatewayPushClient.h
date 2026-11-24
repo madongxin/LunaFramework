@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayPushClient.h — 向指定 gateway_instance_id 发 Push 的客户端。
+ * 路径: runtime/brpc/GatewayPushClient.h
+ */
 #include "RpcChannelSnapshot.h"
 #include "gateway_push.pb.h"
 

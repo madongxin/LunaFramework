@@ -1,3 +1,7 @@
+/**
+ * ProcessMetricsSnapshot.cpp — ProcessMetricsSnapshot 填充与格式化。
+ * 路径: base/ProcessMetricsSnapshot.cpp
+ */
 #include "ProcessMetricsSnapshot.h"
 
 #include "EventLoopMetrics.h"

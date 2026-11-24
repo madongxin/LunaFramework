@@ -1,3 +1,7 @@
+/**
+ * HealthProbe.cpp — 运行时：健康检查。
+ * 路径: runtime/HealthProbe.cpp
+ */
 #include "HealthProbe.h"
 
 #include "FormalMode.h"

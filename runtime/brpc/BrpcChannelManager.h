@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * BrpcChannelManager.h — brpc Channel 池/管理。
+ * 路径: runtime/brpc/BrpcChannelManager.h
+ */
 #include "RpcChannelSnapshot.h"
 
 #include <atomic>

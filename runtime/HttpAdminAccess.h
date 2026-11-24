@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * HttpAdminAccess.h — HTTP 管理口访问判定：loopback / token / MONITOR_OPEN 路径白名单。
+ * 路径: runtime/HttpAdminAccess.h
+ */
 #include <cstdlib>
 #include <cstring>
 #include <string>

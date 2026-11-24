@@ -1,3 +1,7 @@
+/**
+ * BrpcGameDbRepository.cpp — MySQL/GameDB：brpc 相关。游戏逻辑。
+ * 路径: db/BrpcGameDbRepository.cpp
+ */
 #include "BrpcGameDbRepository.h"
 
 #include "BrpcSslUtil.h"

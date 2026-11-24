@@ -1,3 +1,7 @@
+/**
+ * HttpContext.cpp — HttpContext 解析实现。
+ * 路径: http/HttpContext.cpp
+ */
 #include "HttpContext.h"
 #include "HttpRequest.h"
 #include <memory>

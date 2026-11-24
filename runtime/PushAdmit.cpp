@@ -1,3 +1,7 @@
+/**
+ * PushAdmit.cpp — 运行时：推送相关。
+ * 路径: runtime/PushAdmit.cpp
+ */
 #include "PushAdmit.h"
 
 namespace {

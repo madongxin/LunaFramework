@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * MessageRoute.h — 消息应转发到哪类服务/实例的路由辅助。
+ * 路径: runtime/MessageRoute.h
+ */
 #include "game.pb.h"
 
 namespace gameproto {

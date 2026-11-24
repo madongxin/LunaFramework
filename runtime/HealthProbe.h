@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * HealthProbe.h — 主动探测依赖健康。
+ * 路径: runtime/HealthProbe.h
+ */
 #include <cstdint>
 #include <memory>
 #include <string>

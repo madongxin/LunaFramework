@@ -1,3 +1,7 @@
+/**
+ * PlayerProfileStore.cpp — MySQL/GameDB：数据访问/存储封装。角色档案。
+ * 路径: db/PlayerProfileStore.cpp
+ */
 #include "PlayerProfileStore.h"
 
 #include "Connection.h"

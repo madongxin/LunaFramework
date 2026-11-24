@@ -1,3 +1,7 @@
+/**
+ * RedisClient.cpp — Redis：客户端封装。Redis。
+ * 路径: redis/RedisClient.cpp
+ */
 #include "RedisClient.h"
 
 #include "ServerStats.h"

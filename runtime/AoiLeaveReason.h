@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiLeaveReason.h — AOI LEAVE 原因枚举。
+ * 路径: runtime/AoiLeaveReason.h
+ */
 /** LEAVE 的原因。指标名 lunaserver_aoi_leave_total{reason=...}。 */
 enum class AoiLeaveReason {
     OutOfWindow = 0,

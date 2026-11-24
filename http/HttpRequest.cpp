@@ -1,3 +1,7 @@
+/**
+ * HttpRequest.cpp — HttpRequest 实现。
+ * 路径: http/HttpRequest.cpp
+ */
 
 #include "HttpRequest.h"
 

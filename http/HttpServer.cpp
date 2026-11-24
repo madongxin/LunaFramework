@@ -1,3 +1,7 @@
+/**
+ * HttpServer.cpp — HttpServer：Formal/token/MONITOR_OPEN 访问控制后回调业务路由。
+ * 路径: http/HttpServer.cpp
+ */
 #include "HttpServer.h"
 #include "HttpResponse.h"
 #include "HttpRequest.h"

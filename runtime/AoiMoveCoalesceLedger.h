@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiMoveCoalesceLedger.h — 纯 MOVE 合并账本。
+ * 路径: runtime/AoiMoveCoalesceLedger.h
+ */
 #include "AoiEvidence.h"
 #include "MoveSendConfig.h"
 #include "ServerStats.h"

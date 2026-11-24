@@ -1,3 +1,7 @@
+/**
+ * PrometheusMetrics.cpp — BuildPrometheusMetricsText 等实现。
+ * 路径: base/PrometheusMetrics.cpp
+ */
 #include "PrometheusMetrics.h"
 
 #include "OpsMetrics.h"

@@ -1,3 +1,7 @@
+/**
+ * BrpcTransport.cpp — 运行时：传输层。brpc 相关。
+ * 路径: runtime/brpc/BrpcTransport.cpp
+ */
 #include "BrpcTransport.h"
 
 #include "BrpcChannelManager.h"

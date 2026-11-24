@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * HealthyLogicOwners.h — 可分配的 Logic Owner 刷新。
+ * 路径: runtime/HealthyLogicOwners.h
+ */
 #include <cstddef>
 
 /**

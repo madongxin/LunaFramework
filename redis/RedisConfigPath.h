@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * RedisConfigPath.h — redis.cnf 路径。
+ * 路径: redis/RedisConfigPath.h
+ */
 #include "LunaServerPaths.h"
 
 #include <string>

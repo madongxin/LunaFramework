@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * GatewayAuthFlow.h — Gateway 侧 Auth/Session 调用流程封装。
+ * 路径: runtime/GatewayAuthFlow.h
+ */
 #include <cstdint>
 #include <mutex>
 #include <unordered_map>

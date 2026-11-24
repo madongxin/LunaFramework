@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * AoiEvidence.h — AOI 证据采集接口（压测/审计）。
+ * 路径: runtime/AoiEvidence.h
+ */
 #include <cstdint>
 #include <ostream>
 #include <string>

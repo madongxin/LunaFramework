@@ -1,3 +1,7 @@
+/**
+ * AoiEvidenceFrame.cpp — 运行时：AOI 相关。证据/审计。
+ * 路径: runtime/AoiEvidenceFrame.cpp
+ */
 #include "AoiEvidence.h"
 
 #include "ProtoFraming.h"

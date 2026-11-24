@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * TcpReplySink.h — 把业务回包安全投递回连接所属 EventLoop 再 Send。
+ * 路径: runtime/TcpReplySink.h
+ */
 #include "ReplySink.h"
 
 #include <memory>

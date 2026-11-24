@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * RocksDbClient.h — RocksDB 打开/读写薄封装。
+ * 路径: rocksdb/RocksDbClient.h
+ */
 /**
  * @file RocksDbClient.h
  * @brief RocksDB 同步客户端封装（本地 KV，与 MySQL/Redis 并存）
