@@ -221,8 +221,8 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &requ
         conn->HandleClose();
 }
 
-/** 进入 TcpServer::Start → 主 EventLoop::Loop（阻塞） */
-void HttpServer::start() { server_->Start(); }
+/** 拉起子 IO 线程；主 Loop 由外层 EventLoop::Loop 驱动 */
+void HttpServer::Start() { server_->Start(); }
 
 void HttpServer::SetThreadNums(int thread_nums) { server_->SetThreadNums(thread_nums); }
 

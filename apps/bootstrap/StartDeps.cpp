@@ -1,6 +1,6 @@
 /**
  * 启动依赖：角色门禁（PrepareRole）+ MySQL / Redis / RocksDB 初始化。
- * 在主 EventLoop 创建之后、HTTP/brpc 之前由 RunServer 调用。
+ * 在主 EventLoop 创建之后、角色 brpc / 管理 HTTP 之前由 RunServer 调用。
  */
 #include "bootstrap/StartDeps.h"
 
@@ -144,32 +144,46 @@ void BootstrapInitMysql(EventLoop *loop, const std::string &role) {
 // ---------------------------------------------------------------------------
 // Redis：Session / Placement / PushReplay；可选登录限流与服务发现
 // ---------------------------------------------------------------------------
-void BootstrapInitRedis(const std::string &role) {
+bool BootstrapInitRedis(const std::string &role) {
 #ifdef WEBSERVER_ENABLE_REDIS
-    if (role == "all" || role == "gamelogic" || role == "gateway" || role == "globalservice" ||
-        role == "session" || role == "gamedb") {
-        if (!SessionStore::Instance().InitFromConfig())
-            LOG_WARN << "Redis session disabled (config/redis.cnf)";
-        else {
-            if (role == "all" || role == "session" || role == "gamelogic" || role == "globalservice" ||
-                role == "gateway") {
-                PlacementStore::Instance().InitFromSessionPrefix(
-                    SessionStore::Instance().key_prefix());
-            }
-            if (role == "all" || role == "gateway" || role == "gamelogic" || role == "globalservice" ||
-                role == "session" || role == "gamedb") {
-                PushReplayStore::Instance().InitFromSessionPrefix(
-                    SessionStore::Instance().key_prefix());
-            }
-#ifdef WEBSERVER_ENABLE_BRPC
-            AuthLoginRateLimit::Instance().Configure(SessionStore::Instance().key_prefix());
-            RedisServiceRegistry::Get().Configure(SessionStore::Instance().key_prefix());
-            RedisServiceRegistry::Get().InitFromRedisConfig();
-#endif
+    const bool need_redis =
+        (role == "all" || role == "gamelogic" || role == "gateway" || role == "globalservice" ||
+         role == "session" || role == "gamedb");
+    if (!need_redis)
+        return true;
+    if (!SessionStore::Instance().InitFromConfig()) {
+        // Formal：会话/路由/限流都依赖 Redis，不能带病宣称就绪
+        if (FormalModeEnabled()) {
+            LOG_ERROR << "formal mode: Redis required for role=" << role
+                      << " (config/redis.cnf or connectivity)";
+            return false;
         }
+        LOG_WARN << "Redis session disabled (config/redis.cnf)";
+        return true;
     }
+    if (role == "all" || role == "session" || role == "gamelogic" || role == "globalservice" ||
+        role == "gateway") {
+        PlacementStore::Instance().InitFromSessionPrefix(SessionStore::Instance().key_prefix());
+    }
+    if (role == "all" || role == "gateway" || role == "gamelogic" || role == "globalservice" ||
+        role == "session" || role == "gamedb") {
+        PushReplayStore::Instance().InitFromSessionPrefix(SessionStore::Instance().key_prefix());
+    }
+#ifdef WEBSERVER_ENABLE_BRPC
+    AuthLoginRateLimit::Instance().Configure(SessionStore::Instance().key_prefix());
+    RedisServiceRegistry::Get().Configure(SessionStore::Instance().key_prefix());
+    RedisServiceRegistry::Get().InitFromRedisConfig();
+#endif
+    return true;
 #else
+    if (FormalModeEnabled() &&
+        (role == "all" || role == "gamelogic" || role == "gateway" || role == "globalservice" ||
+         role == "session" || role == "gamedb")) {
+        LOG_ERROR << "formal mode: role=" << role << " requires ENABLE_REDIS";
+        return false;
+    }
     (void)role;
+    return true;
 #endif
 }
 

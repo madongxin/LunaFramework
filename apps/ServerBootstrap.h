@@ -50,14 +50,12 @@ bool ParseLaunchArgs(int argc, char *argv[], LaunchOpts *opts);
  *
  * 顺序概要：
  *   异步日志 → Formal 提示 → BootstrapPrepareRole
- *   → 主 EventLoop + SIGTERM/SIGINT 优雅退出
- *   → MySQL / Redis / RocksDB 初始化
- *   → HTTP 管理口（/metrics、/monitor、/live…）
- *   → BootstrapStartRoleServices（brpc 等）
- *   → 周期任务 →（gateway）Game TCP
- *   → SetReady → server.start()（内部 TcpServer::Loop 阻塞）
- *   → Loop 返回后 BootstrapGracefulShutdown 收尾
+ *   → 主 EventLoop + SIGTERM/SIGINT
+ *   → MySQL / Redis / RocksDB → 角色 brpc → 周期任务 →（gateway）Game TCP
+ *   → 管理 HTTP Start（子 IO）→ SetReady → loop.Loop()
+ *   → Quit 后 BootstrapGracefulShutdown + 停异步日志
  *
+ * 管理 HTTP 放在业务就绪之后，避免启动失败时空挂 IO 线程。
  * 返回 0 表示正常退出；非 0 为启动失败。
  */
 int RunServer(const LaunchOpts &opts);

@@ -33,6 +33,13 @@ std::vector<Entry> &Entries() {
 
 void Track(const std::string &service, const std::string &instance_id, int ttl_sec) {
     std::lock_guard<std::mutex> lk(Mu());
+    // 同 service+id 只保留一条，避免 Renew/Unregister 重复打注册表
+    for (auto &e : Entries()) {
+        if (e.service == service && e.instance_id == instance_id) {
+            e.ttl_sec = ttl_sec > 0 ? ttl_sec : e.ttl_sec;
+            return;
+        }
+    }
     Entries().push_back({service, instance_id, ttl_sec});
 }
 

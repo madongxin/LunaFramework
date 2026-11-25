@@ -107,13 +107,8 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
         ApplyGatewayPushAddrsFromConfig();
         {
             std::string gamedb_addr = GatewayConfigPath::ReadValue("gamedb_addrs");
-            if (gamedb_addr.empty()) {
-                std::string cnf = "../config/session.cnf";
-                std::string resolved;
-                if (LunaServerPaths::ResolveProjectSubdir("config/session.cnf", &resolved))
-                    cnf = resolved;
-                gamedb_addr = LoadCnfValue(cnf, "gamedb_addrs");
-            }
+            if (gamedb_addr.empty())
+                gamedb_addr = LoadProjectCnfValue("config/session.cnf", "gamedb_addrs");
             if (!gamedb_addr.empty())
                 BrpcGameDbRepository::Instance().Init(SplitAddrList(gamedb_addr));
         }
@@ -152,13 +147,8 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
             EtcdDiscovery::Instance().Register("gamedb", gid, adv, 30);
         {
             std::string session_addr = GatewayConfigPath::ReadValue("session_addrs");
-            if (session_addr.empty()) {
-                std::string logic_cnf = "../config/gamelogic.cnf";
-                std::string resolved;
-                if (LunaServerPaths::ResolveProjectSubdir("config/gamelogic.cnf", &resolved))
-                    logic_cnf = resolved;
-                session_addr = LoadCnfValue(logic_cnf, "session_addrs");
-            }
+            if (session_addr.empty())
+                session_addr = LoadProjectCnfValue("config/gamelogic.cnf", "session_addrs");
             if (!session_addr.empty())
                 SessionRpcClient::Instance().Init(session_addr);
         }
@@ -196,23 +186,13 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
         }
         {
             std::string session_addr = GatewayConfigPath::ReadValue("session_addrs");
-            if (session_addr.empty()) {
-                std::string logic_cnf = "../config/gamelogic.cnf";
-                std::string resolved;
-                if (LunaServerPaths::ResolveProjectSubdir("config/gamelogic.cnf", &resolved))
-                    logic_cnf = resolved;
-                session_addr = LoadCnfValue(logic_cnf, "session_addrs");
-            }
+            if (session_addr.empty())
+                session_addr = LoadProjectCnfValue("config/gamelogic.cnf", "session_addrs");
             if (!session_addr.empty())
                 SessionRpcClient::Instance().Init(session_addr);
             std::string gamedb_addr = GatewayConfigPath::ReadValue("gamedb_addrs");
-            if (gamedb_addr.empty()) {
-                std::string logic_cnf = "../config/gamelogic.cnf";
-                std::string resolved;
-                if (LunaServerPaths::ResolveProjectSubdir("config/gamelogic.cnf", &resolved))
-                    logic_cnf = resolved;
-                gamedb_addr = LoadCnfValue(logic_cnf, "gamedb_addrs");
-            }
+            if (gamedb_addr.empty())
+                gamedb_addr = LoadProjectCnfValue("config/gamelogic.cnf", "gamedb_addrs");
             if (!gamedb_addr.empty()) {
                 auto addrs = SplitAddrList(gamedb_addr);
                 BrpcGameDbRepository::Instance().Init(addrs);
@@ -315,8 +295,12 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
             char listen_buf[64];
             snprintf(listen_buf, sizeof(listen_buf), "0.0.0.0:%d", push_port);
             GatewayPushServer::Instance().set_gateway_instance_id(gw_id);
-            if (!GatewayPushServer::Instance().Start(listen_buf))
-                LOG_WARN << "GatewayPushServer start failed " << listen_buf;
+            if (!GatewayPushServer::Instance().Start(listen_buf)) {
+                LOG_ERROR << "GatewayPushServer start failed " << listen_buf;
+                // Formal：Push 是 Logic→Gateway 必经通道，失败不得继续宣称就绪
+                if (FormalModeEnabled())
+                    return 1;
+            }
             const std::string adv = MakeAdvertiseAddr(push_port);
             if (EtcdDiscovery::Instance().enabled())
                 EtcdDiscovery::Instance().Register("gateway_push", gw_id, adv, 30);
@@ -467,13 +451,8 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
     } else if (role == "globalservice") {
         {
             std::string gamedb_addr = GatewayConfigPath::ReadValue("gamedb_addrs");
-            if (gamedb_addr.empty()) {
-                std::string globalservice_cnf = "../config/globalservice.cnf";
-                std::string resolved;
-                if (LunaServerPaths::ResolveProjectSubdir("config/globalservice.cnf", &resolved))
-                    globalservice_cnf = resolved;
-                gamedb_addr = LoadCnfValue(globalservice_cnf, "gamedb_addrs");
-            }
+            if (gamedb_addr.empty())
+                gamedb_addr = LoadProjectCnfValue("config/globalservice.cnf", "gamedb_addrs");
             if (!gamedb_addr.empty()) {
                 auto addrs = SplitAddrList(gamedb_addr);
                 BrpcGameDbRepository::Instance().Init(addrs);
@@ -508,6 +487,12 @@ int BootstrapStartRoleServices(EventLoop *loop, const RoleStartOpts &opts) {
             EtcdDiscovery::Instance().Register("globalservice", wid, adv, 30);
         LOG_INFO << "role=globalservice listen=" << listen << " instance_id=" << wid
                  << " advertise=" << adv;
+    } else if (role == "all") {
+        // 单进程调试：brpc 由各子系统按需拉起（Game TCP / BrpcGameServer）；不走多进程注册表
+        LOG_INFO << "role=all: skip dedicated brpc role branch (in-process / optional BrpcGameServer)";
+    } else {
+        LOG_ERROR << "unknown role=" << role;
+        return 1;
     }
 
     return 0;

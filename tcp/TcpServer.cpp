@@ -25,10 +25,9 @@ TcpServer::TcpServer(EventLoop *loop, const char *ip, const int port)
 
 TcpServer::~TcpServer() {}
 
-/** 先起 IO 线程池，再阻塞进入主 Loop（只 accept） */
+/** 仅拉起子 IO 线程；主 EventLoop::Loop 由调用方驱动 */
 void TcpServer::Start() {
   thread_pool_->start();
-  main_reactor_->Loop();
 }
 
 /**

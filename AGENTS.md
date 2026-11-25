@@ -25,7 +25,7 @@ Scene construction (LINE / DUNGEON): `docs/mmo-migration/scene-management-constr
 
 ```bash
 ./scripts/check_deps.sh
-./scripts/build.sh Debug          # C++17；支持 clean
+./scripts/build.sh Debug          # C++17；支持 clean；并行度按 MemAvailable 自动限制
 ./scripts/test_reactor.sh         # 阶段 0 Reactor / ProtoFraming
 ./scripts/test_unit.sh
 ./scripts/test_all.sh
@@ -33,6 +33,8 @@ Scene construction (LINE / DUNGEON): `docs/mmo-migration/scene-management-constr
 ./scripts/test.sh unit            # 兼容旧入口
 ./scripts/test.sh integration
 ```
+
+本机约 4GiB/无 swap：勿对 `make`/`cmake --build` 直接 `-j$(nproc)`（易 OOM）。优先 `./scripts/build.sh`；手编用 `-j1`/`-j2`，或 `LUNASERVER_JOBS=2`。
 
 全阶段路线图：`docs/LunaServer_Cursor_All_Phases.md`（阶段 0–3 见 `docs/mmo-migration/PHASE*_STATUS.md`）。
 Session Redis：连接池 + Lua；正式业务 `Dispatch`；Register/Login 经 Auth→GameDB；`LUNASERVER_FORMAL=1` fail-closed。

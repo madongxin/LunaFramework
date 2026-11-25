@@ -5,7 +5,7 @@
 class EventLoop;
 
 /**
- * 启动依赖初始化（在创建主 EventLoop 之后、起 HTTP/brpc 之前）。
+ * 启动依赖初始化（在创建主 EventLoop 之后、起 brpc / 管理 HTTP 之前）。
  * 与 StartRoles（起各角色 brpc 服务）分工：这里只准备 MySQL/Redis/RocksDB 与角色门禁。
  */
 
@@ -15,8 +15,11 @@ bool BootstrapPrepareRole(const std::string &role, int http_port);
 /** MySQL 连接池上的 Store / Metrics / Mail；Formal 下非 gamedb 会跳过。 */
 void BootstrapInitMysql(EventLoop *loop, const std::string &role);
 
-/** Redis：SessionStore / PlacementStore / PushReplay + 可选 Registry。 */
-void BootstrapInitRedis(const std::string &role);
+/**
+ * Redis：SessionStore / PlacementStore / PushReplay + 可选 Registry。
+ * @return Formal 下必需角色初始化失败时为 false；非正式仅打 WARN 仍返回 true。
+ */
+bool BootstrapInitRedis(const std::string &role);
 
 /** RocksDB demo KV（仅 role=all）。 */
 void BootstrapInitRocksdb(const std::string &role);

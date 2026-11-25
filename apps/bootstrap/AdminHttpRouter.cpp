@@ -105,6 +105,8 @@ void HttpResponseCallback(const HttpRequest &request, HttpResponse *response) {
             SendJson(response, GmExecute(cmd));
             return;
         }
+        SendPlain(response, "method not allowed", HttpResponse::HttpStatusCode::k400BadRequest);
+        return;
     }
 
 

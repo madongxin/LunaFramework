@@ -11,6 +11,12 @@
 /** 读 cnf 中第一个匹配的 key；找不到返回空串。 */
 std::string LoadCnfValue(const std::string &path, const char *key);
 
+/**
+ * 按项目相对路径读 cnf（如 config/gamelogic.cnf）。
+ * 先 ResolveProjectSubdir，失败再回退 ../rel_path。
+ */
+std::string LoadProjectCnfValue(const char *rel_path, const char *key);
+
 /** 逗号分隔地址列表，去掉空白。 */
 std::vector<std::string> SplitAddrList(const std::string &csv);
 

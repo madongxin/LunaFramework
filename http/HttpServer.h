@@ -36,7 +36,7 @@ public:
     DISALLOW_COPY_AND_MOVE(HttpServer);
 
     /**
-     * @param loop 主 EventLoop（Start 后会阻塞在 TcpServer::Start→Loop）
+     * @param loop 主 EventLoop（accept 与定时器挂在此；Loop 由调用方驱动）
      * @param ip/port 监听地址
      * @param auto_close_conn 是否按 AUTOCLOSETIMEOUT 主动关空闲连接
      */
@@ -49,8 +49,11 @@ public:
     /** 设置路由回调（通常为 HttpResponseCallback / AdminHttpRouter） */
     void SetHttpCallback(const HttpResponseCallback &cb);
 
-    /** 启动底层 TcpServer（内部 Loop，直到 Quit） */
-    void start();
+    /**
+     * 拉起 HTTP 子 IO 线程；不阻塞。
+     * 进程主循环请对构造时传入的 EventLoop 调用 Loop()。
+     */
+    void Start();
 
     /** 新连接建立：可选挂上自动关闭定时器 */
     void onConnection(const TcpConnectionPtr &conn);

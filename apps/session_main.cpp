@@ -7,11 +7,15 @@
 
 #include "ServerBootstrap.h"
 
+#include <cstdio>
+
 int main(int argc, char *argv[]) {
     LaunchOpts opts;
     opts.force_role = "session";
     opts.log_basename = "session";
-    if (!ParseLaunchArgs(argc, argv, &opts))
-        return 0;
+    if (!ParseLaunchArgs(argc, argv, &opts)) {
+        std::fprintf(stderr, "usage: %s [http_port] [brpc_port]\n", argv[0] ? argv[0] : "session");
+        return 1;
+    }
     return RunServer(opts);
 }

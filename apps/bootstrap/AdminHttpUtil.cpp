@@ -27,7 +27,16 @@ void SendHtml(HttpResponse *response, const std::string &body, bool head_only) {
 void SendPlain(HttpResponse *response, const std::string &body,
                HttpResponse::HttpStatusCode code) {
     response->SetStatusCode(code);
-    response->SetStatusMessage(code == HttpResponse::HttpStatusCode::k200K ? "OK" : "Error");
+    if (code == HttpResponse::HttpStatusCode::k200K)
+        response->SetStatusMessage("OK");
+    else if (code == HttpResponse::HttpStatusCode::k400BadRequest)
+        response->SetStatusMessage("Bad Request");
+    else if (code == HttpResponse::HttpStatusCode::k403Forbidden)
+        response->SetStatusMessage("Forbidden");
+    else if (code == HttpResponse::HttpStatusCode::k404NotFound)
+        response->SetStatusMessage("Not Found");
+    else
+        response->SetStatusMessage("Error");
     response->SetContentType("text/plain; charset=utf-8");
     response->SetContentLength(static_cast<int>(body.size()));
     response->SetBody(body);
@@ -39,7 +48,17 @@ void SendJson(HttpResponse *response, const Json::Value &v,
     b["indentation"] = "";
     const std::string body = Json::writeString(b, v);
     response->SetStatusCode(code);
-    response->SetStatusMessage("OK");
+    // 非 2xx 不得写死 OK，避免客户端/代理误判成功
+    if (code == HttpResponse::HttpStatusCode::k200K)
+        response->SetStatusMessage("OK");
+    else if (code == HttpResponse::HttpStatusCode::k400BadRequest)
+        response->SetStatusMessage("Bad Request");
+    else if (code == HttpResponse::HttpStatusCode::k403Forbidden)
+        response->SetStatusMessage("Forbidden");
+    else if (code == HttpResponse::HttpStatusCode::k404NotFound)
+        response->SetStatusMessage("Not Found");
+    else
+        response->SetStatusMessage("Error");
     response->SetContentType("application/json; charset=utf-8");
     response->SetContentLength(static_cast<int>(body.size()));
     response->SetBody(body);

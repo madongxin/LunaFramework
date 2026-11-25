@@ -1,6 +1,6 @@
 /**
  * @file ServerBootstrap.cpp
- * @brief RunServer：日志、依赖、角色启动、管理 HTTP、信号与优雅退出
+ * @brief RunServer：日志、依赖、角色服务、管理 HTTP、主 EventLoop、优雅退出
  */
 
 #include "ServerBootstrap.h"
@@ -71,9 +71,55 @@ void AsyncFlushFunc() {
  */
 EventLoop *g_main_loop = nullptr;
 
+/** 纯 brpc/数据面角色：无玩家 Game TCP。 */
+bool IsBackendRole(const std::string &role) {
+    return role == "gamelogic" || role == "globalservice" || role == "session" || role == "gamedb";
+}
+
+/** 管理 HTTP 绑定地址；默认 loopback。Formal 下拒绝公网/0.0.0.0（除非 ALLOW_PUBLIC_BIND）。 */
+bool ResolveAdminHttpBind(std::string *out_bind, std::string *err) {
+    const char *http_bind_env = std::getenv("LUNASERVER_HTTP_BIND");
+    std::string http_bind = (http_bind_env && *http_bind_env) ? http_bind_env : "127.0.0.1";
+    if (FormalModeEnabled()) {
+        const ListenBindDecision d =
+            EvaluateListenBind(http_bind, true, AllowPublicBindFromEnv());
+        if (!d.ok) {
+            if (err)
+                *err = d.error;
+            return false;
+        }
+    }
+    if (out_bind)
+        *out_bind = std::move(http_bind);
+    return true;
+}
+
+/**
+ * 管理口 IO 线程数：流量小，2～4 足够；可用 LUNASERVER_HTTP_IO_THREADS 覆盖。
+ * 旧逻辑 max(8, ncpu) 对管理口过重。
+ */
+int AdminHttpIoThreadCount() {
+    if (const char *e = std::getenv("LUNASERVER_HTTP_IO_THREADS")) {
+        const int v = std::atoi(e);
+        if (v >= 1 && v <= 64)
+            return v;
+    }
+    const unsigned ncpu = std::thread::hardware_concurrency();
+    const int cores = ncpu > 0 ? static_cast<int>(ncpu) : 2;
+    return std::max(2, std::min(4, cores));
+}
+
+void StopAsyncLog() {
+    if (!asynclog)
+        return;
+    asynclog->Stop();
+    delete asynclog;
+    asynclog = nullptr;
+}
+
 }  // namespace
 
-/** 解析 argv 到 opts；见 ServerBootstrap.h 约定 */
+/** 解析 argv 到 opts；见 ServerBootstrap.h 约定。非法端口返回 false。 */
 bool ParseLaunchArgs(int argc, char *argv[], LaunchOpts *opts) {
     if (!opts)
         return false;
@@ -81,6 +127,7 @@ bool ParseLaunchArgs(int argc, char *argv[], LaunchOpts *opts) {
         return s && (!strcmp(s, "all") || !strcmp(s, "gateway") || !strcmp(s, "gamelogic") ||
                      !strcmp(s, "globalservice") || !strcmp(s, "session") || !strcmp(s, "gamedb"));
     };
+    auto valid_port = [](int p) { return p > 0 && p <= 65535; };
 
     // force_role：专用二进制入口已钉死角色；否则默认 all，或从 argv[1] 读。
     std::string role = opts->force_role.empty() ? "all" : opts->force_role;
@@ -105,11 +152,18 @@ bool ParseLaunchArgs(int argc, char *argv[], LaunchOpts *opts) {
             logic_port_override = std::atoi(argv[argi]);
         else if (role != "globalservice")
             game_port = std::atoi(argv[argi]);
-    } else if (game_port <= 0 && role != "gamelogic" && role != "globalservice" && role != "session" &&
-               role != "gamedb") {
+    } else if (game_port <= 0 && !IsBackendRole(role)) {
         // gateway/all 未显式给 game_port 时：默认 HTTP+1（如 8080 → 8081）
         game_port = port + 1;
     }
+
+    if (!valid_port(port))
+        return false;
+    if (!IsBackendRole(role) && role != "globalservice" && !valid_port(game_port))
+        return false;
+    if ((role == "gamelogic" || role == "session" || role == "gamedb") &&
+        logic_port_override != -1 && !valid_port(logic_port_override))
+        return false;
 
     opts->role = role;
     opts->http_port = port;
@@ -118,7 +172,15 @@ bool ParseLaunchArgs(int argc, char *argv[], LaunchOpts *opts) {
     return true;
 }
 
-/** 完整启动：AsyncLogging → Formal/依赖 → 角色服务 → HTTP → loop → 信号退出 */
+/**
+ * 启动顺序（刻意）：
+ *   日志 → 角色门禁 → 主 EventLoop/信号 → 依赖 → 角色 brpc
+ *   → 周期任务 → Game TCP →（可选）旧 BrpcGameServer
+ *   → 管理 HTTP Start → SetReady → loop.Loop() → 优雅退出
+ *
+ * 管理 HTTP 放在业务就绪之后：启动失败不会空挂管理口线程；
+ * accept 本来也要等 Loop，提前 Start 只浪费线程。
+ */
 int RunServer(const LaunchOpts &launch) {
     LaunchOpts opts = launch;
 
@@ -136,13 +198,9 @@ int RunServer(const LaunchOpts &launch) {
     const int port = opts.http_port;
     int game_port = opts.game_port;
     // 再兜底一次 game_port（ParseLaunchArgs 之后若调用方只填了部分字段）
-    if (game_port <= 0 && role != "gamelogic" && role != "globalservice" && role != "session" &&
-        role != "gamedb")
+    if (game_port <= 0 && !IsBackendRole(role))
         game_port = port + 1;
-    if (role == "gamelogic" || role == "globalservice" || role == "session" || role == "gamedb")
-        g_game_port = 0;
-    else
-        g_game_port = game_port;
+    g_game_port = IsBackendRole(role) ? 0 : game_port;
 
     SetLogService(role.c_str());
     LOG_INFO << "lunaserver role=" << role << " http=" << port << " game_port=" << g_game_port;
@@ -159,12 +217,16 @@ int RunServer(const LaunchOpts &launch) {
     }
 
     // 角色门禁：AOI 回调、Formal 禁非 gamedb 直连 MySQL、健康检查身份、brpc 编译检查
-    if (!BootstrapPrepareRole(role, port))
+    if (!BootstrapPrepareRole(role, port)) {
+        StopAsyncLog();
         return 1;
+    }
 
-    // ----- 主 Reactor：后续 HTTP/定时器/部分业务都挂在这条 EventLoop 上 -----
+    // ----- 主 Reactor：管理 HTTP accept、周期任务、信号 Quit 都挂这里 -----
     EventLoop loop;
     g_main_loop = &loop;
+    // 对端半关闭写会触发 SIGPIPE；忽略以免进程被默认行为杀掉
+    std::signal(SIGPIPE, SIG_IGN);
     // SIGTERM（stop 脚本 / kill）与 SIGINT（Ctrl+C）：先 draining 再 Quit，避免硬杀
     std::signal(SIGTERM, [](int) {
         ServiceHealth::Instance().SetDraining(true);
@@ -177,31 +239,22 @@ int RunServer(const LaunchOpts &launch) {
             g_main_loop->Quit();
     });
 
-    // 依赖初始化（Formal 下非 gamedb 会跳过 MySQL 池）
-    BootstrapInitMysql(&loop, role);
-    BootstrapInitRedis(role);
-    BootstrapInitRocksdb(role);
-    // 周期性采样 RSS/FD 等，写入指标
-    ResourceWatchdog::Instance().StartPeriodic(&loop, 5.0);
+    GameTcpGateway *game_tcp_gw = nullptr;
+    // 启动失败：立刻收尾已拉起的 brpc/GameTCP，不 drain 等待
+    auto fail_startup = [&](const char *why) {
+        LOG_ERROR << "startup failed: " << why;
+        BootstrapGracefulShutdown(role, game_tcp_gw, /*drain_sec_override=*/0);
+        g_main_loop = nullptr;
+        StopAsyncLog();
+        return 1;
+    };
 
-    // ----- HTTP 管理口：默认 127.0.0.1；公网需 LUNASERVER_HTTP_BIND + ALLOW_PUBLIC_BIND -----
-    const unsigned ncpu = std::thread::hardware_concurrency();
-    const int size = std::max(8, ncpu > 0 ? static_cast<int>(ncpu) : 4);
-    const char *http_bind_env = std::getenv("LUNASERVER_HTTP_BIND");
-    std::string http_bind = (http_bind_env && *http_bind_env) ? http_bind_env : "127.0.0.1";
-    if (FormalModeEnabled()) {
-        const ListenBindDecision http_bind_decision =
-            EvaluateListenBind(http_bind, true, AllowPublicBindFromEnv());
-        if (!http_bind_decision.ok) {
-            LOG_ERROR << "HTTP admin " << http_bind_decision.error;
-            return 1;
-        }
-    }
-    HttpServer server(&loop, http_bind.c_str(), port, true);
-    server.SetHttpCallback(HttpResponseCallback);  // AdminHttpRouter：/metrics /monitor /live …
-    server.SetThreadNums(size);
-    LOG_INFO << "HTTP admin bind=" << http_bind << ":" << port
-             << " admin_apis=" << (AdminHttpEnabled() ? "on" : "off");
+    // 依赖初始化（Formal 下非 gamedb 会跳过 MySQL 池；Redis 失败则 fail-closed）
+    BootstrapInitMysql(&loop, role);
+    if (!BootstrapInitRedis(role))
+        return fail_startup("Redis");
+    BootstrapInitRocksdb(role);
+    ResourceWatchdog::Instance().StartPeriodic(&loop, 5.0);
 
     // 按角色启动 brpc 服务端/客户端（Auth、Session、GameLogic、GameDB、Push 等）
     RoleStartOpts role_opts;
@@ -210,15 +263,14 @@ int RunServer(const LaunchOpts &launch) {
     role_opts.game_port = game_port;
     role_opts.logic_port_override = opts.logic_port_override;
     if (BootstrapStartRoleServices(&loop, role_opts) != 0)
-        return 1;
+        return fail_startup("role brpc/services");
 
-    // 心跳、指标落库、地图租约等周期任务
+    // 心跳、指标落库、地图租约等周期任务（挂在主 EventLoop；Loop 前只注册）
     BootstrapInstallPeriodicTasks(&loop, role);
 
-    // 仅 gateway/all：对客户端开 ProtoFraming Game TCP
-    GameTcpGateway *game_tcp_gw = nullptr;
+    // 仅 gateway/all：对客户端开 ProtoFraming Game TCP（独立线程 + 自己的 EventLoop）
     if (!BootstrapStartGameTcp(role, game_port, port, &game_tcp_gw))
-        return 1;
+        return fail_startup("Game TCP");
 
 #ifdef WEBSERVER_ENABLE_BRPC
     // 单进程 all：额外尝试拉起邮件等旧 BrpcGameServer（多进程拓扑下各角色已有独立 brpc）
@@ -228,12 +280,34 @@ int RunServer(const LaunchOpts &launch) {
     }
 #endif
 
-    // 依赖与监听就绪后再对外宣称 ready；Prometheus/监控据此判定
-    ServiceHealth::Instance().SetReady(true);
-    ServiceHealth::Instance().MarkAlive();
-    server.start();
+    // ----- 管理 HTTP：业务就绪后再绑端口/起 IO，避免失败路径空挂线程 -----
+    std::string http_bind;
+    std::string http_bind_err;
+    if (!ResolveAdminHttpBind(&http_bind, &http_bind_err)) {
+        LOG_ERROR << "HTTP admin " << http_bind_err;
+        return fail_startup("HTTP admin bind policy");
+    }
+    const int http_io_threads = AdminHttpIoThreadCount();
+    HttpServer admin_http(&loop, http_bind.c_str(), port, true);
+    admin_http.SetHttpCallback(HttpResponseCallback);  // /metrics /monitor /live …
+    admin_http.SetThreadNums(http_io_threads);
+    admin_http.Start();  // 子 IO 线程；accept 仍等下面 loop.Loop()
+    LOG_INFO << "HTTP admin bind=" << http_bind << ":" << port
+             << " io_threads=" << http_io_threads
+             << " admin_apis=" << (AdminHttpEnabled() ? "on" : "off");
 
-    // server.start() 已在 TcpServer::Loop 里阻塞到 Quit；此处做停服收尾
+    // ready 放到 Loop 首轮：与 accept/定时器同时生效，避免「ready 但尚未 epoll」窗口
+    loop.QueueOneFunc([]() {
+        ServiceHealth::Instance().SetReady(true);
+        ServiceHealth::Instance().MarkAlive();
+        LOG_INFO << "service ready (main loop running)";
+    });
+
+    // 进程主 reactor：accept 管理 HTTP、跑定时器；SIGTERM/SIGINT → Quit
+    loop.Loop();
+
     BootstrapGracefulShutdown(role, game_tcp_gw);
+    g_main_loop = nullptr;
+    StopAsyncLog();
     return 0;
 }

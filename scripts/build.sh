@@ -6,10 +6,45 @@
 #   ./scripts/build.sh clean
 #   ENABLE_BRPC=OFF ./scripts/build.sh Debug   # 低层单测构建
 #   ./scripts/build.sh Debug --lowlevel
+#   LUNASERVER_JOBS=2 ./scripts/build.sh Debug  # 手动指定并行度
+#
+# 并行度：默认按 MemAvailable 估算（约 1GiB/job），避免小内存机 -j$(nproc) OOM。
+# 覆盖：LUNASERVER_JOBS / MMO_JOBS；单 job 预算 LUNASERVER_JOB_MEM_MB（默认 1024）。
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+
+# 按可用内存限制 -j，防止 4C/3.6G 无 swap 机器上并行 g++ 触发 oom-killer
+lunaserver_default_jobs() {
+  local nproc_n total_kb avail_kb per_mb auto
+  nproc_n="$(nproc 2>/dev/null || echo 2)"
+  [[ "$nproc_n" -lt 1 ]] && nproc_n=1
+  total_kb="$(awk '/MemTotal:/ {print $2}' /proc/meminfo 2>/dev/null || echo 0)"
+  avail_kb="$(awk '/MemAvailable:/ {print $2}' /proc/meminfo 2>/dev/null || echo 0)"
+  if [[ "$avail_kb" -le 0 && "$total_kb" -gt 0 ]]; then
+    # 无 MemAvailable 时给 OS/MySQL 预留约 1.5GiB
+    if [[ "$total_kb" -gt 1572864 ]]; then
+      avail_kb=$((total_kb - 1572864))
+    else
+      avail_kb=$((total_kb / 2))
+    fi
+  fi
+  per_mb="${LUNASERVER_JOB_MEM_MB:-1024}"
+  [[ "$per_mb" -lt 256 ]] && per_mb=256
+  if [[ "$avail_kb" -gt 0 ]]; then
+    auto=$((avail_kb / (per_mb * 1024)))
+  else
+    auto=1
+  fi
+  [[ "$auto" -lt 1 ]] && auto=1
+  [[ "$auto" -gt "$nproc_n" ]] && auto=$nproc_n
+  # <4GiB 物理内存：硬顶 2，宁可慢也不要卡死整机
+  if [[ "$total_kb" -gt 0 && "$total_kb" -lt 4194304 && "$auto" -gt 2 ]]; then
+    auto=2
+  fi
+  echo "$auto"
+}
 
 BUILD_TYPE="${1:-${LUNASERVER_BUILD_TYPE:-${MMO_BUILD_TYPE:-Debug}}}"
 # Release 默认独立目录，避免覆盖 Debug 的 build/test 业务二进制
@@ -20,7 +55,14 @@ elif [[ "$BUILD_TYPE" == "Release" ]]; then
 else
   BUILD_DIR="$ROOT/build"
 fi
-JOBS="${LUNASERVER_JOBS:-${MMO_JOBS:-$(nproc 2>/dev/null || echo 4)}}"
+
+JOBS_SOURCE="auto"
+if [[ -n "${LUNASERVER_JOBS:-${MMO_JOBS:-}}" ]]; then
+  JOBS="${LUNASERVER_JOBS:-${MMO_JOBS}}"
+  JOBS_SOURCE="env"
+else
+  JOBS="$(lunaserver_default_jobs)"
+fi
 TARGET=""
 LOWLEVEL=0
 
@@ -101,6 +143,13 @@ echo "  brpc     : ${ENABLE_BRPC}"
 echo "  asan     : ${ENABLE_ASAN}"
 echo "  ubsan    : ${ENABLE_UBSAN}"
 echo "  tsan     : ${ENABLE_TSAN}"
+echo "  jobs     : ${JOBS} (${JOBS_SOURCE}; budget ${LUNASERVER_JOB_MEM_MB:-1024}MB/job)"
+if [[ "$JOBS_SOURCE" == "env" ]]; then
+  total_kb="$(awk '/MemTotal:/ {print $2}' /proc/meminfo 2>/dev/null || echo 0)"
+  if [[ "$total_kb" -gt 0 && "$total_kb" -lt 4194304 && "$JOBS" -gt 2 ]]; then
+    echo "WARN: LUNASERVER_JOBS=${JOBS} on <4GiB RAM may OOM (no/low swap). Prefer unset or JOBS<=2." >&2
+  fi
+fi
 
 echo "== configure: type=$BUILD_TYPE dir=$BUILD_DIR =="
 cmake -S "$ROOT" -B "$BUILD_DIR" \

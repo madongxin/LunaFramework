@@ -7,11 +7,16 @@
 
 #include "ServerBootstrap.h"
 
+#include <cstdio>
+
 int main(int argc, char *argv[]) {
     LaunchOpts opts;
     opts.force_role = "globalservice";
     opts.log_basename = "globalservice";
-    if (!ParseLaunchArgs(argc, argv, &opts))
-        return 0;
+    if (!ParseLaunchArgs(argc, argv, &opts)) {
+        std::fprintf(stderr, "usage: %s [http_port]\n",
+                     argv[0] ? argv[0] : "globalservice");
+        return 1;
+    }
     return RunServer(opts);
 }

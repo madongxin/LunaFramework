@@ -15,6 +15,8 @@
 
 std::string LoadCnfValue(const std::string &path, const char *key) {
     std::ifstream in(path);
+    if (!in || !key || !*key)
+        return {};
     std::string line;
     while (std::getline(in, line)) {
         if (line.empty() || line[0] == '#')
@@ -36,6 +38,16 @@ std::string LoadCnfValue(const std::string &path, const char *key) {
         }
     }
     return {};
+}
+
+std::string LoadProjectCnfValue(const char *rel_path, const char *key) {
+    if (!rel_path || !*rel_path)
+        return {};
+    std::string path = std::string("../") + rel_path;
+    std::string resolved;
+    if (LunaServerPaths::ResolveProjectSubdir(rel_path, &resolved))
+        path = std::move(resolved);
+    return LoadCnfValue(path, key);
 }
 
 std::vector<std::string> SplitAddrList(const std::string &csv) {
@@ -69,18 +81,12 @@ std::vector<std::string> SplitAddrList(const std::string &csv) {
 void ApplyGatewayPushAddrsFromConfig() {
     // 优先 GatewayConfigPath（已解析的运行配置），否则依次试各角色 cnf
     std::string push_map = GatewayConfigPath::ReadValue("gateway_push_addrs");
-    auto try_cnf = [&](const char *rel) {
-        if (!push_map.empty())
-            return;
-        std::string p = std::string("../") + rel;
-        std::string resolved;
-        if (LunaServerPaths::ResolveProjectSubdir(rel, &resolved))
-            p = resolved;
-        push_map = LoadCnfValue(p, "gateway_push_addrs");
-    };
-    try_cnf("config/gamelogic.cnf");
-    try_cnf("config/session.cnf");
-    try_cnf("config/globalservice.cnf");
+    if (push_map.empty())
+        push_map = LoadProjectCnfValue("config/gamelogic.cnf", "gateway_push_addrs");
+    if (push_map.empty())
+        push_map = LoadProjectCnfValue("config/session.cnf", "gateway_push_addrs");
+    if (push_map.empty())
+        push_map = LoadProjectCnfValue("config/globalservice.cnf", "gateway_push_addrs");
     auto entries = SplitAddrList(push_map);
     for (const auto &e : entries) {
         const auto eq = e.find('=');

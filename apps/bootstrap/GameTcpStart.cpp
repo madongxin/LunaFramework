@@ -24,6 +24,10 @@ bool BootstrapStartGameTcp(const std::string &role, int game_port, int http_port
     // 仅 gateway / all 对外开 Game TCP；其它角色直接成功跳过
     if (!(role == "all" || role == "gateway"))
         return true;
+    if (game_port <= 0 || game_port > 65535) {
+        LOG_ERROR << "Game TCP port invalid: " << game_port;
+        return false;
+    }
     if (role == "all") {
         InProcessTransport::Instance().EnsureStarted(0);
         MapInstanceRegistry::Instance().SetLocalInstanceId("gl-local");

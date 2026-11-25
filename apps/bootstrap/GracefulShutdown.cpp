@@ -1,5 +1,5 @@
 /**
- * Loop 退出后的停服收尾。不负责 EventLoop::Loop（由 HttpServer→TcpServer 主循环承担）。
+ * Loop 退出或启动失败后的停服收尾。不负责 EventLoop::Loop（由 RunServer 显式驱动）。
  */
 #include "bootstrap/GracefulShutdown.h"
 
@@ -29,7 +29,8 @@
 #include "SessionBrpcServer.h"
 #endif
 
-void BootstrapGracefulShutdown(const std::string &role, GameTcpGateway *&game_tcp_gw) {
+void BootstrapGracefulShutdown(const std::string &role, GameTcpGateway *&game_tcp_gw,
+                               int drain_sec_override) {
     // 先宣告 draining：/ready 变坏，拒绝新登录/进图（配合 LoginAdmission 等）
     ServiceHealth::Instance().SetDraining(true);
     ServiceHealth::Instance().SetReady(false);
@@ -44,9 +45,11 @@ void BootstrapGracefulShutdown(const std::string &role, GameTcpGateway *&game_tc
     LocalRegistry::MarkDraining();
 #endif
     {
-        // 给负载均衡 / 上游一点时间感知 not-ready；可用环境变量覆盖，最长 60s
+        // 给负载均衡 / 上游一点时间感知 not-ready；启动失败可 override=0 跳过
         int drain_sec = 2;
-        if (const char *e = std::getenv("LUNASERVER_DRAIN_SEC")) {
+        if (drain_sec_override >= 0) {
+            drain_sec = drain_sec_override > 60 ? 60 : drain_sec_override;
+        } else if (const char *e = std::getenv("LUNASERVER_DRAIN_SEC")) {
             const int v = std::atoi(e);
             if (v >= 0 && v <= 60)
                 drain_sec = v;
@@ -59,11 +62,11 @@ void BootstrapGracefulShutdown(const std::string &role, GameTcpGateway *&game_tc
 #ifdef WEBSERVER_ENABLE_BRPC
     LocalRegistry::UnregisterAll();
 #ifdef WEBSERVER_ENABLE_GAME_PROTOBUF
-    if (role == "gamelogic" || role == "all")
+    if (role == "gamelogic" || role == "all") {
         GameLogic::Instance().FlushAllLastSafe("graceful_shutdown");
-    GameLogic::Instance().StopAoiPublisher();
-    if (role == "gamelogic")
+        GameLogic::Instance().StopAoiPublisher();
         RpcOffloadPool::Instance().Stop();
+    }
 #endif
     // 按角色停对应 brpc；role=all 全停
     if (role == "session" || role == "all")
@@ -77,6 +80,7 @@ void BootstrapGracefulShutdown(const std::string &role, GameTcpGateway *&game_tc
     if (role == "gateway" || role == "all")
         GatewayPushServer::Instance().Stop();
 #endif
+    // Game TCP 析构会 join 线程；gateway 侧 RpcOffload 在 Run 末尾停
     BootstrapStopGameTcp(game_tcp_gw);
     LOG_INFO << "graceful shutdown done role=" << role;
 }

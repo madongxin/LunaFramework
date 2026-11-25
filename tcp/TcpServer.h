@@ -30,9 +30,9 @@
  * =============================================================================
  *
  * 【启动】
- *   TcpServer(loop, ip, port) -> Acceptor 绑定监听
- *   Start() -> thread_pool_->start() 起子线程 EventLoop
- *            -> main_reactor_->Loop()  主线程 epoll 循环（只 accept）
+ *   TcpServer(loop, ip, port) -> Acceptor 已 bind/listen 并挂到主 loop
+ *   Start() -> 仅 thread_pool_->start() 起子 IO 线程
+ *   主循环由调用方 loop.Loop() 驱动（accept 仍在主 reactor）
  *
  * 【新连接】
  *   listenfd 可读 -> Acceptor::AcceptConnection -> accept4 非阻塞
@@ -86,7 +86,10 @@ public:
     TcpServer(EventLoop *loop, const char *ip, const int port);
     ~TcpServer();
 
-    /** 启动子 IO 线程池，并在 main_reactor_ 上进入 Loop（阻塞） */
+    /**
+     * 启动子 IO 线程池（不进入 Loop）。
+     * listen 已在构造时完成；调用方随后应对同一 main_reactor_ 执行 Loop()。
+     */
     void Start();
 
     void set_connection_callback(std::function<void(const std::shared_ptr<TcpConnection> &)> const &fn);

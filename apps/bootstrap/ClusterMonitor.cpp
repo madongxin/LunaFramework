@@ -244,7 +244,8 @@ Json::Value BuildClusterStatusJson() {
     out["alive_n"] = alive_n;
     out["live_n"] = live_n;
     out["ready_n"] = ready_n;
-    out["expected_n"] = 9;
+    // 期望数=inventory 行数（不再写死 9）；空 inventory 时为 0
+    out["expected_n"] = n;
     out["all_alive"] = (n > 0 && alive_n == n);
     out["all_ready"] = (n > 0 && ready_n == n);
     out["processes"] = procs;

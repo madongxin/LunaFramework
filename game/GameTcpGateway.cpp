@@ -1152,7 +1152,7 @@ void GameTcpGateway::RequestQuit() {
     lp->QueueOneFunc([lp]() { lp->Quit(); });
 }
 
-/** 建 TcpServer、注册回调、领取 Gateway claim、阻塞 Loop。 */
+/** 建 TcpServer、注册回调、领取 Gateway claim；Start 后本线程 Loop。 */
 void GameTcpGateway::Run() {
     InProcessTransport::Instance().EnsureStarted(0);
     RpcOffloadPool::Instance().Start(0);
@@ -1353,7 +1353,8 @@ void GameTcpGateway::Run() {
     }
     g_tcp_listening.store(true, std::memory_order_release);
     HealthProbeStore::SetGatewayTcpListening(true);
-    server->Start();
+    server->Start();  // 子 IO 线程；本线程随后 Loop 做 accept
+    loop.Loop();
     g_tcp_listening.store(false, std::memory_order_release);
     HealthProbeStore::SetGatewayTcpListening(false);
     server_.store(nullptr);
